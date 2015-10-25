@@ -1,0 +1,35 @@
+{
+	"ecmaFeatures": {
+		"arrowFunctions": true,
+		"jsx": false,
+		"blockBindings": true
+	},
+	"rules": {
+		"quotes": [2, "single"],
+		"no-unused-vars": [2, {"vars": "local", "args": "none"}],
+		"eol-last": [0],
+		"space-infix-ops": [0],
+		"no-use-before-define": [2, "nofunc"],
+		"no-underscore-dangle": [0],
+		"handle-callback-err": [0],
+		"no-unused-expressions": [0],
+		"semi": [2, "always"],
+		strict: [2, "global"]
+	},
+	"env": {
+		"browser": true,
+		"node": true
+	},
+	"plugins": [
+		"react"
+	],
+	"globals": {
+		"describe"   : false,
+		"it"         : false,
+		"before"     : false,
+		"beforeEach" : false,
+		"after"      : false,
+		"afterEach"  : false,
+		"expect"     : false
+	}
+}
