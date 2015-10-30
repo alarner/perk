@@ -1,5 +1,5 @@
+/*eslint strict:0 */
 'use strict';
-
 var fork = require('child_process').fork;
 
 var gulp = require('gulp');
