@@ -14,7 +14,7 @@
 		"handle-callback-err": [0],
 		"no-unused-expressions": [0],
 		"semi": [2, "always"],
-		strict: [2, "global"]
+		"strict": [2, "never"]
 	},
 	"env": {
 		"browser": true,
