@@ -7,7 +7,6 @@ var _ = require('lodash');
 
 router.get('/auth/:type/login', function(req, res, next) {
 	var type = req.params.type.toLowerCase();
-	console.log('login', type);
 	if(!config.auth || !_.isObject(config.auth)) {
 		return res.send(500).json({
 			message: 'No defined authentication methods',
