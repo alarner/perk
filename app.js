@@ -1,3 +1,4 @@
+'use strict';
 var express = require('express');
 var path = require('path');
 // var favicon = require('serve-favicon');
@@ -7,12 +8,17 @@ var bodyParser = require('body-parser');
 var config = require('./lib/config');
 
 var routes = require('./routes/index');
+var api1 = require('./routes/api1');
 var users = require('./routes/users');
 
 var app = express();
 
 global.knex = require('knex')(config.database);
 global.bookshelf = require('bookshelf')(knex);
+bookshelf.plugin('registry');
+
+var passportSetup = require('./lib/auth/passport-setup');
+passportSetup(app);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,6 +33,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
+app.use('/api/v1/', api1);
 app.use('/users', users);
 
 // catch 404 and forward to error handler

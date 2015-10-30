@@ -24,7 +24,8 @@ var dirs = {
 		'views/{,*/}*.ejs',
 		'routes/{,*/}*.js',
 		'models/{,*/}*.js',
-		'libs/{,*/}*.js',
+		'lib/{,*/}*.js',
+		'config/{,*/}*.js',
 		'app.js',
 	],
 	public: [

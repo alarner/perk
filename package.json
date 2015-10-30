@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "devDependencies": {
+    "babel-plugin-transform-strict-mode": "^6.0.2",
     "babelify": "^6.2.0",
     "browserify": "^11.0.1",
     "gulp": "^3.9.0",
@@ -29,8 +30,10 @@
     "ejs": "~2.3.3",
     "express": "~4.13.1",
     "knex": "^0.8.6",
+    "lodash": "^3.10.1",
     "morgan": "~1.6.1",
     "node-sass": "^3.4.0",
+    "passport-google-oauth2": "^0.1.6",
     "pg": "^4.4.2",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
