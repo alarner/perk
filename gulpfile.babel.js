@@ -1,20 +1,20 @@
 /*eslint strict:0 */
 'use strict';
-var fork = require('child_process').fork;
+let fork = require('child_process').fork;
 
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var rename = require('gulp-rename');
-var sass = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');
+let gulp = require('gulp');
+let gutil = require('gulp-util');
+let rename = require('gulp-rename');
+let sass = require('gulp-sass');
+let sourcemaps = require('gulp-sourcemaps');
 
-var watchify = require('watchify');
-var browserify = require('browserify');
-var babelify = require('babelify');
-var strictify = require('strictify');
-var source = require('vinyl-source-stream');
-var buffer = require('vinyl-buffer');
-var async = require('async');
+let watchify = require('watchify');
+let browserify = require('browserify');
+let babelify = require('babelify');
+let strictify = require('strictify');
+let source = require('vinyl-source-stream');
+let buffer = require('vinyl-buffer');
+let async = require('async');
 
 
 function bundle(b) {
@@ -35,18 +35,18 @@ function bundle(b) {
 	.pipe(gulp.dest('./public/scripts'));
 };
 
-var dirs = {
+let dirs = {
 	app: [
-		'views/{,*/}*.ejs',
-		'routes/{,*/}*.js',
-		'models/{,*/}*.js',
-		'lib/{,*/}*.js',
-		'config/{,*/}*.js',
-		'app.js',
+		'views/**/*.ejs',
+		'routes/**/*.js',
+		'models/**/*.js',
+		'lib/**/*.js',
+		'config/**/*.js',
+		'app.js'
 	]
 };
 
-var app = {
+let app = {
 	instance: {},
 
 	path: './bin/www',
@@ -85,7 +85,7 @@ var app = {
 };
 
 gulp.task('watchify', function() {
-	var b = browserify({
+	let b = browserify({
 		cache: {},
 		packageCache: {},
 		plugin: [watchify],

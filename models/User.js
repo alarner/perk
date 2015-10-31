@@ -1,5 +1,3 @@
-'use strict';
-/* globals bookshelf */
 require('./Authentication');
 module.exports = bookshelf.model('User', {
 	tableName: 'users',

@@ -1,4 +1,3 @@
-'use strict';
 exports.up = function(knex, Promise) {
 	return knex.schema.createTable('authentication', function(t) {
 		t.increments('id').unsigned().primary();

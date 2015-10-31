@@ -1,4 +1,3 @@
-'use strict';
-var config = require('./lib/config');
+let config = require('./lib/config');
 
 module.exports = config.database;
