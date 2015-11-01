@@ -1,6 +1,4 @@
 /*eslint strict: [0]*/
-'use strict';
-require('use-strict');
 let config = require('./lib/config');
 
 global.knex = require('knex')(config.database);
@@ -16,6 +14,7 @@ let bodyParser = require('body-parser');
 let session = require('express-session');
 let RedisStore = require('connect-redis')(session);
 let _ = require('lodash');
+let flash = require('./lib/middleware/flash-messages');
 
 let passportSetup = require('./lib/auth/passport-setup');
 let routes = require('./routes/index');
@@ -38,6 +37,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash);
 passportSetup(app);
 
 // app.use('/api/v1/', api1);

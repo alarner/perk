@@ -54,7 +54,7 @@ let app = {
 	env: { NODE_ENV: 'development', port: 3000 },
 
 	start: function( callback ) {
-		// process.execArgv.push( '--harmony' );
+		process.execArgv.push( '--use_strict' );
 
 		app.instance = fork( app.path, { silent: true, env: app.env } );
 		app.instance.stdout.pipe( process.stdout );

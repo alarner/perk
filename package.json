@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node --use_strict ./bin/www"
   },
   "devDependencies": {
     "async": "^1.5.0",
@@ -32,15 +32,19 @@
     "express": "~4.13.1",
     "express-session": "^1.12.1",
     "include-all": "^0.1.6",
+    "install": "^0.2.3",
     "knex": "^0.8.6",
     "lodash": "^3.10.1",
     "morgan": "~1.6.1",
+    "npm": "^3.3.10",
     "passport-google-oauth2": "^0.1.6",
+    "passport-oauth1": "^1.0.1",
     "passport-trello": "^0.1.4",
     "pg": "^4.4.2",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
+    "request": "^2.65.0",
     "serve-favicon": "~2.3.0",
-    "use-strict": "^1.0.1"
+    "validator": "^4.2.1"
   }
 }
