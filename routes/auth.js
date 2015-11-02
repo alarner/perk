@@ -2,10 +2,15 @@ let express = require('express');
 let router = express.Router();
 let config = require('../lib/config');
 let passport = require('passport');
-var validator = require('validator');
+let validator = require('validator');
+let includeAll = require('include-all');
 let validateAuthType = require('../lib/middleware/validate-auth-type');
 let validateAuthProfile = require('../lib/middleware/validate-auth-profile');
 let authenticator = require('../lib/auth/authenticator');
+let adapters = includeAll({
+	dirname: __dirname + '/../lib/auth/adapters',
+	filter: /(.+)\.js$/
+});
 
 router.get('/:type/login', validateAuthType, function(req, res, next) {
 	passport.authenticate(
@@ -30,7 +35,7 @@ router.get('/:type/register', function(req, res, next) {
 
 });
 
-router.get('/email', validateAuthProfile, function(req, res, next) {
+router.get('/email', validateAuthProfile, function(req, res) {
 	if(!req.session.hasOwnProperty('_auth_profile')) {
 		return res.redirect('/auth/error');
 	}
@@ -51,12 +56,10 @@ router.post('/email', validateAuthProfile, function(req, res, next) {
 		return res.redirect('/auth/email');
 	}
 	req.session._auth_profile.email = req.body.email;
-	// console.log('valid email');
-	// res.json(req.session._auth_profile);
-	// if(!req.session.hasOwnProperty('_auth_profile')) {
-	// 	res.redirect('/auth/error');
-	// }
-	// if()
+	let authCallback = authenticator(req, req.session._auth_profile, req.session._auth_type, function(err, authModel) {
+		console.log(err, authModel);
+	});
+
 });
 
 router.get('/finish', function(req, res, next) {

@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
 
 		t.string('firstName').notNull();
 		t.string('lastName').nullable();
-		t.string('email').notNull();
+		t.string('email').nullable();
 	});
 };
 

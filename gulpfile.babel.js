@@ -79,9 +79,9 @@ let app = {
 	restart: function( event ) {
 		async.series([
 			app.stop,
-			app.start,
+			app.start
 		]);
-	},
+	}
 };
 
 gulp.task('watchify', function() {
@@ -89,7 +89,7 @@ gulp.task('watchify', function() {
 		cache: {},
 		packageCache: {},
 		plugin: [watchify],
-		entries: ['./public/scripts/main.js'],
+		entries: ['./public/scripts/main.js']
 	});
 	b.on('update', bundle.bind(this, b));
 	bundle(b);
