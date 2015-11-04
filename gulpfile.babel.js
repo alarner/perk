@@ -20,9 +20,6 @@ let _ = require('lodash');
 function bundle(b) {
 	b.transform(babelify);
 	b.transform(strictify);
-	b.on('log', (message) => {
-		gutil.log(gutil.colors.green('Browserify'), message);
-	});
 	b.bundle()
 	.on('error', (err) => {
 		gutil.log(gutil.colors.red('Browserify'), err.toString());
@@ -96,6 +93,9 @@ gulp.task('watchify', function() {
 		packageCache: {},
 		plugin: [watchify],
 		entries: ['./public/scripts/main.js']
+	});
+	b.on('log', (message) => {
+		gutil.log(gutil.colors.green('Browserify'), message);
 	});
 	b.on('update', bundle.bind(this, b));
 	bundle(b);
