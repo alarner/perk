@@ -15,7 +15,7 @@ let strictify = require('strictify');
 let source = require('vinyl-source-stream');
 let buffer = require('vinyl-buffer');
 let async = require('async');
-
+let _ = require('lodash');
 
 function bundle(b) {
 	b.transform(babelify);
@@ -33,7 +33,7 @@ function bundle(b) {
 	.pipe(sourcemaps.init({loadMaps: true}))
 	.pipe(sourcemaps.write('./'))
 	.pipe(gulp.dest('./public/scripts'));
-};
+}
 
 let dirs = {
 	app: [
@@ -51,7 +51,7 @@ let app = {
 
 	path: './bin/www',
 
-	env: { NODE_ENV: 'development', port: 3000 },
+	env: _.extend({}, process.env, { NODE_ENV: 'development', port: 3000 }),
 
 	start: function( callback ) {
 		process.execArgv.push( '--use_strict' );
@@ -62,18 +62,24 @@ let app = {
 
 		gutil.log( gutil.colors.cyan( 'Starting' ), 'express server ( PID:', app.instance.pid, ')' );
 
-		if( callback ) callback();
+		if( callback ) {
+			callback();
+		}
 	},
 
 	stop: function( callback ) {
 		if( app.instance.connected ) {
 			app.instance.on( 'exit', function() {
 				gutil.log( gutil.colors.red( 'Stopping' ), 'express server ( PID:', app.instance.pid, ')' );
-				if( callback ) callback();
+				if( callback ) {
+					callback();
+				}
 			});
 			return app.instance.kill( 'SIGINT' );
 		}
-		if( callback ) callback();
+		if( callback ) {
+			callback();
+		}
 	},
 
 	restart: function( event ) {
