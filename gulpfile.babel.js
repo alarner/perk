@@ -123,5 +123,5 @@ gulp.task('sass', function() {
 
 gulp.task('default', ['watchify', 'server', 'sass'], function() {
 	gulp.watch( dirs.app, app.restart );
-	gulp.watch('public/styles/**/*.{scss,sass}', ['serve-sass']);
+	gulp.watch('public/styles/**/*.{scss,sass}', ['sass']);
 });
