@@ -18,8 +18,6 @@ let async = require('async');
 
 
 function bundle(b) {
-	b.transform(babelify);
-	b.transform(strictify);
 	b.on('log', (message) => {
 		gutil.log(gutil.colors.green('Browserify'), message);
 	});
@@ -92,6 +90,8 @@ gulp.task('watchify', function() {
 		entries: ['./public/scripts/main.js']
 	});
 	b.on('update', bundle.bind(this, b));
+	b.transform(babelify);
+	b.transform(strictify);
 	bundle(b);
 });
 
