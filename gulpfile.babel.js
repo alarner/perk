@@ -90,6 +90,7 @@ gulp.task('watchify', function() {
 		cache: {},
 		packageCache: {},
 		plugin: [watchify],
+		debug: true,
 		entries: ['./public/scripts/main.js']
 	});
 	b.on('log', (message) => {
