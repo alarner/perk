@@ -15,12 +15,9 @@ let strictify = require('strictify');
 let source = require('vinyl-source-stream');
 let buffer = require('vinyl-buffer');
 let async = require('async');
-
+let _ = require('lodash');
 
 function bundle(b) {
-	b.on('log', (message) => {
-		gutil.log(gutil.colors.green('Browserify'), message);
-	});
 	b.bundle()
 	.on('error', (err) => {
 		gutil.log(gutil.colors.red('Browserify'), err.toString());
@@ -31,7 +28,7 @@ function bundle(b) {
 	.pipe(sourcemaps.init({loadMaps: true}))
 	.pipe(sourcemaps.write('./'))
 	.pipe(gulp.dest('./public/scripts'));
-};
+}
 
 let dirs = {
 	app: [
@@ -49,7 +46,7 @@ let app = {
 
 	path: './bin/www',
 
-	env: { NODE_ENV: 'development', port: 3000 },
+	env: _.extend({}, process.env, { NODE_ENV: 'development', port: 3000 }),
 
 	start: function( callback ) {
 		process.execArgv.push( '--use_strict' );
@@ -60,18 +57,24 @@ let app = {
 
 		gutil.log( gutil.colors.cyan( 'Starting' ), 'express server ( PID:', app.instance.pid, ')' );
 
-		if( callback ) callback();
+		if( callback ) {
+			callback();
+		}
 	},
 
 	stop: function( callback ) {
 		if( app.instance.connected ) {
 			app.instance.on( 'exit', function() {
 				gutil.log( gutil.colors.red( 'Stopping' ), 'express server ( PID:', app.instance.pid, ')' );
-				if( callback ) callback();
+				if( callback ) {
+					callback();
+				}
 			});
 			return app.instance.kill( 'SIGINT' );
 		}
-		if( callback ) callback();
+		if( callback ) {
+			callback();
+		}
 	},
 
 	restart: function( event ) {
@@ -88,6 +91,9 @@ gulp.task('watchify', function() {
 		packageCache: {},
 		plugin: [watchify],
 		entries: ['./public/scripts/main.js']
+	});
+	b.on('log', (message) => {
+		gutil.log(gutil.colors.green('Browserify'), message);
 	});
 	b.on('update', bundle.bind(this, b));
 	b.transform(babelify);
@@ -117,5 +123,5 @@ gulp.task('sass', function() {
 
 gulp.task('default', ['watchify', 'server', 'sass'], function() {
 	gulp.watch( dirs.app, app.restart );
-	gulp.watch('public/styles/**/*.{scss,sass}', ['serve-sass']);
+	gulp.watch('public/styles/**/*.{scss,sass}', ['sass']);
 });

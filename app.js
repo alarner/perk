@@ -2,7 +2,7 @@
 let config = require('./lib/config');
 
 global.knex = require('knex')(config.database);
-global.bookshelf = require('bookshelf')(knex);
+global.bookshelf = require('bookshelf')(global.knex);
 bookshelf.plugin('registry');
 
 let express = require('express');
@@ -17,8 +17,8 @@ let _ = require('lodash');
 let flash = require('./lib/middleware/flash-messages');
 
 let passportSetup = require('./lib/auth/passport-setup');
-let routes = require('./routes/index');
-let api1 = require('./routes/api1');
+// let routes = require('./routes/index');
+// let api1 = require('./routes/api1');
 let auth = require('./routes/auth');
 
 let app = express();
