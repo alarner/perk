@@ -97,7 +97,7 @@ gulp.task('watchify', function() {
 		gutil.log(gutil.colors.green('Browserify'), message);
 	});
 	b.on('update', bundle.bind(this, b));
-	b.transform(babelify);
+	b.transform(babelify, {presets: ['es2015', 'react']});
 	b.transform(strictify);
 	bundle(b);
 });
