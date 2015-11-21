@@ -17,7 +17,7 @@ let _ = require('lodash');
 let flash = require('./lib/middleware/flash-messages');
 
 let passportSetup = require('./lib/auth/passport-setup');
-// let routes = require('./routes/index');
+let index = require('./routes/index');
 // let api1 = require('./routes/api1');
 let auth = require('./routes/auth');
 
@@ -42,7 +42,7 @@ passportSetup(app);
 
 // app.use('/api/v1/', api1);
 app.use('/auth', auth);
-// app.use('/', routes);
+app.use('/', index);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
