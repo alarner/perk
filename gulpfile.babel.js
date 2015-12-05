@@ -126,3 +126,7 @@ gulp.task('default', ['watchify', 'server', 'sass'], function() {
 	gulp.watch( dirs.app, app.restart );
 	gulp.watch('public/styles/**/*.{scss,sass}', ['sass']);
 });
+
+// gulp deploy
+// gulp deploy --env=digitalocean
+gulp.task('deploy', require('./gulp-deploy'));
