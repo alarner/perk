@@ -47,6 +47,7 @@ module.exports = function() {
 			async.auto(
 				{
 					droplets: [(cb) => {
+						gutil.log(gutil.colors.green('Start'), 'loading available droplets...');
 						request(
 							{
 								method: 'GET',
@@ -57,11 +58,13 @@ module.exports = function() {
 								}
 							},
 							(error, response, body) => {
+								gutil.log(gutil.colors.green('Finish'), 'loading available droplets...');
 								cb(error, body ? body.droplets.filter((drop) => drop.status === 'active') : null);
 							}
 						);
 					}],
 					images: [(cb) => {
+						gutil.log(gutil.colors.green('Start'), 'loading available images...');
 						request(
 							{
 								method: 'GET',
@@ -73,6 +76,7 @@ module.exports = function() {
 							},
 							(error, response, body) => {
 								getAllImages(body, (err, images) => {
+									gutil.log(gutil.colors.green('Finish'), 'loading available images...');
 									if(!err && images && Array.isArray(images)) {
 										// Show private images first.
 										return cb(null, _.sortBy(images, (image) => {
@@ -87,8 +91,24 @@ module.exports = function() {
 							}
 						);
 					}],
+					// regions: [(cb) => {
+					// 	gutil.log(gutil.colors.green('Start'), 'loading available regions...');
+					// 	request(
+					// 		{
+					// 			method: 'GET',
+					// 			url: 'https://api.digitalocean.com/v2/regions',
+					// 			json: true,
+					// 			headers: {
+					// 				Authorization: 'Bearer ' + deployConfig.key
+					// 			}
+					// 		},
+					// 		(error, response, body) => {
+					// 			gutil.log(gutil.colors.green('Finish'), 'loading available regions...');
+					// 			cb(error, body ? body.regions.filter((region) => region.available) : null);
+					// 		}
+					// 	);
+					// }],
 					prompt: ['droplets', 'images', (cb, results) => {
-						// console.log(results.images);
 						let imageChoices = results.images.map((image) => {
 							return {name: (image.public ? '' : '*private* ')+image.distribution+' '+image.name, value: image.id};
 						});
@@ -97,6 +117,13 @@ module.exports = function() {
 						let dropletChoices = results.droplets.map((drop) => drop.name);
 						dropletChoices.unshift('new droplet');
 						dropletChoices.push(new inquirer.Separator());
+
+						// let regionChoices = results.regions.map((region) => {
+						// 	return {name: region.name, value: region.slug};
+						// });
+						// regionChoices.push(new inquirer.Separator());
+						let regionChoices = [];
+
 						inquirer.prompt(
 							[
 								{
@@ -109,7 +136,13 @@ module.exports = function() {
 									type: 'input',
 									name: 'newDropletName',
 									message: 'What should the new droplet be called?',
-									when: (answers) => answers.droplet === 'new droplet'
+									when: (answers) => answers.droplet === 'new droplet',
+									validate: (input) => {
+										if(!input) {
+											return 'A droplet name is required.';
+										}
+										return true;
+									}
 								},
 								{
 									type: 'list',
@@ -119,15 +152,63 @@ module.exports = function() {
 									when: (answers) => answers.droplet === 'new droplet'
 								},
 								{
+									type: 'list',
+									name: 'region',
+									message: 'Which region should be used for the new droplet?',
+									choices:  (answers) => {
+										let image = _.findWhere(results.images, {id: answers.image});
+										return image.regions;
+									},
+									when: (answers) => answers.droplet === 'new droplet'
+								},
+								{
 									type: 'input',
 									name: 'projectName',
 									message: 'What is the name of this project?',
-									default: pjson.name || ''
+									default: pjson.name || '',
+									validate: (input) => {
+										if(!input) {
+											return 'A project name is required.';
+										}
+										return true;
+									}
 								}
 							],
-							function( answers ) {
-								console.log(answers);
-								// Use user feedback for... whatever!!
+							function(answers) {
+								cb(null, answers);
+							}
+						);
+					}],
+					create: ['prompt', (cb, results) => {
+						if(results.prompt.droplet !== 'new droplet' || !results.prompt.newDropletName) {
+							return cb();
+						}
+						gutil.log(gutil.colors.green('Start'), 'creating droplet...');
+						console.log({
+							name: results.prompt.newDropletName,
+							region: results.prompt.region,
+							size: '512mb',
+							image: results.prompt.image
+						});
+						request(
+							{
+								method: 'POST',
+								url: 'https://api.digitalocean.com/v2/droplets',
+								json: true,
+								headers: {
+									Authorization: 'Bearer ' + deployConfig.key
+								},
+								body: JSON.stringify({
+									name: results.prompt.newDropletName,
+									region: results.prompt.region,
+									size: '512mb',
+									image: results.prompt.image
+								})
+							},
+							(error, response, body) => {
+								gutil.log(gutil.colors.green('Finish'), 'creating droplet...');
+								console.log(error, body);
+								cb(error, body);
 							}
 						);
 					}]
