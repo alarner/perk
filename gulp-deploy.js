@@ -75,6 +75,9 @@ module.exports = function() {
 								}
 							},
 							(error, response, body) => {
+								if(error || !body) {
+									return cb(error);
+								}
 								getAllImages(body, (err, images) => {
 									gutil.log(gutil.colors.green('Finish'), 'loading available images...');
 									if(!err && images && Array.isArray(images)) {
@@ -91,38 +94,15 @@ module.exports = function() {
 							}
 						);
 					}],
-					// regions: [(cb) => {
-					// 	gutil.log(gutil.colors.green('Start'), 'loading available regions...');
-					// 	request(
-					// 		{
-					// 			method: 'GET',
-					// 			url: 'https://api.digitalocean.com/v2/regions',
-					// 			json: true,
-					// 			headers: {
-					// 				Authorization: 'Bearer ' + deployConfig.key
-					// 			}
-					// 		},
-					// 		(error, response, body) => {
-					// 			gutil.log(gutil.colors.green('Finish'), 'loading available regions...');
-					// 			cb(error, body ? body.regions.filter((region) => region.available) : null);
-					// 		}
-					// 	);
-					// }],
 					prompt: ['droplets', 'images', (cb, results) => {
 						let imageChoices = results.images.map((image) => {
-							return {name: (image.public ? '' : '*private* ')+image.distribution+' '+image.name, value: image.id};
+							return {name: (image.public ? '' : '*private* ')+image.distribution+' '+image.name, value: image.slug || image.id};
 						});
 						imageChoices.push(new inquirer.Separator());
 
 						let dropletChoices = results.droplets.map((drop) => drop.name);
 						dropletChoices.unshift('new droplet');
 						dropletChoices.push(new inquirer.Separator());
-
-						// let regionChoices = results.regions.map((region) => {
-						// 	return {name: region.name, value: region.slug};
-						// });
-						// regionChoices.push(new inquirer.Separator());
-						let regionChoices = [];
 
 						inquirer.prompt(
 							[
@@ -156,8 +136,13 @@ module.exports = function() {
 									name: 'region',
 									message: 'Which region should be used for the new droplet?',
 									choices:  (answers) => {
-										let image = _.findWhere(results.images, {id: answers.image});
-										return image.regions;
+										console.log(answers);
+										if(_.isString(answers.image)) {
+											return _.findWhere(results.images, {slug: answers.image}).regions;
+										}
+										else {
+											return _.findWhere(results.images, {id: answers.image}).regions;
+										}
 									},
 									when: (answers) => answers.droplet === 'new droplet'
 								},
@@ -198,12 +183,12 @@ module.exports = function() {
 								headers: {
 									Authorization: 'Bearer ' + deployConfig.key
 								},
-								body: JSON.stringify({
+								body: {
 									name: results.prompt.newDropletName,
 									region: results.prompt.region,
-									size: '512mb',
+									size: '1gb',
 									image: results.prompt.image
-								})
+								}
 							},
 							(error, response, body) => {
 								gutil.log(gutil.colors.green('Finish'), 'creating droplet...');
