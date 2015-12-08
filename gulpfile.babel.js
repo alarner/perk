@@ -17,6 +17,10 @@ let buffer = require('vinyl-buffer');
 let async = require('async');
 let _ = require('lodash');
 
+let config = require('./lib/config');
+let pjson = require('./package.json');
+let configTemplate = require('./config/local.template');
+
 function bundle(b) {
 	b.bundle()
 	.on('error', (err) => {
@@ -129,4 +133,4 @@ gulp.task('default', ['watchify', 'server', 'sass'], function() {
 
 // gulp deploy
 // gulp deploy --env=digitalocean
-gulp.task('deploy', require('./gulp-deploy'));
+gulp.task('deploy', require('./gulp/deploy/gulp-deploy')(config, configTemplate, pjson));

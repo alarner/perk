@@ -1,0 +1,12 @@
+[Service]
+ExecStart=/usr/bin/node --use_strict /usr/share/nginx/node/impact-web/bin/www
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=impact-web
+User=node
+Group=node
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
