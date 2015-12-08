@@ -13,6 +13,7 @@ let fingerprint = require('ssh-fingerprint');
 let path = require('path');
 let SSH = require('simple-ssh');
 let clipboard = require('copy-paste');
+let LinuxTools = require('../linuxTools');
 
 const API_ROOT = 'https://api.digitalocean.com/v2/';
 
@@ -347,25 +348,25 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 				pjson: pjson
 			}
 
-			async.auto({
-				sshKey: [configurer.getSshKey.bind(options)],
-				cloneApp: ['sshKey', configurer.cloneApp.bind(options)],
-				// npmInstall: ['cloneApp', configurer.npmInstall],
-				// putNginxConf: [configurer.putNginxConf],
-				// restartNginx: ['putNginxConf', configurer.restartNginx],
-				// putSystemdConf: [configurer.putSystemdConf],
-				// startApp: ['putSystemdConf', 'npmInstall', configurer.startApp]
-			});
-			// ssh.pipe(process.stdout);
-			// ssh.pipe(process.stderr);
-			// ssh.write('cat ~/.ssh/id_rsa.pub');
-			// ssh.write('mkdir -p '+appPath);
-			// ssh.write('git clone '+pjson.repository.url+' '+appPath);
+			async.auto(
+				{
+					sshKey: [configurer.getSshKey.bind(options)],
+					cloneApp: ['sshKey', configurer.cloneApp.bind(options)],
+					// npmInstall: ['cloneApp', configurer.npmInstall],
+					// putNginxConf: [configurer.putNginxConf],
+					// restartNginx: ['putNginxConf', configurer.restartNginx],
+					// putSystemdConf: [configurer.putSystemdConf],
+					// startApp: ['putSystemdConf', 'npmInstall', configurer.startApp]
+				},
+				function(err) {
+					console.log('auto done!');
+				}
+			);
 			// Things to do:
 			// set up app code
-			//	- generate ssh key
-			//	- ask user to add read only verification for ssh key
-			//	- git clone app into correct directory
+			//	*- generate ssh key
+			//	*- ask user to add read only verification for ssh key
+			//	*- git clone app into correct directory
 			//	- run npm install
 			// set up nginx config
 			// restart nginx server
@@ -376,66 +377,60 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 
 	let configurer = {
 		getSshKey: function(cb) {
-			var ssh = new SSH(this.sshConfig);
-			let err = '';
-			let out = '';
-			ssh.exec('cat ~/.ssh/id_rsa.pub', {
-				out: (stdout) => {
-					out += stdout;
-				},
-				err: (stderr) => {
-					err += stderr;
-				},
-				exit: (code) => {
-					if(code === 0 && out) {
-						return cb(null, out.trim());
-					}
-					out = '';
-					err = '';
-					ssh.exec('ssh-keygen -t rsa -b 4096 -C "'+this.results.serverConfig.projectName+'" -f ~/.ssh/id_rsa -N \'\'', {
-						out: (stdout) => {
-							out += stdout;
-						},
-						err: (stderr) => {
-							err += stderr;
-						},
-						exit: (code) => {
-							if(code !== 0) {
-								return cb(err);
-							}
-
-							out = '';
-							err = '';
-							ssh.exec('cat ~/.ssh/id_rsa.pub', {
-								out: (stdout) => {
-									out += stdout;
-								},
-								err: (stderr) => {
-									err += stderr;
-								},
-								exit: (code) => {
-									if(code !== 0) {
-										return cb(err);
-									}
-
-									cb(null, out.trim());
-								}
-							});
-							return false;
-						}
-					});
-					return false;
-				}
-			}).start();
+			console.log('getSshKey!');
+			let lt = new LinuxTools(this.sshConfig.user, this.sshConfig.host);
+			lt.execute('upsertSshKey')
+			.then((key) => {
+				console.log('success');
+				cb(null, key);
+			})
+			.catch((err) => {
+				console.log('err');
+				cb(err);
+			});
 		},
 
 		cloneApp: function(cb, results) {
+			console.log('clone');
 			clipboard.copy(results.sshKey, (err, data) => {
 				gutil.log(gutil.colors.green('Retreived server SSH key'), 'The server SSH key has been retrieved. Please add access for the following public key to your repository.');
 				gutil.log(gutil.colors.yellow('The SSH key has been copied to your clipboard.'));
 				gutil.log(gutil.colors.cyan('Repo:'), this.pjson.repository.url);
 				gutil.log(gutil.colors.cyan('SSH Key:'));
-				console.log(results.sshKey);
+
+				let cloned = false;
+
+				async.doUntil(
+					(cb) => {
+						let lt = new LinuxTools(this.sshConfig.user, this.sshConfig.host);
+						lt.execute('clone', this.pjson.repository.url, this.appPath)
+						.then(() => {
+							cloned = true;
+							cb();
+						})
+						.catch((err) => {
+							gutil.log(gutil.colors.red(err.error));
+							inquirer.prompt(
+								[{
+									type: 'input',
+									name: 'answer',
+									message: 'Press enter once you\'ve authorized the SSH key'
+								}],
+								(answer) => {
+									cb();
+								}
+							);
+						});
+					},
+					function () {
+						return cloned;
+					},
+					function (err, n) {
+						console.log('err', err);
+						// 5 seconds have passed, n = 5
+					}
+				);
+
 			});
 		}
 	};

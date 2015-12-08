@@ -134,3 +134,15 @@ gulp.task('default', ['watchify', 'server', 'sass'], function() {
 // gulp deploy
 // gulp deploy --env=digitalocean
 gulp.task('deploy', require('./gulp/deploy/gulp-deploy')(config, configTemplate, pjson));
+
+gulp.task('test', function() {
+	let LinuxTools = require('./gulp/deploy/linuxTools');
+	let lt = new LinuxTools('root', '104.236.44.29');
+	return lt.execute('gitLatestTag', '/usr/share/nginx/apps/test-app', 'git@bitbucket.org:alarner/impact-web.git')
+	.then((data) => {
+		console.log('got data', data);
+	})
+	.catch((err) => {
+		console.log('caught error', err);
+	});
+});
