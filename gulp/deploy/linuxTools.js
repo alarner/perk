@@ -7,6 +7,7 @@ let path = require('path');
 let SHHH = function(options) {
 	this.ssh = new SSH(options);
 	this.exec = function(command) {
+		console.log('exec', command);
 		return new Promise((resolve, reject) => {
 			let out = '';
 			let err = '';
@@ -28,7 +29,17 @@ let SHHH = function(options) {
 						});
 					}
 				}
-			}).start();
+			})
+			.on('error', (err) => {
+				if(typeof err !== 'string') {
+					err = err.toString();
+				}
+				reject({
+					code: -1,
+					error: err.trim()
+				});
+			})
+			.start();
 		});
 	};
 };
@@ -77,7 +88,7 @@ module.exports = function(user, host) {
 					}
 				});
 			}
-		})
+		});
 	};
 
 	this.getSshKey = function(ssh) {
@@ -93,12 +104,16 @@ module.exports = function(user, host) {
 		.catch((err) => {
 			if(err.error.indexOf('No such file or directory') >= -1) {
 				return this.execute('createSshKey', name)
-					.then(this.execute.bind(this, 'getSshKey'));
+					.then(() => this.execute('getSshKey'));
 			}
 			else {
 				throw err;
 			}
 		});
+	};
+
+	this.mkdirp = function(ssh, destination) {
+		return ssh.exec('mkdir -p '+destination);
 	};
 
 	this.npmInstall = function(ssh, destination) {
@@ -133,6 +148,6 @@ module.exports = function(user, host) {
 			else {
 				throw err;
 			}
-		})
-	}
-}
+		});
+	};
+};

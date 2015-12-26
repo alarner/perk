@@ -11,7 +11,6 @@ let configTemplate = require('config-template');
 let fs = require('fs');
 let fingerprint = require('ssh-fingerprint');
 let path = require('path');
-let SSH = require('simple-ssh');
 let clipboard = require('copy-paste');
 let LinuxTools = require('../linuxTools');
 
@@ -42,7 +41,7 @@ function getAllImages(key, data, cb) {
 	}
 }
 
-module.exports = function(appName, adapterConfig, appConfigTemplate) {
+module.exports = function(pjson, adapterConfig, appConfigTemplate) {
 	function getDroplet(id, cb) {
 		request(
 			{
@@ -58,6 +57,89 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 			}
 		);
 	}
+
+	let configurer = {
+		mkdirp: function(cb) {
+			console.log('mkdirp');
+			let lt = new LinuxTools(this.sshConfig.user, this.sshConfig.host);
+			lt.execute('mkdirp', '/usr/share/nginx/apps')
+			.then(() => {
+				cb();
+			})
+			.catch((err) => {
+				cb(err);
+			});
+		},
+		getSshKey: function(cb) {
+			console.log('getSshKey!');
+			let lt = new LinuxTools(this.sshConfig.user, this.sshConfig.host);
+			lt.execute('upsertSshKey', this.results.serverConfig.projectName)
+			.then((key) => {
+				cb(null, key);
+			})
+			.catch((err) => {
+				cb(err);
+			});
+		},
+
+		cloneApp: function(cb, results) {
+			console.log('clone');
+			clipboard.copy(results.sshKey, (err, data) => {
+				gutil.log(gutil.colors.green('Retreived server SSH key'), 'The server SSH key has been retrieved. Please add access for the following public key to your repository.');
+				gutil.log(gutil.colors.yellow('The SSH key has been copied to your clipboard.'));
+				gutil.log(gutil.colors.cyan('Repo:'), this.repository);
+				gutil.log(gutil.colors.cyan('SSH Key:'));
+				console.log(results.sshKey+'\n');
+
+				let cloned = false;
+
+				async.doUntil(
+					(cb) => {
+						let lt = new LinuxTools(this.sshConfig.user, this.sshConfig.host);
+						lt.execute('gitLatestTag', this.appPath, this.repository)
+						.then(() => {
+							cloned = true;
+							cb();
+						})
+						.catch((err) => {
+							gutil.log(gutil.colors.red(err.error));
+							inquirer.prompt(
+								[{
+									type: 'input',
+									name: 'answer',
+									message: 'Press enter once you\'ve authorized the SSH key'
+								}],
+								(answer) => {
+									cb();
+								}
+							);
+						});
+					},
+					function () {
+						return cloned;
+					},
+					cb
+				);
+
+			});
+		},
+
+		npmInstall: function(cb, results) {
+			console.log('npmInstall');
+			let lt = new LinuxTools(this.sshConfig.user, this.sshConfig.host);
+			lt.execute('npmInstall', this.appPath)
+			.then(() => {
+				cb();
+			})
+			.catch((err) => {
+				cb(err);
+			});
+		},
+
+		putNginxConf: function(cb) {
+			cb();
+		}
+	};
 
 	let builder = {
 		getPublicKey: function(cb) {
@@ -160,7 +242,7 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 						type: 'input',
 						name: 'newDropletName',
 						message: 'What should the new droplet be called?',
-						default: appName || '',
+						default: pjson.name || '',
 						when: (answers) => answers.droplet === 'new droplet',
 						validate: (input) => {
 							if(!input) {
@@ -194,13 +276,26 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 						type: 'input',
 						name: 'projectName',
 						message: 'What is the name of this project?',
-						default: appName || '',
+						default: pjson.name || '',
 						validate: (input) => {
 							if(!input) {
 								return 'A project name is required.';
 							}
 							return true;
 						}
+					},
+					{
+						type: 'input',
+						name: 'repository',
+						message: 'Where is the project git repository located?',
+						default: pjson.name || '',
+						validate: (input) => {
+							if(!input) {
+								return 'A repository url is required.';
+							}
+							return true;
+						},
+						when: (answers) => !pjson.repository || !pjson.repository.url
 					}
 				],
 				function(answers) {
@@ -235,8 +330,6 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 					}
 				},
 				(error, response, body) => {
-					// gutil.log(gutil.colors.green('Creating droplet:'), 'Your droplet is in the process of being created. In the mean time,');
-					// gutil.log(gutil.colors.green('Creating droplet:'), 'please fill out this configuration information for your app...');
 					cb(error, body ? body.droplet : null);
 				}
 			);
@@ -285,7 +378,10 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 						droplet = d;
 
 						if(droplet.status === 'active') {
-							checkCb();
+							// update droplet
+							results.droplet = droplet;
+							// give the droplet some time to start accepting ssh connections
+							setTimeout(checkCb, 20000);
 						}
 						else {
 							setTimeout(checkCb, 5000);
@@ -299,30 +395,30 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 				}
 			);
 		},
-		setupServer: function(cb, r) {
+		setupServer: function(cb, results) {
 			// for testing
-			var results = {
-				droplet: {
-					networks: {
-						v4: [
-							{
-								type: 'public',
-								ip_address: '104.236.44.29'
-							}
-						],
-						v6: []
-					}
-				},
-				privateKey: r.privateKey,
-				serverConfig: {
-					projectName: 'test-app'
-				}
-			};
-			let pjson = {
-				repository: {
-					url: 'git@bitbucket.org:alarner/impact-web.git'
-				}
-			};
+			// var results = {
+			// 	droplet: {
+			// 		networks: {
+			// 			v4: [
+			// 				{
+			// 					type: 'public',
+			// 					ip_address: '159.203.132.127'
+			// 				}
+			// 			],
+			// 			v6: []
+			// 		}
+			// 	},
+			// 	privateKey: r.privateKey,
+			// 	serverConfig: {
+			// 		projectName: 'test-app'
+			// 	}
+			// };
+			// let pjson = {
+			// 	repository: {
+			// 		url: 'git@bitbucket.org:alarner/impact-web.git'
+			// 	}
+			// };
 
 			let ip = null;
 			let publicV4s = results.droplet.networks.v4.filter((network) => network.type === 'public');
@@ -334,6 +430,7 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 				ip = publicV6s[0].ip_address;
 			}
 			else {
+				console.log(results.droplet);
 				return cb('No network address found for droplet.');
 			}
 
@@ -345,93 +442,37 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 				},
 				appPath: '/usr/share/nginx/apps/'+results.serverConfig.projectName,
 				results: results,
-				pjson: pjson
-			}
+				pjson: pjson,
+				repository: pjson.repository && pjson.repository.url ? pjson.repository.url : results.serverConfig.repository
+			};
 
 			async.auto(
 				{
+					mkdirp: [configurer.mkdirp.bind(options)],
 					sshKey: [configurer.getSshKey.bind(options)],
-					cloneApp: ['sshKey', configurer.cloneApp.bind(options)],
-					// npmInstall: ['cloneApp', configurer.npmInstall],
-					// putNginxConf: [configurer.putNginxConf],
+					cloneApp: ['mkdirp', 'sshKey', configurer.cloneApp.bind(options)],
+					npmInstall: ['cloneApp', configurer.npmInstall.bind(options)],
+					putNginxConf: [configurer.putNginxConf],
 					// restartNginx: ['putNginxConf', configurer.restartNginx],
 					// putSystemdConf: [configurer.putSystemdConf],
 					// startApp: ['putSystemdConf', 'npmInstall', configurer.startApp]
 				},
-				function(err) {
-					console.log('auto done!');
-				}
+				cb
 			);
 			// Things to do:
 			// set up app code
 			//	*- generate ssh key
 			//	*- ask user to add read only verification for ssh key
 			//	*- git clone app into correct directory
-			//	- run npm install
+			//	*- run npm install
+			//	- set up local.js config
 			// set up nginx config
 			// restart nginx server
 			// set up systemd config
 			// start app via systemd
-		}
-	};
-
-	let configurer = {
-		getSshKey: function(cb) {
-			console.log('getSshKey!');
-			let lt = new LinuxTools(this.sshConfig.user, this.sshConfig.host);
-			lt.execute('upsertSshKey')
-			.then((key) => {
-				console.log('success');
-				cb(null, key);
-			})
-			.catch((err) => {
-				console.log('err');
-				cb(err);
-			});
-		},
-
-		cloneApp: function(cb, results) {
-			console.log('clone');
-			clipboard.copy(results.sshKey, (err, data) => {
-				gutil.log(gutil.colors.green('Retreived server SSH key'), 'The server SSH key has been retrieved. Please add access for the following public key to your repository.');
-				gutil.log(gutil.colors.yellow('The SSH key has been copied to your clipboard.'));
-				gutil.log(gutil.colors.cyan('Repo:'), this.pjson.repository.url);
-				gutil.log(gutil.colors.cyan('SSH Key:'));
-
-				let cloned = false;
-
-				async.doUntil(
-					(cb) => {
-						let lt = new LinuxTools(this.sshConfig.user, this.sshConfig.host);
-						lt.execute('clone', this.pjson.repository.url, this.appPath)
-						.then(() => {
-							cloned = true;
-							cb();
-						})
-						.catch((err) => {
-							gutil.log(gutil.colors.red(err.error));
-							inquirer.prompt(
-								[{
-									type: 'input',
-									name: 'answer',
-									message: 'Press enter once you\'ve authorized the SSH key'
-								}],
-								(answer) => {
-									cb();
-								}
-							);
-						});
-					},
-					function () {
-						return cloned;
-					},
-					function (err, n) {
-						console.log('err', err);
-						// 5 seconds have passed, n = 5
-					}
-				);
-
-			});
+			// create database
+			// run migrations
+			// gulp build
 		}
 	};
 
@@ -445,16 +486,16 @@ module.exports = function(appName, adapterConfig, appConfigTemplate) {
 		async.auto(
 			{
 				privateKey: [builder.getPrivateKey],
-				// publicKey: [builder.getPublicKey],
-				// droplets: [builder.listDroplets],
-				// images: [builder.listImages],
-				// sshKeys: [builder.listSshKeys],
-				// sshKey: ['sshKeys', 'publicKey', builder.getDigitalOceanKey],
-				// serverConfig: ['droplets', 'images', builder.serverPrompt],
-				// droplet: ['serverConfig', 'sshKey', builder.droplet],
-				// appConfig: ['droplet', builder.configPrompt],
-				// wait: ['appConfig', builder.wait],
-				setup: [/*'wait', */'privateKey', builder.setupServer]
+				publicKey: [builder.getPublicKey],
+				droplets: [builder.listDroplets],
+				images: [builder.listImages],
+				sshKeys: [builder.listSshKeys],
+				sshKey: ['sshKeys', 'publicKey', builder.getDigitalOceanKey],
+				serverConfig: ['droplets', 'images', builder.serverPrompt],
+				droplet: ['serverConfig', 'sshKey', builder.droplet],
+				appConfig: ['droplet', builder.configPrompt],
+				wait: ['appConfig', builder.wait],
+				setup: ['wait', 'privateKey', builder.setupServer]
 			},
 			function(err, data) {
 				console.log('async finish');

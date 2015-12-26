@@ -17,7 +17,7 @@ module.exports = function(config, configTemplate, pjson) {
 
 		let deployConfig = config.deploy[env];
 		if(deployConfig.type.toLowerCase() === 'digitalocean') {
-			return digitalocean(pjson.name, deployConfig, configTemplate);
+			return digitalocean(pjson, deployConfig, configTemplate);
 		}
 		else {
 			gutil.log(gutil.colors.red('Could not deployment adapter for type'), gutil.colors.yellow(deployConfig.type));
