@@ -56,7 +56,7 @@ router.post('/email', validateAuthProfile, function(req, res, next) {
 		return res.redirect('/auth/email');
 	}
 	req.session._auth_profile.email = req.body.email;
-	let authCallback = authenticator(req, req.session._auth_profile, req.session._auth_type, function(err, authModel) {
+	let authCallback = authenticator(req, req.session._auth_access_token, req.session._auth_profile, req.session._auth_type, function(err, authModel) {
 		console.log(err, authModel);
 	});
 
