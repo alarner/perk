@@ -19,8 +19,8 @@ module.exports = {
 		requireEmail: true
 	},
 	local: {
-		usernameField: 'email',
-		passwordField: 'password',
-		requireEmail: true
+		saltRounds: 10,
+		registerRedirect: '/dashboard',
+		loginRedirect: '/dashboard'
 	}
 };

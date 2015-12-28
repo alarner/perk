@@ -32,6 +32,7 @@
   "dependencies": {
     "async": "^1.5.0",
     "backbone": "^1.2.3",
+    "bcrypt": "^0.8.5",
     "body-parser": "~1.14.2",
     "bookshelf": "^0.9.1",
     "config-loader": "github:alarner/config-loader",

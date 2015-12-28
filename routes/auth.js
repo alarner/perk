@@ -3,6 +3,7 @@ let router = express.Router();
 let config = require('../lib/config');
 let passport = require('passport');
 let validator = require('validator');
+let bcrypt = require('bcrypt');
 let validateAuthType = require('../lib/middleware/validate-auth-type');
 let validateAuthProfile = require('../lib/middleware/validate-auth-profile');
 let validateLocalCredentials = require('../lib/middleware/validate-local-credentials');
@@ -12,7 +13,6 @@ let UserModel = require('../models/User');
 
 
 router.use('/:type/login', validateAuthType, function(req, res, next) {
-	console.log('hit route');
 	passport.authenticate(
 		req.params.type,
 		{
@@ -104,27 +104,50 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 					lastName: req.body.lastName,
 					email: req.body.email
 				});
-				let newAuth = null;
 				newUser.save(null, {transacting: t})
 				.then(function(user) {
-					return AuthenticationModel.forge({
-						type: 'local',
-						identifier: req.body.email,
-						password: req.body.password,
-						userId: user.id
-					})
-					.save(null, {transacting: t})
-					.then(function(newAuthModel) {
-						newAuth = newAuthModel;
+					return new Promise(function(resolve, reject) {
+						bcrypt.genSalt(config.auth.local.saltRounds, function(err, salt) {
+							bcrypt.hash(req.body.password, salt, function(err, hash) {
+								if(err) {
+									reject(err);
+								}
+								else {
+									AuthenticationModel.forge({
+										type: 'local',
+										identifier: req.body.email,
+										password: hash,
+										userId: user.id
+									})
+									.save(null, {transacting: t})
+									.then(resolve)
+									.catch(reject);
+								}
+							});
+						});
 					});
 				})
 				.then(t.commit)
 				.then(function() {
-					// done(null, newAuth);
+					if(req.accepts('html')) {
+						res.redirect(config.auth.local.registerRedirect || '/auth/finish');
+					}
+					else {
+						res.json(newUser.toJSON());
+					}
 				})
 				.catch(function(err) {
 					t.rollback();
-					// done(err);
+					if(req.accepts('html')) {
+						req.flash('email', err.toString());
+						res.redirect('/auth/register');
+					}
+					else {
+						res.status(500).json({
+							message: err.toString(),
+							status: 500
+						});
+					}
 				});
 			});
 		}
