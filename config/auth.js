@@ -17,5 +17,10 @@ module.exports = {
 			'write'
 		],
 		requireEmail: true
+	},
+	local: {
+		usernameField: 'email',
+		passwordField: 'password',
+		requireEmail: true
 	}
 };

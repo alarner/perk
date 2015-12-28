@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Log in</title>
+		<link rel='stylesheet' href='/styles/main.scss.css' />
+	</head>
+	<body>
+		<h1>Log in</h1>
+		<form action="/auth/login" method="post">
+			<div>
+				<%- messages.email || '' %>
+				<input type="email" placeholder="email" name="email">
+			</div>
+			<div>
+				<%- messages.password || '' %>
+				<input type="password" placeholder="password" name="password">
+			</div>
+			<button>Log in</button>
+		</form>
+	</body>
+</html>

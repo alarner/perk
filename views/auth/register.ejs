@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Register</title>
+		<link rel='stylesheet' href='/styles/main.scss.css' />
+	</head>
+	<body>
+		<h1>Register</h1>
+		<form action="/auth/register" method="post">
+			<div>
+				<%- messages.firstName || '' %>
+				<input type="text" placeholder="first name" name="firstName">
+			</div>
+			<div>
+				<%- messages.lastName || '' %>
+				<input type="text" placeholder="last name" name="lastName">
+			</div>
+			<div>
+				<%- messages.email || '' %>
+				<input type="email" placeholder="email" name="email">
+			</div>
+			<div>
+				<%- messages.password || '' %>
+				<input type="password" placeholder="password" name="password">
+			</div>
+			<button>Register</button>
+		</form>
+	</body>
+</html>

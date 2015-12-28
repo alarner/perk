@@ -49,6 +49,7 @@
     "npm": "^3.5.2",
     "passport": "^0.3.2",
     "passport-google-oauth2": "^0.1.6",
+    "passport-local": "^1.0.0",
     "passport-oauth1": "^1.0.1",
     "passport-trello": "^0.1.5",
     "pg": "^4.4.3",
