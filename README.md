@@ -3,6 +3,7 @@
 This is microframework provides:
 
 1. Routing (express)
+1. Flash Messages / errors
 1. Database connection and ORM (knex and bookshelf)
 1. User registration and authentication (passport and custom adapters)
 1. Configuration [config-loader](https://github.com/alarner/config-loader)

@@ -56,7 +56,7 @@ router.post('/email', validateAuthProfile, function(req, res, next) {
 		return res.redirect('/auth/email');
 	}
 	req.session._auth_profile.email = req.body.email;
-	let authCallback = authenticator(req, req.session._auth_access_token, req.session._auth_profile, req.session._auth_type, function(err, authModel) {
+	authenticator(req, req.session._auth_access_token, req.session._auth_profile, req.session._auth_type, function(err, authModel) {
 		console.log(err, authModel);
 	});
 
@@ -71,30 +71,20 @@ router.get('/login', function(req, res, next) {
 });
 
 router.post('/register', validateLocalCredentials, function(req, res, next) {
-	let profile = {
-		id: req.body.email,
-		firstName: req.body.firstName,
-		lastName: req.body.lastName,
-		email: req.body.email,
-		password: req.body.password
-	};
-
 	UserModel
 	.forge({email: req.body.email})
 	.fetch()
-	.then(function(auth) {
+	.then(function(u) {
 		// The account already exists, return an error.
-		if(auth) {
-			if(req.accepts('html')) {
-				req.flash('email', 'A user with that email has already registered. Would you like to <a href="/auth/reset-password">reset your password</a>?');
-				res.redirect('/auth/register');
-			}
-			else {
-				res.status(400).json({
-					message: 'A user with that email has already registered.',
-					status: 400
-				});
-			}
+		if(u) {
+			res.error.add('auth.EMAIL_EXISTS', 'email');
+			res.error.send('/auth/register');
+			// res.error(
+			// 	'A user with that email has already registered. Would you like to <a href="/auth/reset-password">reset your password</a>?',
+			// 	400,
+			// 	'email',
+			// 	'/auth/register'
+			// );
 		}
 		// The account doesn't exists. Create it.
 		else {
@@ -138,16 +128,14 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 				})
 				.catch(function(err) {
 					t.rollback();
-					if(req.accepts('html')) {
-						req.flash('email', err.toString());
-						res.redirect('/auth/register');
-					}
-					else {
-						res.status(500).json({
-							message: err.toString(),
-							status: 500
-						});
-					}
+					res.error.add('auth.UNKNOWN');
+					res.error.send('/auth/register');
+					// res.error(
+					// 	err.toString(),
+					// 	500,
+					// 	'email',
+					// 	'/auth/register'
+					// );
 				});
 			});
 		}
@@ -155,7 +143,55 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 });
 
 router.post('/login', validateLocalCredentials, function(req, res, next) {
-
+	AuthenticationModel.forge({
+		type: 'local',
+		identifier: req.body.email
+	})
+	.fetch({withRelated: ['user']})
+	.then(function(auth) {
+		if(!auth) {
+			res.error.add('auth.UNKNOWN_USER', 'email');
+			res.error.send('/auth/login');
+			// res.error(
+			// 	'There is no user with that email. Would you like to <a href="/auth/register">register</a>?',
+			// 	404,
+			// 	'email',
+			// 	'/auth/login'
+			// );
+		}
+		else {
+			bcrypt.compare(req.body.password, auth.get('password'), function(err, result) {
+				if(err) {
+					res.error.add('auth.UNKNOWN');
+					res.error.send('/auth/login');
+					// res.error(
+					// 	err.toString(),
+					// 	500,
+					// 	'email',
+					// 	'/auth/login'
+					// );
+				}
+				else if(!result) {
+					res.error.add('auth.INVALID_PASSWORD', 'password');
+					res.error.send('/auth/login');
+					// res.error(
+					// 	'That password is not correct.',
+					// 	400,
+					// 	'password',
+					// 	'/auth/login'
+					// );
+				}
+				else {
+					if(req.accepts('html')) {
+						res.redirect(config.auth.local.loginRedirect || '/auth/finish');
+					}
+					else {
+						res.json();
+					}
+				}
+			});
+		}
+	});
 });
 
 router.get('/finish', function(req, res, next) {

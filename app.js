@@ -8,13 +8,20 @@ bookshelf.plugin('registry');
 let express = require('express');
 let path = require('path');
 // let favicon = require('serve-favicon');
-let logger = require('morgan');
+// let logger = require('morgan');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 let session = require('express-session');
+let includeAll = require('include-all');
+let errors = includeAll({
+	dirname: path.join(__dirname, 'errors'),
+	filter:  /(.+)\.js$/
+});
+let howhap = require('howhap-middleware');
 let RedisStore = require('connect-redis')(session);
 let _ = require('lodash');
 let flash = require('./lib/middleware/flash-messages');
+// let error = require('./lib/middleware/error-sender');
 
 let passportSetup = require('./lib/auth/passport-setup');
 let index = require('./routes/index');
@@ -25,6 +32,7 @@ let app = express();
 
 let sessionConfig = _.extend({}, config.session, {store: new RedisStore()});
 app.use(session(sessionConfig));
+app.use(howhap({availableErrors: errors}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -38,6 +46,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash);
+// app.use(error);
 passportSetup(app);
 
 // app.use('/api/v1/', api1);
