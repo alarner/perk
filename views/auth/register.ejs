@@ -8,19 +8,19 @@
 		<h1>Register</h1>
 		<form action="/auth/register" method="post">
 			<div>
-				<%- messages.firstName || '' %>
-				<input type="text" placeholder="first name" name="firstName">
+				<%- error.display('firstName') %>
+				<input type="text" placeholder="first name" name="firstName" value="<%= prev.display('body', 'firstName') %>">
 			</div>
 			<div>
-				<%- messages.lastName || '' %>
-				<input type="text" placeholder="last name" name="lastName">
+				<%- error.display('lastName') %>
+				<input type="text" placeholder="last name" name="lastName" value="<%= prev.display('body', 'lastName') %>">
 			</div>
 			<div>
-				<%- messages.email || '' %>
-				<input type="email" placeholder="email" name="email">
+				<%- error.display('email') %>
+				<input type="email" placeholder="email" name="email" value="<%= prev.display('body', 'email') %>">
 			</div>
 			<div>
-				<%- messages.password || '' %>
+				<%- error.display('password') %>
 				<input type="password" placeholder="password" name="password">
 			</div>
 			<button>Register</button>
