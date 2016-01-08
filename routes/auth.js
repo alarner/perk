@@ -79,12 +79,6 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 		if(u) {
 			res.error.add('auth.EMAIL_EXISTS', 'email');
 			res.error.send('/auth/register');
-			// res.error(
-			// 	'A user with that email has already registered. Would you like to <a href="/auth/reset-password">reset your password</a>?',
-			// 	400,
-			// 	'email',
-			// 	'/auth/register'
-			// );
 		}
 		// The account doesn't exists. Create it.
 		else {
@@ -130,12 +124,6 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 					t.rollback();
 					res.error.add('auth.UNKNOWN');
 					res.error.send('/auth/register');
-					// res.error(
-					// 	err.toString(),
-					// 	500,
-					// 	'email',
-					// 	'/auth/register'
-					// );
 				});
 			});
 		}
@@ -152,34 +140,16 @@ router.post('/login', validateLocalCredentials, function(req, res, next) {
 		if(!auth) {
 			res.error.add('auth.UNKNOWN_USER', 'email');
 			res.error.send('/auth/login');
-			// res.error(
-			// 	'There is no user with that email. Would you like to <a href="/auth/register">register</a>?',
-			// 	404,
-			// 	'email',
-			// 	'/auth/login'
-			// );
 		}
 		else {
 			bcrypt.compare(req.body.password, auth.get('password'), function(err, result) {
 				if(err) {
 					res.error.add('auth.UNKNOWN');
 					res.error.send('/auth/login');
-					// res.error(
-					// 	err.toString(),
-					// 	500,
-					// 	'email',
-					// 	'/auth/login'
-					// );
 				}
 				else if(!result) {
 					res.error.add('auth.INVALID_PASSWORD', 'password');
 					res.error.send('/auth/login');
-					// res.error(
-					// 	'That password is not correct.',
-					// 	400,
-					// 	'password',
-					// 	'/auth/login'
-					// );
 				}
 				else {
 					if(req.accepts('html')) {
