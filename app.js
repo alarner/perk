@@ -27,6 +27,7 @@ let passportSetup = require('./lib/auth/passport-setup');
 let index = require('./routes/index');
 // let api1 = require('./routes/api1');
 let auth = require('./routes/auth');
+let push = require('./routes/push');
 
 let app = express();
 
@@ -51,6 +52,7 @@ passportSetup(app);
 
 // app.use('/api/v1/', api1);
 app.use('/auth', auth);
+app.use('/push', push);
 app.use('/', index);
 
 // catch 404 and forward to error handler

@@ -7,27 +7,43 @@
 var app = require('../app');
 var debug = require('debug')('iron-assignments:server');
 var http = require('http');
+var https = require('https');
+var fs = require('fs');
+var path = require('path');
+var key = fs.readFileSync(path.join(__dirname, '../server.key')).toString();
+var cert = fs.readFileSync(path.join(__dirname, '../server.crt')).toString();
+var https_options = {
+    key: key,
+    cert: cert
+};
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '4000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var server = https.createServer(https_options, app);
+// var httpsServer = https.createServer(https_options, app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(port, function() {
+  console.log((new Date()) + ' Server is listening on port '+port);
+});
 server.on('error', onError);
 server.on('listening', onListening);
+
+// httpsServer.listen('3443');
+// httpsServer.on('error', onError);
+// httpsServer.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.

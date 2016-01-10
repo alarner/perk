@@ -3,10 +3,13 @@
 	<head>
 		<title><%= title %></title>
 		<link rel='stylesheet' href='/styles/main.scss.css' />
+		<link rel="manifest" href="/manifest.json">
 	</head>
 	<body>
 		<h1><%= title %></h1>
 		<p>Welcome to <%= title %></p>
+		<button id="subscribe">Subscribe to push notifications</button>
+		<button id="unsubscribe">Unsubscribe from push notifications</button>
 		<script type="text/javascript" src="/scripts/bundle.js"></script>
 	</body>
 </html>
