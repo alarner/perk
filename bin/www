@@ -7,27 +7,24 @@
 var app = require('../app');
 var debug = require('debug')('iron-assignments:server');
 var http = require('http');
+var config = require('../lib/config');
 
-/**
- * Get port from environment and store in Express.
- */
+var httpPort = normalizePort(process.env.PORT || config.webserver.port.http || '3000');
+app.set('port', httpPort);
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var httpServer = http.createServer(app);
+httpServer.listen(httpPort);
+httpServer.on('error', onError);
+httpServer.on('listening', onListening);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+if(config.webserver.port.https) {
+	
+}
 
 /**
  * Normalize a port into a number, string, or false.
@@ -82,7 +79,7 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
+  var addr = httpServer.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
