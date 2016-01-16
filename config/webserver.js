@@ -1,9 +1,11 @@
 module.exports = {
 	hostname: 'localhost',
-	port: 3000,
-	ssl: {
+	http: {
+		port: 3000
+	},
+	https: {
 		port: 3434,
-		key: '...',
-		cert: '...'
+		keyPath: 'insecure.key',
+		certPath: 'insecure.crt'
 	}
 };
