@@ -57,7 +57,7 @@ router.post('/email', validateAuthProfile, function(req, res, next) {
 	}
 	req.session._auth_profile.email = req.body.email;
 	authenticator(req, req.session._auth_access_token, req.session._auth_profile, req.session._auth_type, function(err, authModel) {
-		console.log(err, authModel);
+		return res.redirect('/auth/finish');
 	});
 
 });
