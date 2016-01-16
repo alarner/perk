@@ -32,7 +32,10 @@ let app = express();
 
 let sessionConfig = _.extend({}, config.session, {store: new RedisStore()});
 app.use(session(sessionConfig));
-app.use(howhap({availableErrors: errors}));
+app.use(howhap({
+	availableErrors: errors,
+	logging: config.logging
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

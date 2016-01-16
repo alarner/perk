@@ -7,84 +7,123 @@
 var app = require('../app');
 var debug = require('debug')('iron-assignments:server');
 var http = require('http');
+var https = require('https');
+var config = require('../lib/config');
+var logger = require('../lib/logger');
 
-/**
- * Get port from environment and store in Express.
- */
-
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+app.set('port', config.webserver.port);
 
 /**
  * Create HTTP server.
  */
-
-var server = http.createServer(app);
+if(config.webserver.http) {
+	var httpPort = normalizePort(process.env.PORT || config.webserver.http.port || '3000');
+	var httpServer = http.createServer(app);
+	var httpEvents = new Events(httpPort, httpServer);
+	httpServer.listen(httpPort);
+	httpServer.on('error', httpEvents.onError);
+	httpServer.on('listening', httpEvents.onListening);
+}
 
 /**
- * Listen on provided port, on all network interfaces.
+ * Create HTTPS server.
  */
+if(config.webserver.https) {
+	var fs = require('fs');
+	var error = false;
+	try {
+		var privateKey = fs.readFileSync(config.webserver.https.keyPath).toString();
+	}
+	catch(e) {
+		error = true;
+		if(e.code === 'ENOENT') {
+			logger.fatal({path: config.webserver.https.keyPath}, 'https key file does not exist.');
+		}
+		else {
+			logger.fatal(e.toString());
+		}
+	}
+	try {
+		var certificate = fs.readFileSync(config.webserver.https.certPath).toString();
+	}
+	catch(e) {
+		error = true;
+		if(e.code === 'ENOENT') {
+			logger.fatal({path: config.webserver.https.certPath}, 'https certificate file does not exist.');
+		}
+		else {
+			logger.fatal(e.toString());
+		}
+	}
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+	if(!error) {
+		var httpsPort = normalizePort(config.webserver.https.port);
+		var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
+		var httpsEvents = new Events(httpsPort, httpsServer);
+		httpsServer.listen(httpsPort);
+		httpsServer.on('error', httpsEvents.onError);
+		httpsServer.on('listening', httpsEvents.onListening);
+	} 
+}
 
 /**
  * Normalize a port into a number, string, or false.
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+	var port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+	if (isNaN(port)) {
+		// named pipe
+		return val;
+	}
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+	if (port >= 0) {
+		// port number
+		return port;
+	}
 
-  return false;
+	return false;
 }
 
-/**
- * Event listener for HTTP server "error" event.
- */
+function Events(port, server) {
+	/**
+	 * Event listener for HTTP server "error" event.
+	 */
 
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+	this.onError = function(error) {
+		if (error.syscall !== 'listen') {
+			throw error;
+		}
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+		var bind = typeof port === 'string'
+			? 'Pipe ' + port
+			: 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-}
+		// handle specific listen errors with friendly messages
+		switch (error.code) {
+			case 'EACCES':
+				logger.fatal(bind + ' requires elevated privileges');
+				process.exit(1);
+				break;
+			case 'EADDRINUSE':
+				logger.fatal(bind + ' is already in use');
+				process.exit(1);
+				break;
+			default:
+				throw error;
+		}
+	};
 
-/**
- * Event listener for HTTP server "listening" event.
- */
+	/**
+	 * Event listener for HTTP server "listening" event.
+	 */
 
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+	this.onListening = function() {
+		var addr = server.address();
+		var bind = typeof addr === 'string'
+			? 'pipe ' + addr
+			: 'port ' + addr.port;
+		debug('Listening on ' + bind);
+	};
 }
