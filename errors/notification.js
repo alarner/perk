@@ -15,6 +15,10 @@ module.exports = {
 		message: 'The subscriber id {{ subscriberId }} does not match an existing record.',
 		status: 404
 	},
+	UNKNOWN_SUBSCRIBER: {
+		message: 'There is no subscriber with a type of "{{ type }}" and a key of "{{ key }}".',
+		status: 404
+	},
 	BAD_SUBSCRIPTION_DESCRIPTOR: {
 		message: '"{{ subscriberId }}" (type = {{ type }}) is not a valid subscription descriptor.',
 		status: 400

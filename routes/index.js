@@ -9,13 +9,14 @@ router.get('/', function(req, res, next) {
 
 router.post('/test', function(req, res) {
 	NotificationService
-	.subscribe(1, '')
+	.subscribe('email', 'anlarner@gmail.com')
 	.then(() => {
 		console.log('success');
 	})
 	.catch(err => {
 		console.log('an error happened');
 		console.log(err.toString());
+		console.log(err.params());
 	});
 });
 
