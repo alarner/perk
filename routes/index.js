@@ -9,9 +9,22 @@ router.get('/', function(req, res, next) {
 
 router.post('/test', function(req, res) {
 	NotificationService
-	.subscribe('email', 'anlarner@gmail.com')
+	.unsubscribe('email', 'anlarner@gmail.com', 'forgot-password/1')
 	.then(() => {
 		console.log('success');
+	})
+	.catch(err => {
+		console.log('an error happened');
+		console.log(err.toString());
+		console.log(err.params());
+	});
+});
+
+router.post('/subscribe', function(req, res) {
+	NotificationService
+	.addSubscriber('email', 'anlarner@gmail.com', 1, ['forgot-password/1'])
+	.then(() => {
+		console.log('addSubscriber success');
 	})
 	.catch(err => {
 		console.log('an error happened');

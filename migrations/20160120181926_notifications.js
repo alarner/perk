@@ -46,6 +46,7 @@ exports.up = function(knex, Promise) {
 			t.string('reason');
 			t.dateTime('createdAt').notNull();
 			t.dateTime('updatedAt').nullable();
+			t.unique(['subscriptionId'], 'subscriptionId');
 		});
 	})
 	.then(function() {

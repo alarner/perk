@@ -11,12 +11,20 @@ module.exports = {
 		message: '"{{ descriptor }}" already exists for subscriber {{ subscriberId }}.',
 		status: 409
 	},
+	DUPLICATE_UNSUBSCRIPTION: {
+		message: 'User has already unsubscribed from subscriptionId {{ subscriptionId }}.',
+		status: 409
+	},
 	UNKNOWN_SUBSCRIBER_ID: {
 		message: 'The subscriber id {{ subscriberId }} does not match an existing record.',
 		status: 404
 	},
 	UNKNOWN_SUBSCRIBER: {
 		message: 'There is no subscriber with a type of "{{ type }}" and a key of "{{ key }}".',
+		status: 404
+	},
+	UNKNOWN_SUBSCRIPTION: {
+		message: 'There is no subscription with a subscriberId of {{ subscriberId }} and descriptor "{{ descriptor }}".',
 		status: 404
 	},
 	BAD_SUBSCRIPTION_DESCRIPTOR: {
