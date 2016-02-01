@@ -30,5 +30,9 @@ module.exports = {
 	BAD_SUBSCRIPTION_DESCRIPTOR: {
 		message: '"{{ subscriberId }}" (type = {{ type }}) is not a valid subscription descriptor.',
 		status: 400
+	},
+	MISSING_HANDLER: {
+		message: 'There is no matching handler for the pattern "{{ descriptor }}"',
+		status: 404
 	}
 };

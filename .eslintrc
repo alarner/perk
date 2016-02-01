@@ -2,7 +2,8 @@
 	"ecmaFeatures": {
 		"arrowFunctions": true,
 		"jsx": true,
-		"blockBindings": true
+		"blockBindings": true,
+		"destructuring": true
 	},
 	"rules": {
 		"quotes": [2, "single"],
