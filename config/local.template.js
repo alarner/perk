@@ -1,5 +1,6 @@
 module.exports = {
 	database: {
+		client: '[string] The type of database to use (pg, mysql, mariasql, ...)',
 		connection: {
 			host: '[string] The database host',
 			user: '[string] The database user',
@@ -7,6 +8,9 @@ module.exports = {
 			database: '[string] The database name'
 		}
 	},
+	session: {
+		secret: '[string] The secret key to use for encrypting sessions'
+	}
 	/*
 	auth: {
 		google: {
@@ -23,11 +27,11 @@ module.exports = {
 			}
 		}
 	},
-	*/
 	deploy: {
 		default: {
 			type: '[string] Deployment type [digitalocean]',
 			key: '[string] Deployment API key'
 		}
 	}
+	*/
 };

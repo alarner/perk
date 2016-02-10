@@ -19,7 +19,6 @@ let buffer = require('vinyl-buffer');
 let async = require('async');
 let _ = require('lodash');
 let configTemplate = require('config-template');
-let toSource = require('tosource');
 
 let config = require('./lib/config');
 let pjson = require('./package.json');
@@ -111,7 +110,7 @@ gulp.task('watchify', ['config'], function() {
 
 gulp.task('server', ['watchify', 'sass'], app.start);
 
-gulp.task('sass', function() {
+gulp.task('sass', ['config'], function() {
 	return gulp.src('public/styles/**/*.{scss,sass}')
 	.pipe(rename(function(p) {
 		p.basename += p.extname;
@@ -175,7 +174,7 @@ gulp.task('config', function(cb) {
 						});
 					})
 					.catch(function(err) {
-						cb('Something went wrong while configuring the local.js config file.');
+						cb('Something went wrong while configuring the local.js file.');
 					});
 				}
 			});
@@ -183,6 +182,7 @@ gulp.task('config', function(cb) {
 	}, function(err) {
 		if(err) {
 			gutil.log(gutil.colors.red('config'), err);
+			process.exit(1);
 		}
 		else {
 			cb();
