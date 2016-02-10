@@ -1,6 +1,8 @@
 /*eslint strict:0 */
 'use strict';
 let fork = require('child_process').fork;
+let fs = require('fs');
+let path = require('path');
 
 let gulp = require('gulp');
 let gutil = require('gulp-util');
@@ -16,10 +18,11 @@ let source = require('vinyl-source-stream');
 let buffer = require('vinyl-buffer');
 let async = require('async');
 let _ = require('lodash');
+let configTemplate = require('config-template');
+let toSource = require('tosource');
 
 let config = require('./lib/config');
 let pjson = require('./package.json');
-let configTemplate = require('./config/local.template');
 
 function bundle(b) {
 	b.bundle()
@@ -89,7 +92,7 @@ let app = {
 	}
 };
 
-gulp.task('watchify', function() {
+gulp.task('watchify', ['config'], function() {
 	let b = browserify({
 		cache: {},
 		packageCache: {},
@@ -124,6 +127,67 @@ gulp.task('sass', function() {
 		}
 	}))
 	.pipe(gulp.dest('public/styles'));
+});
+
+gulp.task('config', function(cb) {
+	let localExists = false;
+	async.series({
+		checkLocal: function(cb) {
+			console.log('checkLocal');
+			fs.lstat(path.join(__dirname, 'config', 'local.js'), function(err, stat) {
+				if(err) {
+					cb();
+				}
+				else if(!stat.isFile()) {
+					cb('config/local.js must be a file, not a directory.');
+				}
+				else {
+					localExists = true;
+					cb();
+				}
+			});
+		},
+		checkTemplate: function(cb) {
+			console.log('checkTemplate 1');
+			if(localExists) {
+				return cb();
+			}
+			let templatePath = path.join(__dirname, 'config', 'local.template.js');
+			fs.lstat(templatePath, function(err, stat) {
+				if(err) {
+					cb('Unable to load local config template: '+err.toString());
+				}
+				else if(!stat.isFile()) {
+					cb('config/local.template.js must be a file, not a directory.');
+				}
+				else {
+					let template = require(templatePath);
+					configTemplate(template)
+					.then(function(config) {
+						let localPath = path.join(__dirname, 'config', 'local.js');
+						fs.writeFile(localPath, 'module.exports = '+JSON.stringify(config, null, '\t')+';', function(err) {
+							if(err) {
+								cb('There was a problem saving the local.js config file: '+err.toString());
+							}
+							else {
+								cb();
+							}
+						});
+					})
+					.catch(function(err) {
+						cb('Something went wrong while configuring the local.js config file.');
+					});
+				}
+			});
+		}
+	}, function(err) {
+		if(err) {
+			gutil.log(gutil.colors.red('config'), err);
+		}
+		else {
+			cb();
+		}
+	});
 });
 
 gulp.task('default', ['watchify', 'server', 'sass'], function() {

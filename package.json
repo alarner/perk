@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node --use_strict ./bin/www"
+    "start": "./node_modules/gulp/bin/gulp.js"
   },
   "devDependencies": {
     "async": "^1.5.2",
@@ -20,11 +20,12 @@
     "gulp-sass": "^2.1.1",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-util": "^3.0.7",
-    "inquirer": "^0.11.2",
+    "inquirer": "^0.12.0",
     "request": "^2.67.0",
     "sequest": "^0.9.0",
     "ssh-fingerprint": "0.0.1",
     "strictify": "^0.2.0",
+    "tosource": "^1.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0"
@@ -41,7 +42,7 @@
     "connect-redis": "^3.0.2",
     "cookie-parser": "~1.4.1",
     "debug": "^2.2.0",
-    "ejs": "~2.3.4",
+    "ejs": "~2.4.1",
     "express": "~4.13.3",
     "express-session": "^1.13.0",
     "fb": "github:alarner/facebook-node-sdk",
@@ -51,7 +52,7 @@
     "knex": "^0.9.0",
     "lodash": "^4.0.0",
     "morgan": "~1.6.1",
-    "node-gcm": "^0.13.1",
+    "node-gcm": "^0.14.0",
     "nodemailer": "^2.0.0",
     "npm": "^3.5.3",
     "passport": "^0.3.2",
@@ -62,6 +63,7 @@
     "passport-trello": "^0.1.5",
     "pg": "^4.4.3",
     "progress": "^1.1.8",
+    "pushpin": "git+https://github.com/alarner/pushpin.git",
     "react": "^0.14.6",
     "react-dom": "^0.14.6",
     "request": "^2.67.0",
