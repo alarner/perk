@@ -25,7 +25,7 @@ router.get('/:type/callback', validateAuthType, function(req, res, next) {
 	passport.authenticate(
 		req.params.type,
 		{ 
-			successRedirect: '/auth/'+req.params.type+'/success',
+			successRedirect: config.auth[req.params.type].redirect || '/auth/finish',
 			failureRedirect: '/auth/'+req.params.type+'/failure'
 		}
 	)(req, res, next);

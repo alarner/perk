@@ -10,7 +10,8 @@ module.exports = {
 			// 'https://www.googleapis.com/auth/userinfo.profile',
 			// 'https://www.googleapis.com/auth/calendar'
 		],
-		requireEmail: true
+		requireEmail: true,
+		redirect: '/dashboard'
 	},
 	facebook: {
 		clientID: '{{ Facebook OAuth2 Client ID }}',
@@ -19,7 +20,8 @@ module.exports = {
 		scope: [
 			// 'email'
 		],
-		requireEmail: true
+		requireEmail: true,
+		redirect: '/dashboard'
 	},
 	trello: {
 		consumerKey: '{{ Trello Consumber Key }}',
@@ -28,7 +30,8 @@ module.exports = {
 			// 'read',
 			// 'write'
 		],
-		requireEmail: true
+		requireEmail: true,
+		redirect: '/dashboard'
 	},
 	local: {
 		saltRounds: 10,
