@@ -132,7 +132,6 @@ gulp.task('config', function(cb) {
 	let localExists = false;
 	async.series({
 		checkLocal: function(cb) {
-			console.log('checkLocal');
 			fs.lstat(path.join(__dirname, 'config', 'local.js'), function(err, stat) {
 				if(err) {
 					cb();
@@ -147,7 +146,6 @@ gulp.task('config', function(cb) {
 			});
 		},
 		checkTemplate: function(cb) {
-			console.log('checkTemplate 1');
 			if(localExists) {
 				return cb();
 			}

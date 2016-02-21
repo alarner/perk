@@ -1,8 +1,10 @@
 {
-	"ecmaFeatures": {
-		"arrowFunctions": true,
-		"jsx": true,
-		"blockBindings": true
+	"parserOptions": {
+		"ecmaVersion": 6,
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"jsx": true
+		},
 	},
 	"rules": {
 		"quotes": [2, "single"],
@@ -21,9 +23,6 @@
 		"browser": true,
 		"node": true
 	},
-	"plugins": [
-		"react"
-	],
 	"globals": {
 		"describe"   : false,
 		"it"         : false,

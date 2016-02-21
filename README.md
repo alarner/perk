@@ -1,7 +1,22 @@
-# React / Express Template App
+# Perk Framework
 
-This is microframework provides:
+## Build Node Web Apps with Ease
 
+Perk is a sturdy node framework that gets out of your way, built on top of the best existing libraries out there. This framework is for developers who value simplicity and are looking for a solid set of tools to build sophisticated web applications.
+
+### [Getting Started](docs/getting-started.md)
+
+Learn how to get up and running with Perk.
+
+### [Documentation](docs/README.md)
+
+Detailed description of the ins and outs of the framework.
+
+### [Tutorials](docs/tutorials/README.md)
+
+Need to build and API server? Set up user authentication or OAuth? This is the place to go for step by step guides.
+
+<!--
 1. Routing (express)
 1. Flash Messages / errors
 1. Database connection and ORM (knex and bookshelf)
@@ -36,3 +51,4 @@ This is microframework provides:
 1. Hierarchical user permissioning system
 1. OAuth / API server
 1. CSRF protection
+-->

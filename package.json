@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "./node_modules/gulp/bin/gulp.js"
+    "start": "node --use_strict ./bin/www",
+    "serve": "./node_modules/gulp/bin/gulp.js"
   },
   "devDependencies": {
     "async": "^1.5.2",
@@ -52,11 +53,8 @@
     "knex": "^0.9.0",
     "lodash": "^3.10.1",
     "morgan": "~1.6.1",
-<<<<<<< HEAD
-=======
     "node-gcm": "^0.14.0",
     "nodemailer": "^2.0.0",
->>>>>>> 68b4082... Update to use npm start and config-template
     "npm": "^3.5.3",
     "passport": "^0.3.2",
     "passport-facebook": "^2.0.0",
