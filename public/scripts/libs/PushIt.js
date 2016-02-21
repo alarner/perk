@@ -1,6 +1,8 @@
 module.exports = {
-	subscribe: function(workerPath, options) {
+	subscribe: function(workerPath, options={}) {
+		console.log(1);
 		return new Promise((resolve, reject) => {
+			console.log(2);
 			if(!('serviceWorker' in navigator)) {
 				return reject('UNSUPPORTED');
 			}
@@ -17,14 +19,18 @@ module.exports = {
 				return reject('UNSUPPORTED');
 			}
 
+			console.log(3);
+
 			navigator.serviceWorker.register(workerPath, options);
 			navigator.serviceWorker.ready
 			.then((serviceWorkerRegistration) => {
+				console.log(4);
 				return serviceWorkerRegistration.pushManager.subscribe(
 					{userVisibleOnly: options.userVisibleOnly || true}
 				);
 			})
 			.then(subscription => {
+				console.log(5);
 				let subscriptionId = getSubscriptionId(subscription.endpoint);
 				if(!subscriptionId) {
 					reject('UNKNOWN_SUBSCRIPTION_ID');
