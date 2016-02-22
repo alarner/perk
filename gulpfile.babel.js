@@ -43,6 +43,7 @@ let dirs = {
 		'models/**/*.js',
 		'lib/**/*.js',
 		'config/**/*.js',
+		'errors/**/*.js',
 		'app.js'
 	]
 };
