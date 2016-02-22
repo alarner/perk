@@ -71,6 +71,7 @@ router.get('/login', function(req, res, next) {
 });
 
 router.post('/register', validateLocalCredentials, function(req, res, next) {
+	let savedUser = null;
 	UserModel
 	.forge({email: req.body.email})
 	.fetch()
@@ -90,6 +91,7 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 				});
 				newUser.save(null, {transacting: t})
 				.then(function(user) {
+					savedUser = user;
 					return new Promise(function(resolve, reject) {
 						bcrypt.genSalt(config.auth.local.saltRounds, function(err, salt) {
 							bcrypt.hash(req.body.password, salt, function(err, hash) {
@@ -113,12 +115,20 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 				})
 				.then(t.commit)
 				.then(function() {
-					if(req.accepts('html')) {
-						res.redirect(config.auth.local.registerRedirect || '/auth/finish');
-					}
-					else {
-						res.json(newUser.toJSON());
-					}
+					req.logIn(savedUser, err => {
+						if(err) {
+							res.error.add('auth.UNKNOWN');
+							res.error.send('/auth/login');
+						}
+						else {
+							if(req.accepts('html')) {
+								res.redirect(config.auth.local.registerRedirect || '/auth/finish');
+							}
+							else {
+								res.json(savedUser.toJSON());
+							}
+						}
+					});
 				})
 				.catch(function(err) {
 					t.rollback();
@@ -152,12 +162,20 @@ router.post('/login', validateLocalCredentials, function(req, res, next) {
 					res.error.send('/auth/login');
 				}
 				else {
-					if(req.accepts('html')) {
-						res.redirect(config.auth.local.loginRedirect || '/auth/finish');
-					}
-					else {
-						res.json();
-					}
+					req.logIn(auth.related('user'), err => {
+						if(err) {
+							res.error.add('auth.UNKNOWN');
+							res.error.send('/auth/login');
+						}
+						else {
+							if(req.accepts('html')) {
+								res.redirect(config.auth.local.loginRedirect || '/auth/finish');
+							}
+							else {
+								res.json(auth.related('user').toJSON());
+							}
+						}
+					});
 				}
 			});
 		}
