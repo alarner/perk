@@ -12,11 +12,6 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 let session = require('express-session');
-let includeAll = require('include-all');
-let errors = includeAll({
-	dirname: path.join(__dirname, 'errors'),
-	filter:  /(.+)\.js$/
-});
 let howhap = require('howhap-middleware');
 let RedisStore = require('connect-redis')(session);
 let _ = require('lodash');
@@ -33,7 +28,7 @@ let app = express();
 let sessionConfig = _.extend({}, config.session, {store: new RedisStore()});
 app.use(session(sessionConfig));
 app.use(howhap({
-	availableErrors: errors,
+	availableErrors: config.errors,
 	logging: config.logging
 }));
 
