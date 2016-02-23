@@ -16,6 +16,8 @@
     "config-loader": "github:alarner/config-loader",
     "config-template": "^1.0.12",
     "copy-paste": "^1.1.4",
+    "eslint": "^2.2.0",
+    "eslint-plugin-react": "^4.0.0",
     "gulp": "^3.9.1",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^2.2.0",

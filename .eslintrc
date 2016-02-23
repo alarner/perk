@@ -17,12 +17,17 @@
 		"no-unused-expressions": [0],
 		"semi": [2, "always"],
 		"strict": [2, "never"],
-		"comma-dangle": [2, "never"]
+		"comma-dangle": [2, "never"],
+		"react/jsx-uses-react": [2],
+		"react/jsx-uses-vars": [2],
 	},
 	"env": {
 		"browser": true,
 		"node": true
 	},
+	"plugins": [
+		"react"
+	],
 	"globals": {
 		"describe"   : false,
 		"it"         : false,
