@@ -14,6 +14,8 @@ let watchify = require('watchify');
 let browserify = require('browserify');
 let babelify = require('babelify');
 let strictify = require('strictify');
+let uglify = require('gulp-uglify');
+let cleanCss= require('gulp-clean-css');
 let source = require('vinyl-source-stream');
 let buffer = require('vinyl-buffer');
 let async = require('async');
@@ -189,9 +191,68 @@ gulp.task('config', function(cb) {
 	});
 });
 
-gulp.task('default', ['watchify', 'server', 'sass'], function() {
+gulp.task('dev', ['watchify', 'server', 'sass'], function() {
 	gulp.watch( dirs.app, app.restart );
 	gulp.watch('public/styles/**/*.{scss,sass}', ['sass']);
+});
+
+gulp.task('build', ['jsmin', 'cssmin'], function() {
+
+	console.log('build complete');
+	process.exit(0);
+
+});
+
+gulp.task('jsmin', ['prod-js-bundle'], function() {
+	return gulp.src('./public/scripts/bundle.js')
+	.pipe(uglify())
+	.pipe(rename({
+      suffix: '.min'
+    }))
+	.pipe(gulp.dest('./public/scripts'));
+});
+
+gulp.task('cssmin', ['prod-sass-bundle'], function() {
+	return gulp.src('./public/styles/main.scss.css')
+    .pipe(cleanCss({compatibility: 'ie8', s0: true}))
+    .pipe(rename({
+      suffix: '.min'
+    }))
+    .pipe(gulp.dest('./public/styles'));
+});
+
+
+gulp.task('prod-js-bundle', function() {
+	let b = browserify({
+		cache: {},
+		packageCache: {},
+		plugin: [watchify],
+		debug: false,
+		fullPaths: false,
+		entries: ['./public/scripts/main.js']
+	});
+	b.transform(babelify, {presets: ['es2015', 'react']});
+	b.transform(strictify);
+	return b.bundle()
+	.pipe(source('bundle.js'))
+	.pipe(buffer())
+	.pipe(gulp.dest('./public/scripts'));
+});
+
+gulp.task('prod-sass-bundle', function() {
+	return gulp.src('public/styles/**/*.{scss,sass}')
+	.pipe(rename(function(p) {
+		p.basename += p.extname;
+	}))
+	.pipe(sass({
+		errLogToConsole: true
+	}).on('error', sass.logError))
+	.pipe(rename(function(p) {
+		if(p.extname !== '.map') {
+			p.extname = '.css';
+		}
+	}))
+	.pipe(gulp.dest('public/styles'));
 });
 
 // gulp deploy
