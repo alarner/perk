@@ -11,13 +11,13 @@ var https = require('https');
 var config = require('../lib/config');
 var logger = require('../lib/logger');
 
-app.set('port', config.webserver.port);
+app.set('port', config.webserver.proxyPort);
 
 /**
  * Create HTTP server.
  */
 if(config.webserver.http) {
-	var httpPort = normalizePort(process.env.PORT || config.webserver.http.port || '3000');
+	var httpPort = normalizePort(process.env.PORT || config.webserver.http.proxyPort || '3000');
 	var httpServer = http.createServer(app);
 	var httpEvents = new Events(httpPort, httpServer);
 	httpServer.listen(httpPort);
@@ -57,7 +57,7 @@ if(config.webserver.https) {
 	}
 
 	if(!error) {
-		var httpsPort = normalizePort(config.webserver.https.port);
+		var httpsPort = normalizePort(config.webserver.https.proxyPort);
 		var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
 		var httpsEvents = new Events(httpsPort, httpsServer);
 		httpsServer.listen(httpsPort);
