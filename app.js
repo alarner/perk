@@ -25,7 +25,7 @@ let auth = require('./routes/auth');
 
 let app = express();
 
-let sessionConfig = _.extend({}, config.session, {store: new RedisStore()});
+let sessionConfig = _.extend({}, config.session, {store: new RedisStore(config.session.store || {})});
 app.use(session(sessionConfig));
 app.use(howhap({
 	availableErrors: config.errors,
