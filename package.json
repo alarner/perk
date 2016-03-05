@@ -6,7 +6,7 @@
     "start": "node --use_strict ./bin/www",
     "dev": "./node_modules/.bin/gulp dev",
     "build": "./node_modules/.bin/gulp build",
-    "postinstall": "./node_modules/.bin/knex migrate:latest && ./node_modules/.bin/gulp build"
+    "postinstall": "node --use_strict postinstall"
   },
   "devDependencies": {
     "async": "^1.5.2",
