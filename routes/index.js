@@ -1,6 +1,7 @@
 let express = require('express');
 let router = express.Router();
 
+let loggedIn = require('../lib/middleware/logged-in');
 let config = require('../lib/config');
 let pjson = require('../package.json');
 // let NotificationService = require('../lib/notification')([
