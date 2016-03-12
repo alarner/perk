@@ -26,5 +26,9 @@ module.exports = {
 	MISSING_PASSWORD: {
 		message: 'Please enter a password.',
 		status: 400
+	},
+	NOT_LOGGED_IN: {
+		message: 'You must be logged in to perform that action.',
+		status: 403
 	}
 };

@@ -15,6 +15,9 @@
 				<%- error.display('password') %>
 				<input type="password" placeholder="password" name="password">
 			</div>
+			<% if(redirect) { %>
+				<input type="hidden" name="redirect" value="<%= redirect %>">
+			<% } %>
 			<button>Log in</button>
 		</form>
 	</body>

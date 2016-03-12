@@ -67,7 +67,17 @@ router.get('/register', function(req, res, next) {
 });
 
 router.get('/login', function(req, res, next) {
-	res.render('auth/login');
+	res.render('auth/login', { redirect: req.query.redirect || false });
+});
+
+router.use('/logout', function(req, res, next) {
+	delete req.session.passport;
+	if(req.accepts('html')) {
+		res.redirect(req.query.redirect || '/');
+	}
+	else {
+		res.json({success: true});
+	}
 });
 
 router.post('/register', validateLocalCredentials, function(req, res, next) {
@@ -141,6 +151,10 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 });
 
 router.post('/login', validateLocalCredentials, function(req, res, next) {
+	let errorRedirect = '/auth/login';
+	if(req.body.redirect) {
+		errorRedirect += '?redirect='+encodeURIComponent(req.body.redirect);
+	}
 	AuthenticationModel.forge({
 		type: 'local',
 		identifier: req.body.email
@@ -148,28 +162,28 @@ router.post('/login', validateLocalCredentials, function(req, res, next) {
 	.fetch({withRelated: ['user']})
 	.then(function(auth) {
 		if(!auth) {
-			res.error.add('auth.UNKNOWN_USER', 'email');
-			res.error.send('/auth/login');
+			res.error.add('auth.UNKNOWN_USER', 'email').send(errorRedirect);
 		}
 		else {
 			bcrypt.compare(req.body.password, auth.get('password'), function(err, result) {
 				if(err) {
-					res.error.add('auth.UNKNOWN');
-					res.error.send('/auth/login');
+					res.error.add('auth.UNKNOWN').send(errorRedirect);
 				}
 				else if(!result) {
-					res.error.add('auth.INVALID_PASSWORD', 'password');
-					res.error.send('/auth/login');
+					res.error.add('auth.INVALID_PASSWORD', 'password').send(errorRedirect);
 				}
 				else {
 					req.logIn(auth.related('user'), err => {
 						if(err) {
-							res.error.add('auth.UNKNOWN');
-							res.error.send('/auth/login');
+							res.error.add('auth.UNKNOWN').send(errorRedirect);
 						}
 						else {
 							if(req.accepts('html')) {
-								res.redirect(config.auth.local.loginRedirect || '/auth/finish');
+								res.redirect(
+									req.body.redirect ||
+									config.auth.local.loginRedirect ||
+									'/dashboard'
+								);
 							}
 							else {
 								res.json(auth.related('user').toJSON());

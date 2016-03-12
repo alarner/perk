@@ -36,6 +36,6 @@ module.exports = {
 	local: {
 		saltRounds: 10,
 		registerRedirect: '/dashboard',
-		loginRedirect: '/test'
+		loginRedirect: '/dashboard'
 	}
 };
