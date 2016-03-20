@@ -1,4 +1,3 @@
-/*eslint strict: [0]*/
 let config = require('./lib/config');
 
 global.knex = require('knex')(config.database);
@@ -7,8 +6,6 @@ bookshelf.plugin('registry');
 
 let express = require('express');
 let path = require('path');
-// let favicon = require('serve-favicon');
-// let logger = require('morgan');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 let session = require('express-session');
@@ -16,12 +13,10 @@ let howhap = require('howhap-middleware');
 let RedisStore = require('connect-redis')(session);
 let _ = require('lodash');
 let flash = require('./lib/middleware/flash-messages');
-// let error = require('./lib/middleware/error-sender');
-
 let passportSetup = require('./lib/auth/passport-setup');
-let index = require('./routes/index');
-// let api1 = require('./routes/api1');
-let auth = require('./routes/auth');
+
+// let favicon = require('serve-favicon');
+// let logger = require('morgan');
 
 let app = express();
 
@@ -44,10 +39,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash);
-// app.use(error);
 passportSetup(app);
 
-// app.use('/api/v1/', api1);
+/*******************************/
+/*                             */
+/*            ROUTES           */
+/*                             */
+/*******************************/
+
+/* 1. ROUTES are loaded here */
+
+// let api = require('./routes/api1');
+let index = require('./routes/index');
+let auth = require('./routes/auth');
+
+/* 2. ROUTES are added here */
+
+// app.use('/api/v1/', api);
 app.use('/auth', auth);
 app.use('/', index);
 

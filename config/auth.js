@@ -1,4 +1,9 @@
 module.exports = {
+	local: {
+		saltRounds: 10,
+		registerRedirect: '/dashboard',
+		loginRedirect: '/dashboard'
+	},
 	google: {
 		clientID: '{{ Google OAuth2 Client ID }}',
 		clientSecret: '{{ Google OAuth2 Client Secret }}',
@@ -32,10 +37,5 @@ module.exports = {
 		],
 		requireEmail: true,
 		redirect: '/dashboard'
-	},
-	local: {
-		saltRounds: 10,
-		registerRedirect: '/dashboard',
-		loginRedirect: '/dashboard'
 	}
 };
