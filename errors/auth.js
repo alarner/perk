@@ -1,4 +1,5 @@
-let authTypes = require('../config/auth');
+'use strict';
+const authTypes = require('../config/auth');
 let authTypePrompt = '';
 let availTypes = [];
 for (const type in authTypes) {
@@ -9,7 +10,7 @@ for (const type in authTypes) {
 		const loginLinks = availTypes.map(type => {
 			return `<a href="/auth/${type}/login">${type}</a>`
 		});
-		authTypePrompt = `Perhaps you meant to login via ${loginLinks.join(', or')}.`
+		authTypePrompt = `Perhaps you meant to login via ${loginLinks.join(', or ')}.`
 	}
 }
 
@@ -31,7 +32,7 @@ module.exports = {
 		status: 401
 	},
 	UNKNOWN_USER: {
-		message: `There is no user with that email. ${authTypePrompt} Would you like to <a href="/auth/register">register</a>?`,
+		message: `A user with that email could not be found. ${authTypePrompt} Would you like to <a href="/auth/register">register</a>?`,
 		status: 404
 	},
 	MISSING_EMAIL: {
