@@ -94,7 +94,7 @@ let app = {
 	}
 };
 
-gulp.task('watchify', ['config'], function() {
+gulp.task('watchify', ['check-config'], function() {
 	let b = browserify({
 		cache: {},
 		packageCache: {},
@@ -113,7 +113,7 @@ gulp.task('watchify', ['config'], function() {
 
 gulp.task('server', ['watchify', 'sass'], app.start);
 
-gulp.task('sass', ['config'], function() {
+gulp.task('sass', ['check-config'], function() {
 	return gulp.src('public/styles/**/*.{scss,sass}')
 	.pipe(rename(function(p) {
 		p.basename += p.extname;
@@ -131,7 +131,7 @@ gulp.task('sass', ['config'], function() {
 	.pipe(gulp.dest('public/styles'));
 });
 
-gulp.task('config', function(cb) {
+gulp.task('check-config', function(cb) {
 	let localExists = false;
 	async.series({
 		checkLocal: function(cb) {
@@ -152,33 +152,7 @@ gulp.task('config', function(cb) {
 			if(localExists) {
 				return cb();
 			}
-			let templatePath = path.join(__dirname, 'config', 'local.template.js');
-			fs.lstat(templatePath, function(err, stat) {
-				if(err) {
-					cb('Unable to load local config template: '+err.toString());
-				}
-				else if(!stat.isFile()) {
-					cb('config/local.template.js must be a file, not a directory.');
-				}
-				else {
-					let template = require(templatePath);
-					configTemplate(template)
-					.then(function(config) {
-						let localPath = path.join(__dirname, 'config', 'local.js');
-						fs.writeFile(localPath, 'module.exports = '+JSON.stringify(config, null, '\t')+';', function(err) {
-							if(err) {
-								cb('There was a problem saving the local.js config file: '+err.toString());
-							}
-							else {
-								cb();
-							}
-						});
-					})
-					.catch(function(err) {
-						cb('Something went wrong while configuring the local.js file.');
-					});
-				}
-			});
+			doConfig(cb);
 		}
 	}, function(err) {
 		if(err) {
@@ -190,6 +164,38 @@ gulp.task('config', function(cb) {
 		}
 	});
 });
+
+function doConfig(cb) {
+	let templatePath = path.join(__dirname, 'config', 'local.template.js');
+	fs.lstat(templatePath, function(err, stat) {
+		if(err) {
+			cb('Unable to load local config template: '+err.toString());
+		}
+		else if(!stat.isFile()) {
+			cb('config/local.template.js must be a file, not a directory.');
+		}
+		else {
+			let template = require(templatePath);
+			configTemplate(template)
+			.then(function(config) {
+				let localPath = path.join(__dirname, 'config', 'local.js');
+				fs.writeFile(localPath, 'module.exports = '+JSON.stringify(config, null, '\t')+';', function(err) {
+					if(err) {
+						cb('There was a problem saving the local.js config file: '+err.toString());
+					}
+					else {
+						cb();
+					}
+				});
+			})
+			.catch(function(err) {
+				cb('Something went wrong while configuring the local.js file.');
+			});
+		}
+	});
+}
+
+gulp.task('config', doConfig);
 
 gulp.task('dev', ['watchify', 'server', 'sass'], function() {
 	gulp.watch( dirs.app, app.restart );
