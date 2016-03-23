@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node --use_strict ./bin/www",
     "dev": "./node_modules/.bin/gulp dev",
+    "config": "./node_modules/.bin/gulp config",
     "build": "./node_modules/.bin/gulp build",
     "postinstall": "node --use_strict postinstall"
   },
