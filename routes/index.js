@@ -2,8 +2,6 @@ let express = require('express');
 let router = express.Router();
 
 let loggedIn = require('../lib/middleware/logged-in');
-let config = require('../lib/config');
-let pjson = require('../package.json');
 // let NotificationService = require('../lib/notification')([
 // 	{
 // 		pattern: 'forgot-password/:id',
@@ -14,17 +12,13 @@ let pjson = require('../package.json');
 /* GET home page. */
 router.get('/', function(req, res, next) {
 	res.render('index', {
-		title: 'Express / React Template',
-		env: config.env,
-		version: pjson.version
+		title: 'Express / React Template'
 	});
 });
 
 router.get('/dashboard', loggedIn, function(req, res, next) {
 	res.render('dashboard', {
-		title: 'User Dashboard',
-		env: config.env,
-		version: pjson.version
+		title: 'User Dashboard'
 	});
 });
 

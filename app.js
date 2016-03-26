@@ -13,6 +13,7 @@ let howhap = require('howhap-middleware');
 let RedisStore = require('connect-redis')(session);
 let _ = require('lodash');
 let flash = require('./lib/middleware/flash-messages');
+let versions = require('./lib/middleware/versions');
 let passportSetup = require('./lib/auth/passport-setup');
 
 // let favicon = require('serve-favicon');
@@ -39,6 +40,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash);
+app.use(versions);
 passportSetup(app);
 
 /*******************************/
