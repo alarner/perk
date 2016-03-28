@@ -29,7 +29,7 @@ module.exports = {
 		redirect: '/dashboard'
 	},
 	trello: {
-		clientID: '{{ Trello Consumber Key }}',
+		clientID: '{{ Trello Consumer Key }}',
 		clientSecret: '{{ Trello Consumer Secret }}',
 		scope: [
 			// 'read',
