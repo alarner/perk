@@ -143,11 +143,11 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 							res.error.send('/auth/login');
 						}
 						else {
-							if(req.accepts('html')) {
-								res.redirect(config.auth.local.registerRedirect || '/auth/finish');
+							if(req.accepts('json') || !req.accepts('html')) {
+								res.json(savedUser.toJSON());
 							}
 							else {
-								res.json(savedUser.toJSON());
+								res.redirect(config.auth.local.registerRedirect || '/auth/finish');
 							}
 						}
 					});
@@ -190,15 +190,15 @@ router.post('/login', validateLocalCredentials, function(req, res, next) {
 							res.error.add('auth.UNKNOWN').send(errorRedirect);
 						}
 						else {
-							if(req.accepts('html')) {
+							if(req.accepts('json') || !req.accepts('html')) {
+								res.json(auth.related('user').toJSON());
+							}
+							else {
 								res.redirect(
 									req.body.redirect ||
 									config.auth.local.loginRedirect ||
 									'/dashboard'
 								);
-							}
-							else {
-								res.json(auth.related('user').toJSON());
 							}
 						}
 					});
