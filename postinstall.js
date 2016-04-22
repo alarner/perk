@@ -1,3 +1,4 @@
+let gulp = require('gulp');
 if(process.env.HEROKU_POSTINSTALL) {
 	process.env.NODE_ENV = 'heroku';
 
@@ -13,4 +14,6 @@ if(process.env.HEROKU_POSTINSTALL) {
 		console.warn(err.toString());
 		process.exit(1);
 	});
+
+	gulp.start('build');
 }

@@ -5,7 +5,7 @@ module.exports = {
 	session: {
 		secret: process.env.SESSION_SECRET,
 		store: {
-			url: process.env.REDISTOGO_URL
+			url: process.env.REDIS_URL || process.env.REDISTOGO_URL
 		}
 	}
 };
