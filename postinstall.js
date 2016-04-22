@@ -14,6 +14,4 @@ if(process.env.HEROKU_POSTINSTALL) {
 		console.warn(err.toString());
 		process.exit(1);
 	});
-
-	gulp.start('build');
 }
