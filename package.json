@@ -1,6 +1,6 @@
 {
   "name": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "start": "node --use_strict ./bin/www",
