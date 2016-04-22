@@ -1,4 +1,3 @@
-let gulp = require('gulp');
 if(process.env.HEROKU_POSTINSTALL) {
 	process.env.NODE_ENV = 'heroku';
 
