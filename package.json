@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node --use_strict ./bin/www",
-    "dev": "./node_modules/.bin/gulp dev",
+    "dev": "node --use_strict ./dev",
     "config": "./node_modules/.bin/gulp config",
     "build": "./node_modules/.bin/gulp build",
     "postinstall": "node --use_strict postinstall"
@@ -16,6 +16,7 @@
     "babel-preset-react": "^6.5.0",
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
+    "chokidar": "^1.4.3",
     "config-loader": "github:alarner/config-loader",
     "config-template": "^1.0.12",
     "copy-paste": "^1.1.4",
@@ -30,6 +31,7 @@
     "gulp-util": "^3.0.7",
     "inquirer": "^0.12.0",
     "request": "^2.69.0",
+    "sass-graph": "^2.1.1",
     "sequest": "^0.9.0",
     "ssh-fingerprint": "0.0.1",
     "strictify": "^0.2.0",
