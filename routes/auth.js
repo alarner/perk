@@ -9,8 +9,11 @@ let validateAuthProfile = require('../lib/middleware/validate-auth-profile');
 let validateLocalCredentials = require('../lib/middleware/validate-local-credentials');
 let authenticator = require('../lib/auth/authenticator');
 let AuthenticationModel = require('../models/Authentication');
-let UserModel = require('../models/User');
-
+let noDupe = require('../lib/auth/no-dupe');
+let createUser = require('../lib/auth/create-user');
+let createAuth = require('../lib/auth/create-auth');
+let login = require('../lib/auth/login');
+let Howhap = require('howhap');
 
 router.use('/:type/login', validateAuthType, function(req, res, next) {
 	passport.authenticate(
@@ -93,72 +96,33 @@ router.use('/logout', function(req, res, next) {
 });
 
 router.post('/register', validateLocalCredentials, function(req, res, next) {
-	let savedUser = null;
-	UserModel
-	.forge({email: req.body.email})
-	.fetch()
-	.then(function(u) {
-		// The account already exists, return an error.
-		if(u) {
-			res.error.add('auth.EMAIL_EXISTS', 'email');
-			res.error.send('/auth/register');
+	let userData = Object.assign({}, req.body);
+	delete userData.password;
+
+	bookshelf.transaction(function(t) {
+		return noDupe(req.body.email, t)
+		.then(createUser.bind(null, userData, t))
+		.then(user => createAuth(user, req.body.password, t))
+		.then(user => login(user, req.logIn.bind(req)))
+		.then(t.commit)
+		.catch(t.rollback);
+	})
+	.then(user => {
+		if(req.accepts('html')) {
+			res.redirect(config.auth.local.registerRedirect || '/auth/finish');
 		}
-		// The account doesn't exists. Create it.
 		else {
-			bookshelf.transaction(function(t) {
-				let newUser = new UserModel({
-					firstName: req.body.firstName,
-					lastName: req.body.lastName,
-					email: req.body.email
-				});
-				newUser.save(null, {transacting: t})
-				.then(function(user) {
-					savedUser = user;
-					return new Promise(function(resolve, reject) {
-						bcrypt.genSalt(config.auth.local.saltRounds, function(err, salt) {
-							bcrypt.hash(req.body.password, salt, function(err, hash) {
-								if(err) {
-									reject(err);
-								}
-								else {
-									AuthenticationModel.forge({
-										type: 'local',
-										identifier: req.body.email,
-										password: hash,
-										userId: user.id
-									})
-									.save(null, {transacting: t})
-									.then(resolve)
-									.catch(reject);
-								}
-							});
-						});
-					});
-				})
-				.then(t.commit)
-				.then(function() {
-					req.logIn(savedUser, err => {
-						if(err) {
-							res.error.add('auth.UNKNOWN');
-							res.error.send('/auth/login');
-						}
-						else {
-							if(req.accepts('html')) {
-								res.redirect(config.auth.local.registerRedirect || '/auth/finish');
-							}
-							else {
-								res.json(savedUser.toJSON());
-							}
-						}
-					});
-				})
-				.catch(function(err) {
-					t.rollback();
-					res.error.add('auth.UNKNOWN');
-					res.error.send('/auth/register');
-				});
-			});
+			res.json(user.toJSON());
 		}
+	})
+	.catch(err => {
+		if(err instanceof Howhap) {
+			res.error.add(err.toJSON());
+		}
+		else {
+			res.error.add('auth.UNKNOWN', {message: err.toString()});
+		}
+		res.error.send();
 	});
 });
 
