@@ -1,6 +1,9 @@
 let config = require('./lib/config');
 
-global.knex = require('knex')(config.database);
+// Defer to unit test version of knex if it's already defined
+if(!global.knex) {
+	global.knex = require('knex')(config.database);
+}
 global.bookshelf = require('bookshelf')(global.knex);
 bookshelf.plugin('registry');
 
