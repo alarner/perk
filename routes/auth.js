@@ -13,8 +13,6 @@ let noDupe = require('../lib/auth/no-dupe');
 let createUser = require('../lib/auth/create-user');
 let createAuth = require('../lib/auth/create-auth');
 let Howhap = require('howhap');
-let _ = require('lodash');
-
 
 router.use('/:type/login', validateAuthType, function(req, res, next) {
 	passport.authenticate(
@@ -97,7 +95,7 @@ router.use('/logout', function(req, res, next) {
 });
 
 router.post('/register', validateLocalCredentials, function(req, res, next) {
-	let userData = _.extend({}, req.body);
+	let userData = Object.assign({}, req.body);
 	delete userData.password;
 
 	bookshelf.transaction(function(t) {
