@@ -12,6 +12,7 @@ let AuthenticationModel = require('../models/Authentication');
 let noDupe = require('../lib/auth/no-dupe');
 let createUser = require('../lib/auth/create-user');
 let createAuth = require('../lib/auth/create-auth');
+let login = require('../lib/auth/login');
 let Howhap = require('howhap');
 
 router.use('/:type/login', validateAuthType, function(req, res, next) {
@@ -102,6 +103,7 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 		return noDupe(req.body.email, t)
 		.then(createUser.bind(null, userData, t))
 		.then(user => createAuth(user, req.body.password, t))
+		.then(user => login(user, req.logIn.bind(req)))
 		.then(t.commit)
 		.catch(t.rollback);
 	})
