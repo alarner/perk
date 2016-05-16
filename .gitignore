@@ -1,11 +1,11 @@
-/node_modules
 .DS_Store
+/build/.pid
 /config/local.js
+/node_modules
 /public/scripts/bundle.js
 /public/scripts/bundle.js.map
 /public/scripts/bundle.min.js
 /public/scripts/bundle.min.js.map
 /public/styles/**/*.css
 /public/styles/**/*.map
-/build/.pid
 npm-debug.log
