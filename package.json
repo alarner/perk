@@ -8,7 +8,7 @@
     "dev": "node --use_strict ./bin/build --watch --scripts --styles --server",
     "config": "./node_modules/.bin/gulp config",
     "build": "NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify",
-    "postinstall": "node --use_strict postinstall"
+    "heroku-postbuild": "knex migrate:latest && npm build"
   },
   "devDependencies": {
     "async": "^2.0.0-rc.4",
