@@ -7,7 +7,7 @@
     "test": "mocha --compilers js:babel-register --recursive --timeout 5000",
     "dev": "node --use_strict ./bin/build --watch --scripts --styles --server",
     "config": "./node_modules/.bin/gulp config",
-    "build": "./node_modules/.bin/gulp build",
+    "build": "NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify",
     "postinstall": "node --use_strict postinstall"
   },
   "devDependencies": {
