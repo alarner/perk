@@ -59,8 +59,7 @@ module.exports = function(files, minify, watch, cb) {
 					exclude: /node_modules/,
 					loader: 'babel',
 					query: {
-						presets: ['es2015', 'react'],
-						plugins: ['transform-runtime']
+						presets: ['es2015', 'react']
 					}
 				}
 			],
@@ -70,7 +69,10 @@ module.exports = function(files, minify, watch, cb) {
     			})
     		] : []
 		},
-		devtool: minify ? 'source-map' : 'inline-source-map'
+		devtool: minify ? 'source-map' : 'inline-source-map',
+		watchOptions: {
+			poll: config.build.watching.poll ? config.build.watching.interval || 100 : undefined
+		}
 	});
 
 	if(watch) {

@@ -43,8 +43,15 @@ module.exports = function(sassDir, minify, watch, cb) {
 
 	// Watch for additions and changes of sass files
 	if(watch) {
-		chokidar.watch(`${path.join(config.root, sassDir)}**/*.scss`, {ignoreInitial: true}).on('add', sassyChange);
-		chokidar.watch(`${path.join(config.root, sassDir)}**/*.scss`, {ignoreInitial: true}).on('change', sassyChange);
+		let chokidarConf = {
+			usePolling: config.build.watching.poll,
+			ignoreInitial: true
+		};
+		if(config.build.watching.poll) {
+			chokidarConf.interval = config.build.watching.interval || 100;
+		}
+		chokidar.watch(`${path.join(config.root, sassDir)}**/*.scss`, chokidarConf).on('add', sassyChange);
+		chokidar.watch(`${path.join(config.root, sassDir)}**/*.scss`, chokidarConf).on('change', sassyChange);
 	}
 
 	// Process the change of a sass file

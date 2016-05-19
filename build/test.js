@@ -1,10 +1,10 @@
-// node --use_strict bin/build/test.js --loader=browserify -n=100
+// node --use_strict build/test.js --loader=browserify -n=100
 // Low: 2342
 // High: 4266
 // Average: 2739.34
 // Size: 2938137
 
-// node --use_strict bin/build/test.js --loader=webpack -n=100
+// node --use_strict build/test.js --loader=webpack -n=100
 // Low: 2478
 // High: 3752
 // Average: 3090.14
@@ -15,7 +15,7 @@ let fs = require('fs');
 let path = require('path');
 let parseArgs = require('minimist')(process.argv);
 
-const ROOT = path.resolve(__dirname, '../../');
+const ROOT = path.resolve(__dirname, '../');
 const LOADERS = {
 	browserify: require('./browserify'),
 	webpack: require('./webpack')
@@ -73,7 +73,6 @@ else {
 }
 
 function finish() {
-	console.log(times);
 	let sum = times.reduce((prev, current) => {
 		return prev+current;
 	}, 0);

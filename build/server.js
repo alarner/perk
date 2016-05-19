@@ -61,10 +61,18 @@ let app = {
 };
 
 module.exports = function(files, cb) {
+	let chokidarConf = {
+		usePolling: config.build.watching.poll,
+		ignoreInitial: true
+	};
+	if(config.build.watching.poll) {
+		chokidarConf.interval = config.build.watching.interval || 100;
+	}
+		
 	files = files.map(file => {
 		return path.join(config.root, file);
 	});
-	chokidar.watch(files, {ignoreInitial: true}).on('add', file => app.restart('restart', file));
-	chokidar.watch(files, {ignoreInitial: true}).on('change', file => app.restart('restart', file));
+	chokidar.watch(files, chokidarConf).on('add', file => app.restart('restart', file));
+	chokidar.watch(files, chokidarConf).on('change', file => app.restart('restart', file));
 	app.restart('start');
 };

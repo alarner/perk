@@ -28,8 +28,16 @@ module.exports = function(files, minify, watch, cb) {
 	scriptyChange();
 
 	if(watch) {
-		chokidar.watch(`${CLIENT_JS_DIR}/**/*.js`, {ignoreInitial: true, ignored: path.join(CLIENT_JS_DIR, 'bundle.*')}).on('add', scriptyChange);
-		chokidar.watch(`${CLIENT_JS_DIR}/**/*.js`, {ignoreInitial: true, ignored: path.join(CLIENT_JS_DIR, 'bundle.*')}).on('change', scriptyChange);
+		let chokidarConf = {
+			usePolling: config.build.watching.poll,
+			ignoreInitial: true,
+			ignored: path.join(CLIENT_JS_DIR, 'bundle.*')
+		};
+		if(config.build.watching.poll) {
+			chokidarConf.interval = config.build.watching.interval || 100;
+		}
+		chokidar.watch(`${CLIENT_JS_DIR}/**/*.js`, chokidarConf).on('add', scriptyChange);
+		chokidar.watch(`${CLIENT_JS_DIR}/**/*.js`, chokidarConf).on('change', scriptyChange);
 	}
 
 	function scriptyChange(file) {
