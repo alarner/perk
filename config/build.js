@@ -1,8 +1,4 @@
 module.exports = {
-	watching: {
-		poll: true,
-		interval: 10000
-	},
 	scripts: {
 		loader: 'browserify',
 		files: [
@@ -22,5 +18,9 @@ module.exports = {
 			'errors/**/*.js',
 			'app.js'
 		]
+	},
+	watching: {
+		poll: false,
+		interval: 100
 	}
 };
