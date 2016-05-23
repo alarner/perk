@@ -68,6 +68,7 @@
     "nodemailer": "^2.3.2",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.0",
+    "passport-github": "^1.1.0",
     "passport-google-oauth2": "^0.1.6",
     "passport-local": "^1.0.0",
     "passport-oauth1": "^1.1.0",
