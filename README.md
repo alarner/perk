@@ -10,7 +10,7 @@ The goal of Perk is first and foremost to provide a well documented set of tools
 
 Perk is glue that holds together a collection of [powerful](http://passportjs.org/) and [full](http://knexjs.org/) [featured](http://expressjs.com/) [libraries](http://redis.io/) that are written by some awesome developers. This guide will help you get started on OS X.
 
-### API Documentation]http://perkframework.com/v1/api/index.html
+### API Documentation
 
 #### [Go to API Docs](http://perkframework.com/v1/api/index.html)
 
