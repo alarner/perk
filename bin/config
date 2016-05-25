@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+/*eslint no-var: 0*/
+
+// Connot run this script in strict mode because a dependency of config-template
+// uses Octal literals, which are not allowed in strict mode.
+
 var fs = require('fs');
 var path = require('path');
 var parseArgs = require('minimist')(process.argv);

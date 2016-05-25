@@ -1,3 +1,8 @@
+/*eslint no-var: 0*/
+
+// Connot run this script in strict mode because a dependency of config-template
+// uses Octal literals, which are not allowed in strict mode.
+
 var path = require('path');
 var fs = require('fs');
 var configTemplate = require('config-template');
