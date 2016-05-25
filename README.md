@@ -1,54 +1,27 @@
 # Perk Framework
 
-## Build Node Web Apps with Ease
+## Perk is an well [documented](http://perkframework.com) set of tools for building node web applications.
 
-Perk is a sturdy node framework that gets out of your way, built on top of the best existing libraries out there. This framework is for developers who value simplicity and are looking for a solid set of tools to build sophisticated web applications.
+The goal of Perk is first and foremost to provide a well documented set of tools for building node web applications. Perk also aims to get you up and running quickly, while still providing you the flexibility to build production ready node apps. With these goals in mind, Perk is built on top of a series of robust, well supported libraries that have stood the test of time: [Passport](http://passportjs.org/), [Express](http://expressjs.com/), [Redis](http://redis.io/), and [Knex](http://knexjs.org/). These libraries are not hidden from view. You're 100% in control to swap one out here or there if you find a better tool for the job.
 
-### [Getting Started](http://perkframework.com/guides/getting-started-os-x.html)
+### [Getting started with Perk on OS X](http://perkframework.com/v1/guides/getting-started-os-x.html)
 
-Learn how to get up and running with Perk.
+Perk is glue that holds together a collection of [powerful](http://passportjs.org/) and [full](http://knexjs.org/) [featured](http://expressjs.com/) [libraries](http://redis.io/) that are written by some awesome developers. This guide will help you get started on OS X.
 
-### [Documentation](http://perkframework.com/api/index.html)
+### [API Documentation](http://perkframework.com/v1/api/index.html)
 
-Detailed description of the ins and outs of the framework.
+Perk API documentation is designed to be a reference for you as you build your Perk app. API documentation provides structured information on the full set of features that Perk provides as well as resources on where to find more information, where applicable. If you're looking for more step-by-step guides pleas check out the [Guides](http://perkframework.com/v1/guides) section of this website.
 
-### [Guides](http://perkframework.com/guides/index.html)
+### [Guides](http://perkframework.com/v1/guides/index.html)
 
-Need to build and API server? Set up user authentication or OAuth? This is the place to go for step by step guides.
+Perk guides are designed to be step by step instructions for how to accomplish a specific task. They are good if you are doing something for the first time. If you're looking for quick reference material instead you might prefer the [API Documentation](http://perkframework.com/v1/api)
 
-<!--
-1. Routing (express)
-1. Flash Messages / errors
-1. Database connection and ORM (knex and bookshelf)
-1. User registration and authentication (passport and custom adapters)
-1. Configuration [config-loader](https://github.com/alarner/config-loader)
-1. Nice gulp, babel, react configuration
-
-### Tools
-
-* express
-* react
-* gulp
-* sass
-* browserify
-* babel
-* knex
-* bookshelf
-* passport
-
-### To use...
-
-1. Download / fork / clone
-1. Run `npm install -g gulp knex` to install global dependencies
-1. Run `npm install` to install local dependencies
-1. Run `gulp` to start the server
-
-### Todo
-
-1. Local user login
-1. Password reset
-1. More oauth providers (facebook, twitter, amazon, github, bitbucket, dropbox, instagram, linkedin, slack, windows live, etc.)
-1. Hierarchical user permissioning system
-1. OAuth / API server
-1. CSRF protection
--->
+* [Getting started with Perk on OS X](http://perkframework.com/guides/getting-started-os-x.html)
+* [Creating a static home page](http://perkframework.com/v1/guides/creating-a-static-home-page.html)
+* [Creating new pages and routes](http://perkframework.com/v1/guides/creating-new-pages-and-routes.html)
+* [Creating a dynamic view with ejs](http://perkframework.com/v1/guides/creating-a-dynamic-view-with-ejs.html)
+* [Building a RESTful JSON API](http://perkframework.com/v1/guides/building-your-first-api.html)
+* [Querying and displaying data with models](http://perkframework.com/v1/guides/querying-and-displaying-data-with-models.html)
+* [User authentication with Facebook](http://perkframework.com/v1/guides/user-auth-with-facebook.html)
+* [Deploying Perk Apps to Heroku](http://perkframework.com/v1/guides/deploying-perk-apps-to-heroku.html)
+* [Database Migrations with Knex](http://perkframework.com/v1/guides/database-migrations-knex.html)
