@@ -28,7 +28,7 @@ if(args.scripts) {
 			loader = require('../build/webpack');
 		break;
 		default:
-			logger.fatal({path: config.build.loader}, 'loader does not exist.');
+			logger.error('loader does not exist: %s', config.build.loader);
 		break;
 	}
 

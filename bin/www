@@ -37,10 +37,10 @@ if(config.webserver.https) {
 	catch(e) {
 		error = true;
 		if(e.code === 'ENOENT') {
-			logger.fatal({path: config.webserver.https.keyPath}, 'https key file does not exist.');
+			logger.error('https key file does not exist: %s', config.webserver.https.keyPath);
 		}
 		else {
-			logger.fatal(e.toString());
+			logger.error(e.toString());
 		}
 	}
 	try {
@@ -49,10 +49,10 @@ if(config.webserver.https) {
 	catch(e) {
 		error = true;
 		if(e.code === 'ENOENT') {
-			logger.fatal({path: config.webserver.https.certPath}, 'https certificate file does not exist.');
+			logger.error('https certificate file does not exist %s', config.webserver.https.certPath);
 		}
 		else {
-			logger.fatal(e.toString());
+			logger.error(e.toString());
 		}
 	}
 
@@ -103,11 +103,11 @@ function Events(port, server) {
 		// handle specific listen errors with friendly messages
 		switch (error.code) {
 			case 'EACCES':
-				logger.fatal(bind + ' requires elevated privileges');
+				logger.error(bind + ' requires elevated privileges');
 				process.exit(1);
 				break;
 			case 'EADDRINUSE':
-				logger.fatal(bind + ' is already in use');
+				logger.error(bind + ' is already in use');
 				process.exit(1);
 				break;
 			default:
