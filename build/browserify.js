@@ -1,6 +1,5 @@
 let browserify = require('browserify');
 let babelify = require('babelify');
-let strictify = require('strictify');
 let minifyify = require('minifyify');
 let utils = require('./utils');
 let path = require('path');
@@ -16,8 +15,7 @@ module.exports = function(files, minify, watch, cb) {
 		deps: true,
 		debug: true
 	})
-	.transform(babelify, {presets: ['es2015', 'react']})
-	.transform(strictify);
+	.transform(babelify, {presets: ['es2015', 'react']});
 	if(minify) {
 		b.plugin(minifyify, {
 			map: 'bundle.min.js.map',
