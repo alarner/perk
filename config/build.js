@@ -10,7 +10,7 @@ module.exports = {
 	},
 	server: {
 		files: [
-			'views/**/*.ejs',
+			'views/**/*.html',
 			'routes/**/*.js',
 			'models/**/*.js',
 			'lib/**/*.js',
