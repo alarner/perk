@@ -62,8 +62,6 @@
     "passport-trello": "^0.1.5",
     "pg": "^4.5.5",
     "progress": "^1.1.8",
-    "react": "^15.0.2",
-    "react-dom": "^15.0.2",
     "request": "^2.72.0",
     "sass-graph": "^2.1.1",
     "serve-favicon": "~2.3.0",
