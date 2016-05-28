@@ -18,6 +18,7 @@ let _ = require('lodash');
 let flash = require('./lib/middleware/flash-messages');
 let versions = require('./lib/middleware/versions');
 let passportSetup = require('./lib/auth/passport-setup');
+let consolidate = require('consolidate');
 
 // let favicon = require('serve-favicon');
 
@@ -31,8 +32,9 @@ app.use(howhap({
 }));
 
 // view engine setup
+app.engine('html', consolidate.ejs);
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'html');
 
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
