@@ -4,7 +4,7 @@ let router = express.Router();
 
 router.get('/', function(req, res, next) {
 	res.render('index', {
-    title: "Perk Framework"
+    title: "Perk"
   });
 });
 
