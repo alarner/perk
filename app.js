@@ -17,6 +17,7 @@ let RedisStore = require('connect-redis')(session);
 let _ = require('lodash');
 let flash = require('./lib/middleware/flash-messages');
 let versions = require('./lib/middleware/versions');
+let responseFormat = require('./lib/middleware/response-format');
 let passportSetup = require('./lib/auth/passport-setup');
 let consolidate = require('consolidate');
 
@@ -28,7 +29,8 @@ let sessionConfig = _.extend({}, config.session, {store: new RedisStore(config.s
 app.use(session(sessionConfig));
 app.use(howhap({
 	availableErrors: config.errors,
-	logging: config.logging
+	logging: config.logging,
+	defaultFormat: config.webserver.response.defaultFormat
 }));
 
 // view engine setup
@@ -44,6 +46,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash);
 app.use(versions);
+app.use(responseFormat);
 passportSetup(app);
 
 /*******************************/
