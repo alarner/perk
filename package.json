@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node --use_strict ./bin/www",
-    "test": "mocha --compilers js:babel-register --recursive --timeout 5000",
+    "test": "mocha",
     "dev": "node ./bin/config --check-local && node --use_strict ./bin/build --watch --scripts --styles --server",
     "config": "node ./bin/config",
     "build": "NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify",
@@ -19,6 +19,7 @@
     "mocha": "^2.5.3",
     "request": "^2.72.0",
     "sinon": "^1.17.4",
+    "sqlite3": "^3.1.4",
     "supertest": "^1.2.0"
   },
   "dependencies": {
