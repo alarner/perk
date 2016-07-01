@@ -122,7 +122,7 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 		else {
 			res.error.add('auth.UNKNOWN', {message: err.toString()});
 		}
-		res.error.send();
+		res.error.send('/auth/register');
 	});
 });
 
