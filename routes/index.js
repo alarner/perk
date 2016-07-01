@@ -6,7 +6,7 @@ router.get('/', function(req, res, next) {
 	res.render('index');
 });
 
-router.get('/dashboard', loggedIn, function(req, res, next) {
+router.get('/dashboard', loggedIn({ defaultFormat: 'html' }), function(req, res, next) {
 	res.render('dashboard', {
 		title: 'User Dashboard'
 	});
