@@ -105,7 +105,7 @@ describe('POST /auth/register', function() {
 			.expect(500)
 			.end(function (err, res) {
 				cookie = res.headers['set-cookie'].pop().split(';')[0];
-				let req = request(app).get('/dashboard');
+				let req = request(app).get('/dashboard?responseFormat=json');
 				req.cookies = cookie;
 				req.expect('Content-Type', /json/)
 				.expect(function(res) {
