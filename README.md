@@ -22,7 +22,7 @@ Perk API documentation is designed to be a reference for you as you build your P
 
 Perk guides are designed to be step by step instructions for how to accomplish a specific task. They are good if you are doing something for the first time. If you're looking for quick reference material instead you might prefer the [API Documentation](http://perkframework.com/v1/api)
 
-* [Getting started with Perk on OS X](http://perkframework.com/guides/getting-started-os-x.html)
+* [Getting started with Perk on OS X](http://perkframework.com/v1/guides/getting-started-os-x.html)
 * [Creating a static home page](http://perkframework.com/v1/guides/creating-a-static-home-page.html)
 * [Creating new pages and routes](http://perkframework.com/v1/guides/creating-new-pages-and-routes.html)
 * [Creating a dynamic view with ejs](http://perkframework.com/v1/guides/creating-a-dynamic-view-with-ejs.html)
