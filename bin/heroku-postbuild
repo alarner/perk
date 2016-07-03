@@ -4,19 +4,30 @@ process.env.NODE_ENV = 'heroku';
 
 let config = require('../lib/config');
 let knex = require('knex')(config.database);
-
-
-knex.migrate.latest()
-.then(function() {
-	process.exit(0);
-})
-.catch(function(err) {
-	console.warn(err.toString());
-	process.exit(1);
-});
+let async = require('async');
 
 let loader = require('../build/browserify');
 let sass = require('../build/sass');
 
-loader(config.build.scripts.files, true, false);
-sass(config.build.styles.directory, true, false);
+async.parallel([
+	function(cb) {
+		knex.migrate.latest()
+		.then(() => cb())
+		.catch(cb);
+	},
+	function(cb) {
+		loader(config.build.scripts.files, true, false, cb);
+	},
+	function(cb) {
+		sass(config.build.styles.directory, true, false, cb);
+	}
+], function(err, data) {
+	if(err) {
+		console.warn(err.toString());
+		process.exit(1);
+	}
+	else {
+		console.log('heroku-postbuild exited successfully');
+		process.exit(0);
+	}
+});
