@@ -54,7 +54,7 @@ module.exports = function(files, minify, watch, cb) {
 				utils.log('Browserify', 'Bundle successful.', 'success');
 			}
 			if(cb && _.isFunction(cb)) {
-				cb(err, stats);
+				cb();
 			}
 		})
 		.pipe(writeStream);
