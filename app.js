@@ -19,8 +19,7 @@ let flash = require('./lib/middleware/flash-messages');
 let versions = require('./lib/middleware/versions');
 let passportSetup = require('./lib/auth/passport-setup');
 let consolidate = require('consolidate');
-
-// let favicon = require('serve-favicon');
+let utils = require('./build/utils');
 
 let app = express();
 
@@ -95,5 +94,5 @@ app.use(function(err, req, res, next) {
 	});
 });
 
-
+	
 module.exports = app;
