@@ -17,6 +17,7 @@ let RedisStore = require('connect-redis')(session);
 let _ = require('lodash');
 let flash = require('./lib/middleware/flash-messages');
 let versions = require('./lib/middleware/versions');
+let localUser = require('./lib/middleware/local-user');
 let responseFormat = require('./lib/middleware/response-format');
 let passportSetup = require('./lib/auth/passport-setup');
 let consolidate = require('consolidate');
@@ -48,6 +49,7 @@ app.use(flash);
 app.use(versions);
 app.use(responseFormat);
 passportSetup(app);
+app.use(localUser);
 
 /*******************************/
 /*                             */
