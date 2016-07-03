@@ -1,28 +1,6 @@
 {
-  "name": "perk-application",
-  "version": "0.0.3",
-  "private": true,
-  "scripts": {
-    "start": "node --use_strict ./bin/www",
-    "test": "mocha",
-    "dev": "node ./bin/config --check-local && node --use_strict ./bin/build --watch --scripts --styles --server",
-    "config": "node ./bin/config",
-    "build": "NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify",
-    "heroku-postbuild": "node --use_strict ./bin/heroku-postbuild",
-    "eslint": "eslint ./"
-  },
-  "devDependencies": {
-    "chai": "^3.5.0",
-    "config-template": "^1.0.12",
-    "eslint": "^2.13.1",
-    "eslint-plugin-react": "^5.2.2",
-    "inquirer": "^1.1.0",
-    "mocha": "^2.5.3",
-    "node-redis": "^0.1.7",
-    "request": "^2.72.0",
-    "sinon": "^1.17.4",
-    "sqlite3": "^3.1.4",
-    "supertest": "^1.2.0"
+  "bugs": {
+    "url": "https://github.com/alarner/perk/issues"
   },
   "dependencies": {
     "async": "^2.0.0-rc.6",
@@ -71,5 +49,44 @@
     "validator": "^5.4.0",
     "webpack": "^1.13.1",
     "winston": "^2.2.0"
-  }
+  },
+  "description": "A well documented set of tools for building node web applications.",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "config-template": "^1.0.12",
+    "eslint": "^2.13.1",
+    "eslint-plugin-react": "^5.2.2",
+    "inquirer": "^1.1.0",
+    "mocha": "^2.5.3",
+    "node-redis": "^0.1.7",
+    "request": "^2.72.0",
+    "sinon": "^1.17.4",
+    "sqlite3": "^3.1.4",
+    "supertest": "^1.2.0"
+  },
+  "homepage": "http://perkframework.com",
+  "license": "MIT",
+  "main": "app.js",
+  "maintainers": [
+    {
+      "email": "anlarner@gmail.com",
+      "name": "Aaron Larner"
+    }
+  ],
+  "name": "perk",
+  "readme": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alarner/perk.git"
+  },
+  "scripts": {
+    "start": "node --use_strict ./bin/www",
+    "test": "mocha",
+    "dev": "node ./bin/config --check-local && node --use_strict ./bin/build --watch --scripts --styles --server",
+    "config": "node ./bin/config",
+    "build": "NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify",
+    "heroku-postbuild": "node --use_strict ./bin/heroku-postbuild",
+    "eslint": "eslint ./"
+  },
+  "version": "0.0.3"
 }

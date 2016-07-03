@@ -31,3 +31,7 @@ Perk guides are designed to be step by step instructions for how to accomplish a
 * [User authentication with Facebook](http://perkframework.com/v1/guides/user-auth-with-facebook.html)
 * [Deploying Perk Apps to Heroku](http://perkframework.com/v1/guides/deploying-perk-apps-to-heroku.html)
 * [Database Migrations with Knex](http://perkframework.com/v1/guides/database-migrations-knex.html)
+
+### Contributing to Perk
+
+If you're interested in contributing to Perk we would love your help. You can read our [contributors guide](CONTRIBUTORS.md) for tips on how to get started. 
