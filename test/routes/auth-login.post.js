@@ -5,31 +5,13 @@ let _ = require('lodash');
 let getSession = require('../helpers/get-session');
 let HowhapList = require('howhap-list');
 
-describe('POST /auth/register', function() {
+describe('POST /auth/login', function() {
 
 	describe('responseFormat json', function() {
-		it('should throw an error if the user is already registered', function(done) {
-			request(app)
-			.post('/auth/register')
-			.send('firstName=Aaron')
-			.send('lastName=Larner')
-			.send('email=test@test.com')
-			.send('password=password')
-			.expect('Content-Type', /json/)
-			.expect(function(res) {
-				expect(
-					res.body,
-					'EMAIL_EXISTS error should be returned'
-				).to.deep.equal({
-					default: _.assign({params:{}}, config.errors.auth.EMAIL_EXISTS)
-				});
-			})
-			.expect(409, done);
-		});
 
 		it('should throw an error if no email is supplied', function(done) {
 			request(app)
-			.post('/auth/register')
+			.post('/auth/login')
 			.send('password=password')
 			.expect('Content-Type', /json/)
 			.expect(function(res) {
@@ -45,7 +27,7 @@ describe('POST /auth/register', function() {
 
 		it('should throw an error if no password is supplied', function(done) {
 			request(app)
-			.post('/auth/register')
+			.post('/auth/login')
 			.send('email=foo@test.com')
 			.expect('Content-Type', /json/)
 			.expect(function(res) {
@@ -61,7 +43,7 @@ describe('POST /auth/register', function() {
 
 		it('should throw an error if no email and no password are supplied', function(done) {
 			request(app)
-			.post('/auth/register')
+			.post('/auth/login')
 			.expect('Content-Type', /json/)
 			.expect(function(res) {
 				expect(
@@ -75,35 +57,22 @@ describe('POST /auth/register', function() {
 			.expect(400, done);
 		});
 
-		it('should throw an error if a bad field is supplied', function(done) {
-			request(app)
-			.post('/auth/register')
-			.expect('Content-Type', /json/)
-			.send('email=foo@test.com')
-			.send('password=password')
-			.send('username=bananas')
-			.expect(function(res) {
-				expect(res.body.default).not.to.be.undefined;
-				expect(res.body.default.message).to.equal('An unknown error occurred: {{message}}');
-			})
-			.expect(500, done);
-		});
-
-		it('should not log the user in if registration fails', function(done) {
+		it('should not log the user in if the email doesn\'t exist', function(done) {
 			let cookie = null;
 
 			request(app)
-			.post('/auth/register')
+			.post('/auth/login')
 			.expect('Content-Type', /json/)
 			.send('email=foo@test.com')
 			.send('password=password')
-			.send('username=bananas')
-			.expect(function(res) {
-				expect(res.body.default).not.to.be.undefined;
-				expect(res.body.default.message).to.equal('An unknown error occurred: {{message}}');
-			})
-			.expect(500)
+			.expect(404)
 			.end(function (err, res) {
+				expect(
+					res.body
+				).to.deep.equal({
+					email: _.assign({params:{}}, config.errors.auth.UNKNOWN_USER)
+				});
+
 				cookie = res.headers['set-cookie'].pop().split(';')[0];
 				let req = request(app).get('/dashboard?responseFormat=json');
 				req.cookies = cookie;
@@ -121,37 +90,34 @@ describe('POST /auth/register', function() {
 			});
 		});
 
-		
-
-		it('should create a user if all necessary information is provided', function(done) {
+		it('should not log the user in if the password is incorrect', function(done) {
 			request(app)
-			.post('/auth/register')
-			.send('email=foo@test.com')
-			.send('password=password')
-			.expect('Content-Type', /json/)
-			.expect(function(res) {
-				expect(res.body.email).to.equal('foo@test.com');
-			})
-			.expect(200, done);
+			.post('/auth/login')
+			.expect(404)
+			.send('email=test@test.com')
+			.send('password=password1')
+			.end(function(err, res) {
+				expect(
+					res.body
+				).to.deep.equal({
+					password: _.assign({params:{}}, config.errors.auth.INVALID_PASSWORD)
+				});
+				done();
+			});
 		});
 
-		it('should log the user in after registration', function(done) {
-			let cookie = null;
-
+		it('should log the user in if all necessary information is provided', function(done) {
 			request(app)
-			.post('/auth/register')
-			.send('email=foo@test.com')
+			.post('/auth/login')
+			.send('email=test@test.com')
 			.send('password=password')
 			.expect('Content-Type', /json/)
-			.expect(function(res) {
-				expect(res.body.email).to.equal('foo@test.com');
-			})
-			.expect(200)
-			.end(function (err, res) {
+			.end(function(err, res) {
+				expect(res.body.email).to.equal('test@test.com');
 				getSession(res).then(session => {
 					expect(session.passport).to.be.ok;
 					expect(session.passport.user).to.be.ok;
-					cookie = res.headers['set-cookie'].pop().split(';')[0];
+					let cookie = res.headers['set-cookie'].pop().split(';')[0];
 					let req = request(app).get('/dashboard');
 					req.cookies = cookie;
 					req.expect(200, done);
@@ -162,29 +128,9 @@ describe('POST /auth/register', function() {
 	});
 	
 	describe('responseFormat html', function() {
-		it('should throw an error if the user is already registered', function(done) {
-			request(app)
-			.post('/auth/register?responseFormat=html')
-			.send('firstName=Aaron')
-			.send('lastName=Larner')
-			.send('email=test@test.com')
-			.send('password=password')
-			.expect(302)
-			.end(function(err, res) {
-				getSession(res).then(session => {
-					let list = new HowhapList(session._howhap.errors);
-					expect(list.toObject()).to.deep.equal({
-						default: _.assign({params:{}}, config.errors.auth.EMAIL_EXISTS)
-					});
-					done();
-				})
-				.catch(err => console.log(err));
-			});
-		});
-
 		it('should throw an error if no email is supplied', function(done) {
 			request(app)
-			.post('/auth/register?responseFormat=html')
+			.post('/auth/login?responseFormat=html')
 			.send('password=password')
 			.expect(302)
 			.end(function(err, res) {
@@ -201,7 +147,7 @@ describe('POST /auth/register', function() {
 
 		it('should throw an error if no password is supplied', function(done) {
 			request(app)
-			.post('/auth/register?responseFormat=html')
+			.post('/auth/login?responseFormat=html')
 			.send('email=foo@test.com')
 			.expect(302)
 			.end(function(err, res) {
@@ -218,7 +164,7 @@ describe('POST /auth/register', function() {
 
 		it('should throw an error if no email and no password are supplied', function(done) {
 			request(app)
-			.post('/auth/register?responseFormat=html')
+			.post('/auth/login?responseFormat=html')
 			.expect(302)
 			.end(function(err, res) {
 				getSession(res).then(session => {
@@ -233,86 +179,54 @@ describe('POST /auth/register', function() {
 			});
 		});
 
-		it('should throw an error if a bad field is supplied', function(done) {
+		it('should not log the user in if the email doesn\'t exist', function(done) {
 			request(app)
-			.post('/auth/register?responseFormat=html')
+			.post('/auth/login?responseFormat=html')
 			.expect(302)
 			.send('email=foo@test.com')
 			.send('password=password')
-			.send('username=bananas')
 			.end(function(err, res) {
 				getSession(res).then(session => {
 					let list = new HowhapList(session._howhap.errors);
-					let obj = list.toObject();
-					expect(obj.default).not.to.be.undefined;
-					expect(obj.default.message).to.equal('An unknown error occurred: {{message}}');
+					expect(list.toObject()).to.deep.equal({
+						email: _.assign({params:{}}, config.errors.auth.UNKNOWN_USER)
+					});
 					done();
 				})
 				.catch(err => console.log(err));
 			});
 		});
 
-		it('should not log the user in if registration fails', function(done) {
-			let cookie = null;
-
+		it('should not log the user in if the password is incorrect', function(done) {
 			request(app)
-			.post('/auth/register?responseFormat=html')
+			.post('/auth/login?responseFormat=html')
 			.expect(302)
-			.send('email=foo@test.com')
-			.send('password=password')
-			.send('username=bananas')
+			.send('email=test@test.com')
+			.send('password=password1')
 			.end(function(err, res) {
 				getSession(res).then(session => {
 					let list = new HowhapList(session._howhap.errors);
-					let obj = list.toObject();
-					expect(obj.default).not.to.be.undefined;
-					expect(obj.default.message).to.equal('An unknown error occurred: {{message}}');
-					
-					cookie = res.headers['set-cookie'][0].split(';')[0];
-					let req = request(app).get('/dashboard?responseFormat=html');
-					req.cookies = cookie;
-					req.expect(302)
-					.end(function(err, r) {
-						getSession(res).then(session => {
-							let list = new HowhapList(session._howhap.errors);
-							expect(list.toObject()).to.deep.equal({
-								default: {
-									message: 'You must be logged in to perform that action.',
-									params: {},
-									status: 403
-								}
-							});
-							done();
-						})
-						.catch(err => console.log(err));
+					expect(list.toObject()).to.deep.equal({
+						password: _.assign({params:{}}, config.errors.auth.INVALID_PASSWORD)
 					});
+					done();
 				})
 				.catch(err => console.log(err));
 			});
 		});
 
-		it('should create a user if all necessary information is provided', function(done) {
+		it('should log the user in if all necessary information is provided', function(done) {
 			request(app)
-			.post('/auth/register?responseFormat=html')
-			.send('email=foo@test.com')
-			.send('password=password')
-			.expect('Location', '/dashboard')
-			.expect(302, done);
-		});
-
-		it('should log the user in after registration', function(done) {
-			let cookie = null;
-
-			request(app)
-			.post('/auth/register?responseFormat=html')
-			.send('email=foo@test.com')
+			.post('/auth/login?responseFormat=html')
+			.send('email=test@test.com')
 			.send('password=password')
 			.expect(302)
-			.end(function (err, res) {
+			.expect('Location', '/dashboard')
+			.end(function(err, res) {
 				getSession(res).then(session => {
 					expect(session.passport).to.be.ok;
 					expect(session.passport.user).to.be.ok;
-					cookie = res.headers['set-cookie'].pop().split(';')[0];
+					let cookie = res.headers['set-cookie'].pop().split(';')[0];
 					let req = request(app).get('/dashboard');
 					req.cookies = cookie;
 					req.expect(200, done);

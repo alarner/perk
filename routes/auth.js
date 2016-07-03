@@ -65,10 +65,10 @@ router.post('/email', validateAuthProfile, function(req, res, next) {
 				res.error.add('auth.UNKNOWN').send('/auth/login');
 			}
 			else {
-				if(req.accepts('html')) {
+				if(req.responseFormat() === 'html') {
 					res.redirect(config.auth[authModel.get('type')].redirect || '/auth/finish');
 				}
-				else {
+				else if(req.responseFormat() === 'json') {
 					res.json(userModel.toJSON());
 				}
 			}
@@ -87,10 +87,10 @@ router.get('/login', function(req, res, next) {
 
 router.use('/logout', function(req, res, next) {
 	delete req.session.passport;
-	if(req.accepts('html')) {
+	if(req.responseFormat() === 'html') {
 		res.redirect(req.query.redirect || '/');
 	}
-	else {
+	else if(req.responseFormat() === 'json') {
 		res.json({success: true});
 	}
 });
@@ -108,10 +108,10 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 		.catch(t.rollback);
 	})
 	.then(user => {
-		if(req.accepts('html')) {
+		if(req.responseFormat() === 'html') {
 			res.redirect(config.auth.local.registerRedirect || '/auth/finish');
 		}
-		else {
+		else if(req.responseFormat() === 'json') {
 			res.json(user.toJSON());
 		}
 	})
@@ -122,7 +122,7 @@ router.post('/register', validateLocalCredentials, function(req, res, next) {
 		else {
 			res.error.add('auth.UNKNOWN', {message: err.toString()});
 		}
-		res.error.send();
+		res.error.send('/auth/register');
 	});
 });
 
@@ -154,14 +154,14 @@ router.post('/login', validateLocalCredentials, function(req, res, next) {
 							res.error.add('auth.UNKNOWN').send(errorRedirect);
 						}
 						else {
-							if(req.accepts('html')) {
+							if(req.responseFormat() === 'html') {
 								res.redirect(
 									req.body.redirect ||
 									config.auth.local.loginRedirect ||
 									'/dashboard'
 								);
 							}
-							else {
+							else if(req.responseFormat() === 'json') {
 								res.json(auth.related('user').toJSON());
 							}
 						}

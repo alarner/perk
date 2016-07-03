@@ -6,7 +6,7 @@
 	</head>
 	<body>
 		<h1>Log in</h1>
-		<form action="/auth/login" method="post">
+		<form action="/auth/login?responseFormat=html" method="post">
 			<div>
 				<%- error.display('email') %>
 				<input type="email" placeholder="email" name="email" value="<%= prev.display('body', 'email') %>">

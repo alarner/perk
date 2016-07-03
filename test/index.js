@@ -1,6 +1,15 @@
-let config = require('../lib/config');
 before(done => {
-	global.knex = require('knex')(config.testDatabase);
+	global.knex = require('knex')({
+		client: 'sqlite3',
+		useNullAsDefault: true,
+		connection: {
+			filename: './test/fixtures/test1.db'
+		},
+		seeds: {
+			directory: './test/seeds'
+		}//,
+		// debug: true
+	});
 	global.app = require('../app');
 
 	knex.migrate.latest()
@@ -24,5 +33,6 @@ beforeEach(done => {
 	.catch(err => {
 		console.log('MIGRATION / SEED ERROR:');
 		console.log(err);
+		done();
 	});
 });
