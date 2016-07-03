@@ -8,7 +8,8 @@
     "dev": "node ./bin/config --check-local && node --use_strict ./bin/build --watch --scripts --styles --server",
     "config": "node ./bin/config",
     "build": "NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify",
-    "heroku-postbuild": "node --use_strict ./bin/heroku-postbuild"
+    "heroku-postbuild": "node --use_strict ./bin/heroku-postbuild",
+    "eslint": "eslint ./"
   },
   "devDependencies": {
     "chai": "^3.5.0",
