@@ -3,9 +3,7 @@ let loggedIn = require('../lib/middleware/logged-in');
 let router = express.Router();
 
 router.get('/', function(req, res, next) {
-        res.render('index', {
-                title: "Perk Framework"
-        });
+        res.render('index');
 });
 
 router.get('/dashboard', loggedIn({ defaultFormat: 'html' }), function(req, res, next) {

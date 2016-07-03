@@ -11,7 +11,7 @@ let app = {
 
 	path: './bin/www',
 
-	env: Object.assign({}, process.env, { NODE_ENV: 'development', port: 3000 }),
+	env: Object.assign({}, process.env, { NODE_ENV: 'development', PORT: 3000 }),
 
 	start: function(type, file, cb) {
 		process.execArgv = [ '--use_strict' ];
@@ -22,7 +22,7 @@ let app = {
 		app.instance.stderr.pipe( process.stderr );
 
 		if(type === 'start') {
-			utils.log('Server', 'started', 'success');
+			utils.log('Server', `listening at http://127.0.0.1:${this.env.PORT} | NODE_ENV=${process.env.NODE_ENV}`, 'success');
 		}
 		else if(type === 'restart') {
 			utils.log('Server', `restarted from file change ${file}`, 'success');
