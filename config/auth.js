@@ -1,4 +1,9 @@
 module.exports = {
+	local: {
+		saltRounds: 10,
+		registerRedirect: '/dashboard',
+		loginRedirect: '/dashboard'
+	},
 	google: {
 		clientID: '{{ Google OAuth2 Client ID }}',
 		clientSecret: '{{ Google OAuth2 Client Secret }}',
@@ -10,7 +15,8 @@ module.exports = {
 			// 'https://www.googleapis.com/auth/userinfo.profile',
 			// 'https://www.googleapis.com/auth/calendar'
 		],
-		requireEmail: true
+		requireEmail: true,
+		redirect: '/dashboard'
 	},
 	facebook: {
 		clientID: '{{ Facebook OAuth2 Client ID }}',
@@ -19,20 +25,17 @@ module.exports = {
 		scope: [
 			// 'email'
 		],
-		requireEmail: true
+		requireEmail: true,
+		redirect: '/dashboard'
 	},
 	trello: {
-		consumerKey: '{{ Trello Consumber Key }}',
-		consumerSecret: '{{ Trello Consumer Secret }}',
+		clientID: '{{ Trello Consumer Key }}',
+		clientSecret: '{{ Trello Consumer Secret }}',
 		scope: [
 			// 'read',
 			// 'write'
 		],
-		requireEmail: true
-	},
-	local: {
-		saltRounds: 10,
-		registerRedirect: '/dashboard',
-		loginRedirect: '/test'
+		requireEmail: true,
+		redirect: '/dashboard'
 	}
 };

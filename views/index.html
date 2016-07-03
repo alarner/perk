@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>A Fresh Perk App</title>
+		<link rel="stylesheet" href="<%= env === 'development' ? '/styles/main.scss.css' : '/styles/main.scss.min.css?'+version %>" />
+
+	</head>
+	<body>
+		<h1>A Fresh Perk App</h1>
+		<p>Newly installed and ready to go!</p>
+		<p>We recommend checking out the <a href="http://perkframework.com">documentation</a> if you haven't already.</p>
+		<script type="text/javascript" src="<%= env === 'development' ? '/scripts/bundle.js' : '/scripts/bundle.min.js?'+version %>"></script>
+	</body>
+</html>

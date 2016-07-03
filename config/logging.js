@@ -1,10 +1,24 @@
-// Options for bunyan logger
-// https://github.com/trentm/node-bunyan
-var PrettyStream = require('bunyan-prettystream');
-var prettyStdOut = new PrettyStream();
-prettyStdOut.pipe(process.stdout);
+// Options for winston logger
+// https://github.com/winstonjs/winston
+
+let winston = require('winston');
+
 module.exports = {
-	name: 'react-express',
-	stream: prettyStdOut,
-    level: 'info'
+	level: 'info',
+	transports: [
+		new winston.transports.Console({
+			handleExceptions: true,
+			humanReadableUnhandledException: true,
+			colorize: true,
+			prettyPrint: true
+		})
+	],
+	colors: {
+		error: 'red',
+		warn: 'orange',
+		info: 'blue',
+		verbose: 'purple',
+		debug: 'yellow',
+		silly: 'pink'
+	}
 };

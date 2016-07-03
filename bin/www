@@ -11,13 +11,13 @@ var https = require('https');
 var config = require('../lib/config');
 var logger = require('../lib/logger');
 
-app.set('port', config.webserver.port);
+app.set('port', config.webserver.proxyPort);
 
 /**
  * Create HTTP server.
  */
 if(config.webserver.http) {
-	var httpPort = normalizePort(process.env.PORT || config.webserver.http.port || '3000');
+	var httpPort = normalizePort(process.env.PORT || config.webserver.http.proxyPort || '3000');
 	var httpServer = http.createServer(app);
 	var httpEvents = new Events(httpPort, httpServer);
 	httpServer.listen(httpPort);
@@ -37,10 +37,10 @@ if(config.webserver.https) {
 	catch(e) {
 		error = true;
 		if(e.code === 'ENOENT') {
-			logger.fatal({path: config.webserver.https.keyPath}, 'https key file does not exist.');
+			logger.error('https key file does not exist: %s', config.webserver.https.keyPath);
 		}
 		else {
-			logger.fatal(e.toString());
+			logger.error(e.toString());
 		}
 	}
 	try {
@@ -49,15 +49,15 @@ if(config.webserver.https) {
 	catch(e) {
 		error = true;
 		if(e.code === 'ENOENT') {
-			logger.fatal({path: config.webserver.https.certPath}, 'https certificate file does not exist.');
+			logger.error('https certificate file does not exist %s', config.webserver.https.certPath);
 		}
 		else {
-			logger.fatal(e.toString());
+			logger.error(e.toString());
 		}
 	}
 
 	if(!error) {
-		var httpsPort = normalizePort(config.webserver.https.port);
+		var httpsPort = normalizePort(config.webserver.https.proxyPort);
 		var httpsServer = https.createServer({key: privateKey, cert: certificate}, app);
 		var httpsEvents = new Events(httpsPort, httpsServer);
 		httpsServer.listen(httpsPort);
@@ -103,11 +103,11 @@ function Events(port, server) {
 		// handle specific listen errors with friendly messages
 		switch (error.code) {
 			case 'EACCES':
-				logger.fatal(bind + ' requires elevated privileges');
+				logger.error(bind + ' requires elevated privileges');
 				process.exit(1);
 				break;
 			case 'EADDRINUSE':
-				logger.fatal(bind + ' is already in use');
+				logger.error(bind + ' is already in use');
 				process.exit(1);
 				break;
 			default:

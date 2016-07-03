@@ -1,10 +1,10 @@
 module.exports = {
 	UNKNOWN: {
-		message: 'An unknown error occurred.',
+		message: 'An unknown error occurred: {{message}}',
 		status: 500
 	},
 	EMAIL_EXISTS: {
-		message: 'A user with that email has already registered. Would you like to <a href="/auth/reset-password">reset your password</a>?',
+		message: 'A user with that email has already registered.',
 		status: 409
 	},
 	INVALID_PASSWORD: {
@@ -26,5 +26,9 @@ module.exports = {
 	MISSING_PASSWORD: {
 		message: 'Please enter a password.',
 		status: 400
+	},
+	NOT_LOGGED_IN: {
+		message: 'You must be logged in to perform that action.',
+		status: 403
 	}
 };

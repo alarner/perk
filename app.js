@@ -1,58 +1,64 @@
-/*eslint strict: [0]*/
 let config = require('./lib/config');
 
-global.knex = require('knex')(config.database);
+// Defer to unit test version of knex if it's already defined
+if(!global.knex) {
+	global.knex = require('knex')(config.database);
+}
 global.bookshelf = require('bookshelf')(global.knex);
 bookshelf.plugin('registry');
 
 let express = require('express');
 let path = require('path');
-// let favicon = require('serve-favicon');
-// let logger = require('morgan');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 let session = require('express-session');
-let includeAll = require('include-all');
-let errors = includeAll({
-	dirname: path.join(__dirname, 'errors'),
-	filter:  /(.+)\.js$/
-});
 let howhap = require('howhap-middleware');
 let RedisStore = require('connect-redis')(session);
 let _ = require('lodash');
 let flash = require('./lib/middleware/flash-messages');
-// let error = require('./lib/middleware/error-sender');
-
+let versions = require('./lib/middleware/versions');
 let passportSetup = require('./lib/auth/passport-setup');
-let index = require('./routes/index');
-// let api1 = require('./routes/api1');
-let auth = require('./routes/auth');
+let consolidate = require('consolidate');
 
 let app = express();
 
-let sessionConfig = _.extend({}, config.session, {store: new RedisStore()});
+let sessionConfig = _.extend({}, config.session, {store: new RedisStore(config.session.store || {})});
 app.use(session(sessionConfig));
 app.use(howhap({
-	availableErrors: errors,
+	availableErrors: config.errors,
 	logging: config.logging
 }));
 
 // view engine setup
+app.engine('html', consolidate.ejs);
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'html');
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-// app.use(logger('dev'));
+// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash);
-// app.use(error);
+app.use(versions);
 passportSetup(app);
 
-// app.use('/api/v1/', api1);
+/*******************************/
+/*                             */
+/*            ROUTES           */
+/*                             */
+/*******************************/
+
+/* 1. ROUTES are loaded here */
+
+// let api = require('./routes/api1');
+let index = require('./routes/index');
+let auth = require('./routes/auth');
+
+/* 2. ROUTES are added here */
+
+// app.use('/api/v1/', api);
 app.use('/auth', auth);
 app.use('/', index);
 
@@ -86,6 +92,5 @@ app.use(function(err, req, res, next) {
 		error: {}
 	});
 });
-
 
 module.exports = app;

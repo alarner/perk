@@ -9,8 +9,11 @@ let validateAuthProfile = require('../lib/middleware/validate-auth-profile');
 let validateLocalCredentials = require('../lib/middleware/validate-local-credentials');
 let authenticator = require('../lib/auth/authenticator');
 let AuthenticationModel = require('../models/Authentication');
-let UserModel = require('../models/User');
-
+let noDupe = require('../lib/auth/no-dupe');
+let createUser = require('../lib/auth/create-user');
+let createAuth = require('../lib/auth/create-auth');
+let login = require('../lib/auth/login');
+let Howhap = require('howhap');
 
 router.use('/:type/login', validateAuthType, function(req, res, next) {
 	passport.authenticate(
@@ -24,8 +27,8 @@ router.use('/:type/login', validateAuthType, function(req, res, next) {
 router.get('/:type/callback', validateAuthType, function(req, res, next) {
 	passport.authenticate(
 		req.params.type,
-		{ 
-			successRedirect: '/auth/'+req.params.type+'/success',
+		{
+			successRedirect: config.auth[req.params.type].redirect || '/auth/finish',
 			failureRedirect: '/auth/'+req.params.type+'/failure'
 		}
 	)(req, res, next);
@@ -56,8 +59,20 @@ router.post('/email', validateAuthProfile, function(req, res, next) {
 		return res.redirect('/auth/email');
 	}
 	req.session._auth_profile.email = req.body.email;
-	authenticator(req, req.session._auth_access_token, req.session._auth_profile, req.session._auth_type, function(err, authModel) {
-		return res.redirect('/auth/finish');
+	authenticator(req, req.session._auth_access_token, req.session._auth_profile, req.session._auth_type, function(err, authModel, userModel) {
+		req.logIn(userModel, err => {
+			if(err) {
+				res.error.add('auth.UNKNOWN').send('/auth/login');
+			}
+			else {
+				if(req.accepts('html')) {
+					res.redirect(config.auth[authModel.get('type')].redirect || '/auth/finish');
+				}
+				else {
+					res.json(userModel.toJSON());
+				}
+			}
+		});
 	});
 
 });
@@ -67,70 +82,55 @@ router.get('/register', function(req, res, next) {
 });
 
 router.get('/login', function(req, res, next) {
-	res.render('auth/login');
+	res.render('auth/login', { redirect: req.query.redirect || false });
+});
+
+router.use('/logout', function(req, res, next) {
+	delete req.session.passport;
+	if(req.accepts('html')) {
+		res.redirect(req.query.redirect || '/');
+	}
+	else {
+		res.json({success: true});
+	}
 });
 
 router.post('/register', validateLocalCredentials, function(req, res, next) {
-	UserModel
-	.forge({email: req.body.email})
-	.fetch()
-	.then(function(u) {
-		// The account already exists, return an error.
-		if(u) {
-			res.error.add('auth.EMAIL_EXISTS', 'email');
-			res.error.send('/auth/register');
+	let userData = Object.assign({}, req.body);
+	delete userData.password;
+
+	bookshelf.transaction(function(t) {
+		return noDupe(req.body.email, t)
+		.then(createUser.bind(null, userData, t))
+		.then(user => createAuth(user, req.body.password, t))
+		.then(user => login(user, req.logIn.bind(req)))
+		.then(t.commit)
+		.catch(t.rollback);
+	})
+	.then(user => {
+		if(req.accepts('html')) {
+			res.redirect(config.auth.local.registerRedirect || '/auth/finish');
 		}
-		// The account doesn't exists. Create it.
 		else {
-			bookshelf.transaction(function(t) {
-				let newUser = new UserModel({
-					firstName: req.body.firstName,
-					lastName: req.body.lastName,
-					email: req.body.email
-				});
-				newUser.save(null, {transacting: t})
-				.then(function(user) {
-					return new Promise(function(resolve, reject) {
-						bcrypt.genSalt(config.auth.local.saltRounds, function(err, salt) {
-							bcrypt.hash(req.body.password, salt, function(err, hash) {
-								if(err) {
-									reject(err);
-								}
-								else {
-									AuthenticationModel.forge({
-										type: 'local',
-										identifier: req.body.email,
-										password: hash,
-										userId: user.id
-									})
-									.save(null, {transacting: t})
-									.then(resolve)
-									.catch(reject);
-								}
-							});
-						});
-					});
-				})
-				.then(t.commit)
-				.then(function() {
-					if(req.accepts('html')) {
-						res.redirect(config.auth.local.registerRedirect || '/auth/finish');
-					}
-					else {
-						res.json(newUser.toJSON());
-					}
-				})
-				.catch(function(err) {
-					t.rollback();
-					res.error.add('auth.UNKNOWN');
-					res.error.send('/auth/register');
-				});
-			});
+			res.json(user.toJSON());
 		}
+	})
+	.catch(err => {
+		if(err instanceof Howhap) {
+			res.error.add(err.toJSON());
+		}
+		else {
+			res.error.add('auth.UNKNOWN', {message: err.toString()});
+		}
+		res.error.send();
 	});
 });
 
 router.post('/login', validateLocalCredentials, function(req, res, next) {
+	let errorRedirect = '/auth/login';
+	if(req.body.redirect) {
+		errorRedirect += '?redirect='+encodeURIComponent(req.body.redirect);
+	}
 	AuthenticationModel.forge({
 		type: 'local',
 		identifier: req.body.email
@@ -138,26 +138,34 @@ router.post('/login', validateLocalCredentials, function(req, res, next) {
 	.fetch({withRelated: ['user']})
 	.then(function(auth) {
 		if(!auth) {
-			res.error.add('auth.UNKNOWN_USER', 'email');
-			res.error.send('/auth/login');
+			res.error.add('auth.UNKNOWN_USER', 'email').send(errorRedirect);
 		}
 		else {
 			bcrypt.compare(req.body.password, auth.get('password'), function(err, result) {
 				if(err) {
-					res.error.add('auth.UNKNOWN');
-					res.error.send('/auth/login');
+					res.error.add('auth.UNKNOWN').send(errorRedirect);
 				}
 				else if(!result) {
-					res.error.add('auth.INVALID_PASSWORD', 'password');
-					res.error.send('/auth/login');
+					res.error.add('auth.INVALID_PASSWORD', 'password').send(errorRedirect);
 				}
 				else {
-					if(req.accepts('html')) {
-						res.redirect(config.auth.local.loginRedirect || '/auth/finish');
-					}
-					else {
-						res.json();
-					}
+					req.logIn(auth.related('user'), err => {
+						if(err) {
+							res.error.add('auth.UNKNOWN').send(errorRedirect);
+						}
+						else {
+							if(req.accepts('html')) {
+								res.redirect(
+									req.body.redirect ||
+									config.auth.local.loginRedirect ||
+									'/dashboard'
+								);
+							}
+							else {
+								res.json(auth.related('user').toJSON());
+							}
+						}
+					});
 				}
 			});
 		}
