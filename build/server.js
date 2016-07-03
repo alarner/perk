@@ -6,8 +6,6 @@ let path = require('path');
 let fs = require('fs');
 let config = require('../lib/config');
 
-let os = require('os')
-
 let app = {
 	instance: {},
 
