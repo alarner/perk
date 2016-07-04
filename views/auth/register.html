@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Register</title>
-		<link rel='stylesheet' href='/styles/main.scss.css' />
+		<link rel="stylesheet" href="<%= env === 'development' ? '/styles/main.scss.css' : '/styles/main.scss.min.css?'+version %>" />
 	</head>
 	<body>
 		<h1>Register</h1>
