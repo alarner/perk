@@ -11,9 +11,8 @@ let config = require('../lib/config');
 
 module.exports = function(sassDir, minify, watch, cb) {
 	// Get sass graph
-	let graph = grapher.parseDir(path.join(config.root, sassDir), {
-		extensions: ['scss', 'sass']
-	});
+	let graph = null;
+	rebuildGraph();
 
 	// Compile on start
 	let initialFiles = [];
@@ -50,8 +49,18 @@ module.exports = function(sassDir, minify, watch, cb) {
 		if(config.build.watching.poll) {
 			chokidarConf.interval = config.build.watching.interval || 100;
 		}
-		chokidar.watch(`${path.join(config.root, sassDir)}**/*.scss`, chokidarConf).on('add', sassyChange);
+		chokidar.watch(`${path.join(config.root, sassDir)}**/*.scss`, chokidarConf).on('add', rebuildGraph);
 		chokidar.watch(`${path.join(config.root, sassDir)}**/*.scss`, chokidarConf).on('change', sassyChange);
+	}
+
+	function rebuildGraph(file, cb) {
+		graph = grapher.parseDir(path.join(config.root, sassDir), {
+			extensions: ['scss', 'sass']
+		});
+
+		if(file) {
+			sassyChange(file, cb);
+		}
 	}
 
 	// Process the change of a sass file

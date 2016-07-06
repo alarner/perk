@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Log in</title>
-		<link rel='stylesheet' href='/styles/main.scss.css' />
+		<link rel="stylesheet" href="<%= env === 'development' ? '/styles/main.scss.css' : '/styles/main.scss.min.css?'+version %>" />
 	</head>
 	<body>
 		<h1>Log in</h1>
