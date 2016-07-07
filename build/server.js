@@ -11,7 +11,7 @@ let app = {
 
 	path: './bin/www',
 
-	env: Object.assign({}, process.env, { NODE_ENV: 'development', PORT: 3000 }),
+	env: Object.assign({}, { NODE_ENV: 'development', PORT: config.webserver.port }, process.env),
 
 	start: function(type, file, cb) {
 		process.execArgv = [ '--use_strict' ];
@@ -21,10 +21,7 @@ let app = {
 		app.instance.stdout.pipe( process.stdout );
 		app.instance.stderr.pipe( process.stderr );
 
-		if(type === 'start') {
-			utils.log('Server', `running at 127.0.0.1:${this.env.PORT}`, 'success');
-		}
-		else if(type === 'restart') {
+		if(type === 'restart') {
 			utils.log('Server', `restarted from file change ${file}`, 'success');
 		}
 
@@ -74,5 +71,7 @@ module.exports = function(files, cb) {
 	});
 	chokidar.watch(files, chokidarConf).on('add', file => app.restart('restart', file));
 	chokidar.watch(files, chokidarConf).on('change', file => app.restart('restart', file));
-	app.restart('start');
+	app.restart('start', null, function() {
+		cb(null, app.env);
+	});
 };
