@@ -82,7 +82,7 @@
   "scripts": {
     "start": "node --use_strict ./bin/www",
     "test": "mocha",
-    "dev": "node ./bin/config --check-local && node --use_strict ./bin/build --watch --scripts --styles --server",
+    "dev": "node ./bin/config --check-local && NODE_ENV=development node --use_strict ./bin/build --watch --scripts --styles --server",
     "config": "node ./bin/config",
     "build": "NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify",
     "heroku-postbuild": "node --use_strict ./bin/heroku-postbuild",
