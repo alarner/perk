@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
+let async = require('async');
 let config = require('../lib/config');
 let logger = require('../lib/logger');
+let utils = require('../build/utils');
 let parseArgs = require('minimist')(process.argv);
 
 let loader = false;
@@ -18,36 +20,61 @@ let defaultArgs = {
 
 let args = Object.assign({}, defaultArgs, parseArgs);
 
-// Build / Watch JavaScript
-if(args.scripts) {
-	switch(args.loader) {
-		case 'browserify':
-			loader = require('../build/browserify');
-		break;
-		case 'webpack':
-			loader = require('../build/webpack');
-		break;
-		default:
-			logger.error('loader does not exist: %s', config.build.loader);
-		break;
+async.parallel(
+	{
+		// Build / Watch JavaScript
+		js: function(cb) {
+			if(args.scripts) {
+				switch(args.loader) {
+					case 'browserify':
+						loader = require('../build/browserify');
+					break;
+					case 'webpack':
+						loader = require('../build/webpack');
+					break;
+					default:
+						logger.error('loader does not exist: %s', config.build.loader);
+					break;
+				}
+
+				loader(config.build.scripts.files, args.minify, args.watch, cb);
+			}
+			else {
+				cb();
+			}
+		},
+		// Build / Watch SCSS
+		sass: function(cb) {
+			if(args.styles) {
+				let sass = require('../build/sass');
+				sass(config.build.styles.directory, args.minify, args.watch, cb);
+			}
+			else {
+				cb();
+			}
+		},
+		// Run / Watch Server
+		server: function(cb) {
+			if(args.server) {
+				let server = require('../build/server');
+				server(config.build.server.files, cb);
+			}
+			else {
+				cb();
+			}
+		},
+		// todo:
+		// Optimize Images
+		images: function(cb) {
+			if(args.images) {
+				cb();
+			}
+			else {
+				cb();
+			}
+		}
+	},
+	function(err, data) {
+		utils.log('Server', `running at 127.0.0.1:${data.server.PORT}`, 'success');
 	}
-
-	loader(config.build.scripts.files, args.minify, args.watch);
-}
-
-// Build / Watch SCSS
-if(args.styles) {
-	let sass = require('../build/sass');
-	sass(config.build.styles.directory, args.minify, args.watch);
-}
-
-// Run / Watch Server
-if(args.server) {
-	let server = require('../build/server');
-	server(config.build.server.files);
-}
-
-// Optimize Images
-if(args.images) {
-
-}
+);
