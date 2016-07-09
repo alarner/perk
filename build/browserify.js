@@ -9,7 +9,8 @@ let chokidar = require('chokidar');
 let config = require('../lib/config');
 const CLIENT_JS_DIR = path.join(config.root, 'public', 'scripts');
 
-module.exports = function(files, minify, watch, cb) {	
+module.exports = function(files, minify, watch, cb) {
+	let cbCalled = false;	
 	let b = browserify({
 		entries: files,
 		deps: true,
@@ -43,7 +44,6 @@ module.exports = function(files, minify, watch, cb) {
 
 		b.bundle()
 		.on('error', function(err) {
-			// console.log(err);
 			utils.error('Browserify', err.toString(), err.filename || 'unknown', err.loc ? err.loc.line || 'unknown' : 'unknown');
 		})
 		.on('end', function() {
@@ -53,8 +53,9 @@ module.exports = function(files, minify, watch, cb) {
 			else {
 				utils.log('Browserify', 'Bundle successful.', 'success');
 			}
-			if(cb && _.isFunction(cb)) {
+			if(!cbCalled && cb && _.isFunction(cb)) {
 				cb();
+				cbCalled = true;
 			}
 		})
 		.pipe(writeStream);

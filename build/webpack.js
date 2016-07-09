@@ -5,7 +5,8 @@ let utils = require('./utils');
 let config = require('../lib/config');
 
 module.exports = function(files, minify, watch, cb) {
-	
+	let cbCalled = false;
+
 	function finish(err, stats) {
 		if(err) {
 			console.log(err);
@@ -33,11 +34,11 @@ module.exports = function(files, minify, watch, cb) {
 			utils.log('Webpack', 'bundle updated', 'success');
 		}
 
-		if(cb && _.isFunction(cb)) {
+		if(!cbCalled && cb && _.isFunction(cb)) {
 			cb(err, stats);
+			cbCalled = true;
 		}
 	}
-	// console.log('.'+path.join(config.root, 'public', 'scripts').substr(config.root.length-1));
 
 	files = files.map(file => {
 		if(file.charAt(0) !== path.sep) {
