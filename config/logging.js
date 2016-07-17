@@ -1,12 +1,9 @@
 // Options for winston logger
 // https://github.com/winstonjs/winston
-
-let winston = require('winston');
-
 module.exports = {
 	level: 'info',
 	transports: [
-		new winston.transports.Console({
+		new (require('winston').transports.Console)({
 			handleExceptions: true,
 			humanReadableUnhandledException: true,
 			colorize: true,
