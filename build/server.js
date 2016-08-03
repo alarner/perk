@@ -22,7 +22,7 @@ let app = {
 		app.instance.stderr.pipe( process.stderr );
 
 		if(type === 'restart') {
-			utils.log('Server', `restarted from file change ${file.replace(config.root,'')}`, 'success');
+			utils.log('Server', `restarted from file change ${file.substr(config.root.length+1)}`, 'success');
 		}
 
 		if(cb) {
