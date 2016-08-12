@@ -37,5 +37,14 @@ module.exports = {
 		],
 		requireEmail: true,
 		redirect: '/dashboard'
+	},
+	github: {
+		clientID: '{{ Github Auth ClientID }}',
+		clientSecret: '{{ Github Auth Client Secret }}',
+		scope: [ 
+			//'user:email',
+		],
+		requireEmail: true,
+		redirect: '/dashboard'
 	}
 };
