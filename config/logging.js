@@ -11,8 +11,8 @@ module.exports = {
 		})
 	],
 	colors: {
-		error: 'red',
-		warn: 'orange',
+		error: 'bgRed',
+		warn: 'red',
 		info: 'blue',
 		verbose: 'purple',
 		debug: 'yellow',
