@@ -86,7 +86,7 @@
     "config": "node ./bin/config",
     "build": "NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify",
     "heroku-postbuild": "node --use_strict ./bin/heroku-postbuild",
-    "eslint": "eslint ./"
+    "eslint": "eslint ./ || true"
   },
   "version": "0.0.3"
 }
