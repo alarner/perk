@@ -9,4 +9,3 @@
 /public/styles/**/*.css
 /public/styles/**/*.map
 npm-debug.log
-/test/fixtures/test1.db

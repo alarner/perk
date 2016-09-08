@@ -1,9 +1,12 @@
-before(done => {
+const fs = require('fs');
+const path = require('path');
+
+before((done) => {
 	global.knex = require('knex')({
 		client: 'sqlite3',
 		useNullAsDefault: true,
 		connection: {
-			filename: './test/fixtures/test1.db'
+			filename: './test/fixtures/test.db'
 		},
 		seeds: {
 			directory: './test/seeds'
@@ -19,20 +22,28 @@ before(done => {
 	.then(() => {
 		done();
 	})
-	.catch(err => {
+	.catch((err) => {
 		console.log('MIGRATION / SEED ERROR:');
 		console.log(err);
+		done(err);
 	});
 });
 
-beforeEach(done => {
+beforeEach((done) => {
 	knex.seed.run()
 	.then(() => {
 		done();
 	})
-	.catch(err => {
+	.catch((err) => {
 		console.log('MIGRATION / SEED ERROR:');
 		console.log(err);
-		done();
+		done(err);
 	});
+});
+
+after((done) => {
+	fs
+	.createReadStream(path.join(__dirname, 'fixtures/test_template.db'))
+	.pipe(fs.createWriteStream(path.join(__dirname, 'fixtures/test.db')))
+	.on('close', done);
 });
