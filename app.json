@@ -2,5 +2,6 @@
   "name": "Perk Framework",
   "description": "A well documented set of tools for building node web applications.",
   "repository": "https://github.com/alarner/perk",
-  "keywords": ["node", "express", "passport", "redis", "knex"]
+  "keywords": ["node", "express", "passport", "redis", "knex"],
+  "addons": ["heroku-postgresql:hobby-dev"]
 }
