@@ -79,6 +79,9 @@
     "type": "git",
     "url": "https://github.com/alarner/perk.git"
   },
+  "engines": {
+    "node": "6.6.0"
+  },
   "scripts": {
     "start": "node --use_strict ./bin/www",
     "test": "eslint ./ && mocha",
