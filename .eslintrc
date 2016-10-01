@@ -21,6 +21,7 @@
 		"react/jsx-uses-react": [2],
 		"react/jsx-uses-vars": [2],
 		"no-var": [2],
+		"indent": ["error", "tab"],
 	},
 	"env": {
 		"browser": true,

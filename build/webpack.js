@@ -67,8 +67,8 @@ module.exports = function(files, minify, watch, cb) {
 			plugins: minify ? [
 				new webpack.optimize.UglifyJsPlugin({
 					compress: { warnings: false }
-    			})
-    		] : []
+				})
+			] : []
 		},
 		devtool: minify ? 'source-map' : 'inline-source-map',
 		watchOptions: {
