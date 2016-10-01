@@ -75,6 +75,8 @@ async.parallel(
 		}
 	},
 	function(err, data) {
-		utils.log('Server', `running at 127.0.0.1:${data.server.PORT}`, 'success');
+		if(data.server) {
+			utils.log('Server', `running at 127.0.0.1:${data.server.PORT}`, 'success');
+		}
 	}
 );
