@@ -1,0 +1,11 @@
+{
+  "name": "Perk Framework",
+  "description": "A well documented set of tools for building node web applications.",
+  "repository": "https://github.com/alarner/perk",
+  "keywords": ["node", "express", "passport", "redis", "knex"],
+  "addons": ["heroku-redis:hobby-dev", "heroku-postgresql:hobby-dev"],
+  "env": {
+	  "SESSION_SECRET": "heroku",
+	  "NODE_ENV": "heroku"
+  }
+}

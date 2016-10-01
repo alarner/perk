@@ -4,6 +4,8 @@
 
 The goal of Perk is first and foremost to provide a well documented set of tools for building node web applications. Perk also aims to get you up and running quickly, while still providing you the flexibility to build production ready node apps. With these goals in mind, Perk is built on top of a series of robust, well supported libraries that have stood the test of time: [Passport](http://passportjs.org/), [Express](http://expressjs.com/), [Redis](http://redis.io/), and [Knex](http://knexjs.org/). These libraries are not hidden from view. You're 100% in control to swap one out here or there if you find a better tool for the job.
 
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 ### Getting started with Perk on OS X
 
 #### [Get started](http://perkframework.com/v1/guides/getting-started-os-x.html)
@@ -34,4 +36,4 @@ Perk guides are designed to be step by step instructions for how to accomplish a
 
 ### Contributing to Perk
 
-If you're interested in contributing to Perk we would love your help. You can read our [contributors guide](CONTRIBUTORS.md) for tips on how to get started. 
+If you're interested in contributing to Perk we would love your help. You can read our [contributors guide](CONTRIBUTORS.md) for tips on how to get started.
