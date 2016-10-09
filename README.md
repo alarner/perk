@@ -4,13 +4,15 @@
 
 The goal of Perk is first and foremost to provide a well documented set of tools for building node web applications. Perk also aims to get you up and running quickly, while still providing you the flexibility to build production ready node apps. With these goals in mind, Perk is built on top of a series of robust, well supported libraries that have stood the test of time: [Passport](http://passportjs.org/), [Express](http://expressjs.com/), [Redis](http://redis.io/), and [Knex](http://knexjs.org/). These libraries are not hidden from view. You're 100% in control to swap one out here or there if you find a better tool for the job.
 
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
 ### Getting started with Perk on OS X
 
 #### [Get started](http://perkframework.com/v1/guides/getting-started-os-x.html)
 
 Perk is glue that holds together a collection of [powerful](http://passportjs.org/) and [full](http://knexjs.org/) [featured](http://expressjs.com/) [libraries](http://redis.io/) that are written by some awesome developers. This guide will help you get started on OS X.
+
+### Have questions? Join our Slack team!
+
+Fill out [this form](https://goo.gl/forms/Hhem38X1GjNEXRoD2) to get access to our slack team and we'll shoot you an invite ASAP.
 
 ### API Documentation
 
@@ -33,6 +35,10 @@ Perk guides are designed to be step by step instructions for how to accomplish a
 * [User authentication with Facebook](http://perkframework.com/v1/guides/user-auth-with-facebook.html)
 * [Deploying Perk Apps to Heroku](http://perkframework.com/v1/guides/deploying-perk-apps-to-heroku.html)
 * [Database Migrations with Knex](http://perkframework.com/v1/guides/database-migrations-knex.html)
+
+### Quickly deploy to Heroku
+
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ### Contributing to Perk
 
