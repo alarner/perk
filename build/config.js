@@ -20,7 +20,7 @@ module.exports = function(cb) {
 		}
 		else {
 			var template = require(templatePath);
-			configTemplate(template)
+			configTemplate(template, values:require(path.join(CONFIG_DIR, 'local.js')))
 			.then(function(config) {
 				var localPath = path.join(CONFIG_DIR, 'local.js');
 				fs.writeFile(localPath, 'module.exports = '+JSON.stringify(config, null, '\t')+';', function(err) {
