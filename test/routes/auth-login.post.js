@@ -126,7 +126,7 @@ describe('POST /auth/login', function() {
 			});
 		});
 	});
-	
+
 	describe('responseFormat html', function() {
 		it('should throw an error if no email is supplied', function(done) {
 			request(app)

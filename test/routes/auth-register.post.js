@@ -121,7 +121,7 @@ describe('POST /auth/register', function() {
 			});
 		});
 
-		
+
 
 		it('should create a user if all necessary information is provided', function(done) {
 			request(app)
@@ -160,7 +160,7 @@ describe('POST /auth/register', function() {
 			});
 		});
 	});
-	
+
 	describe('responseFormat html', function() {
 		it('should throw an error if the user is already registered', function(done) {
 			request(app)
@@ -267,7 +267,7 @@ describe('POST /auth/register', function() {
 					let obj = list.toObject();
 					expect(obj.default).not.to.be.undefined;
 					expect(obj.default.message).to.equal('An unknown error occurred: {{message}}');
-					
+
 					cookie = res.headers['set-cookie'][0].split(';')[0];
 					let req = request(app).get('/dashboard?responseFormat=html');
 					req.cookies = cookie;
