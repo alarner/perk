@@ -65,6 +65,11 @@ module.exports = function(files, minify, watch, cb) {
 				}
 			],
 			plugins: minify ? [
+				new webpack.DefinePlugin({
+					'process.env': {
+						'NODE_ENV': JSON.stringify('production')
+					}
+				}),
 				new webpack.optimize.UglifyJsPlugin({
 					compress: { warnings: false }
 				})
