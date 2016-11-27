@@ -89,7 +89,8 @@ function finish() {
 	let stats = fs.statSync(filePath);
 	console.log('Low:', times[0]);
 	console.log('High:', times[times.length-1]);
-	console.log('Average:', sum/times.length);
+	console.log('Mean:', sum/times.length);
+	console.log('Median:', times[Math.floor(times.length/2)]);
 	console.log('Size:', stats.size);
 }
 
@@ -99,7 +100,7 @@ function cleanup() {
 		fs.unlinkSync(filePath);
 	}
 	catch(e) {}
-	
+
 	try {
 		if(args.minify) {
 			fs.unlinkSync(path.join(ROOT, '/public/scripts', 'bundle.min.js.map'));

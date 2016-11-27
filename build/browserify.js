@@ -10,7 +10,7 @@ let config = require('../lib/config');
 const CLIENT_JS_DIR = path.join(config.root, 'public', 'scripts');
 
 module.exports = function(files, minify, watch, cb) {
-	let cbCalled = false;	
+	let cbCalled = false;
 	let b = browserify({
 		entries: files,
 		deps: true,
@@ -53,12 +53,12 @@ module.exports = function(files, minify, watch, cb) {
 			else {
 				utils.log('Browserify', 'Bundle successful.', 'success');
 			}
-			if(!cbCalled && cb && _.isFunction(cb)) {
+			if((!cbCalled || watch) && cb && _.isFunction(cb)) {
 				cb();
 				cbCalled = true;
 			}
 		})
 		.pipe(writeStream);
 	}
-	
+
 };
