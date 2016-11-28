@@ -37,6 +37,12 @@ module.exports = function(cb) {
 		if(err) {
 			return cb(err);
 		}
+		if(!results.value.session) {
+			results.value.session = {};
+		}
+		if(!results.value.session.secret) {
+			results.value.session.secret = Math.random().toString(36).slice(-16);
+		}
 		configTemplate(results.template, { appendExtraData: true, values: results.value })
 		.then(function(config) {
 			fs.writeFile(valuePath, 'module.exports = '+JSON.stringify(config, null, '\t')+';', function(err) {
