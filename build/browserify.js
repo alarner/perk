@@ -53,7 +53,7 @@ module.exports = function(files, minify, watch, cb) {
 			else {
 				utils.log('Browserify', 'Bundle successful.', 'success');
 			}
-			if((!cbCalled || watch) && cb && _.isFunction(cb)) {
+			if((!cbCalled) && cb && _.isFunction(cb)) {
 				cb();
 				cbCalled = true;
 			}

@@ -34,7 +34,7 @@ module.exports = function(files, minify, watch, cb) {
 			utils.log('Webpack', 'bundle updated', 'success');
 		}
 
-		if((!cbCalled || watch) && cb && _.isFunction(cb)) {
+		if(!cbCalled && cb && _.isFunction(cb)) {
 			cb(err, stats);
 			cbCalled = true;
 		}
