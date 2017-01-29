@@ -42,23 +42,23 @@ router.get('/email', validateAuthProfile, function(req, res) {
 	if(!req.session.hasOwnProperty('_auth_profile')) {
 		return res.redirect('/auth/error');
 	}
-	if(req.session._auth_profile.email) {
+	if(req.session._auth_profile[config.auth.columns.user.email]) {
 		return res.redirect('/auth/finish');
 	}
 	res.render('auth/email');
 });
 
 router.post('/email', validateAuthProfile, function(req, res, next) {
-	if(!req.body.email) {
-		req.flash('email', 'Please enter your email address');
+	if(!req.body[config.auth.columns.user.email]) {
+		req.flash(config.auth.columns.user.email, 'Please enter your email address');
 	}
-	if(!validator.isEmail(req.body.email)) {
-		req.flash('email', 'It looks like there\'s somthing wrong with that email address');
+	if(!validator.isEmail(req.body[config.auth.columns.user.email])) {
+		req.flash(config.auth.columns.user.email, 'It looks like there\'s somthing wrong with that email address');
 	}
-	if(req.session._flash_messages.email) {
+	if(req.session._flash_messages[config.auth.columns.user.email]) {
 		return res.redirect('/auth/email');
 	}
-	req.session._auth_profile.email = req.body.email;
+	req.session._auth_profile.email = req.body[config.auth.columns.user.email];
 	authenticator(req, req.session._auth_access_token, req.session._auth_profile, req.session._auth_type, function(err, authModel, userModel) {
 		req.logIn(userModel, err => {
 			if(err) {
@@ -97,19 +97,19 @@ router.use('/logout', function(req, res, next) {
 
 router.post('/register', validateLocalCredentials, function(req, res, next) {
 	let userData = Object.assign({}, req.body);
-	delete userData.password;
+	delete userData[config.auth.columns.authentication.password];
 
 	bookshelf.transaction(function(t) {
-		return noDupe(req.body.email, t)
+		return noDupe(req.body[config.auth.columns.user.email], t)
 		.then(createUser.bind(null, userData, t))
-		.then(user => createAuth(user, req.body.password, t))
+		.then(user => createAuth(user, req.body[config.auth.columns.authentication.password], t))
 		.then(user => login(user, req.logIn.bind(req)))
 		.then(t.commit)
 		.catch(t.rollback);
 	})
 	.then(user => {
 		if(req.responseFormat() === 'html') {
-			res.redirect(config.auth.local.registerRedirect || '/auth/finish');
+			res.redirect(config.auth.adapters.local.registerRedirect || '/auth/finish');
 		}
 		else if(req.responseFormat() === 'json') {
 			res.json(user.toJSON());
@@ -133,20 +133,20 @@ router.post('/login', validateLocalCredentials, function(req, res, next) {
 	}
 	AuthenticationModel.forge({
 		type: 'local',
-		identifier: req.body.email
+		identifier: req.body[config.auth.columns.user.email]
 	})
 	.fetch({withRelated: ['user']})
 	.then(function(auth) {
 		if(!auth) {
-			res.error.add('auth.UNKNOWN_USER', 'email').send(errorRedirect);
+			res.error.add('auth.UNKNOWN_USER', config.auth.columns.user.email).send(errorRedirect);
 		}
 		else {
-			bcrypt.compare(req.body.password, auth.get('password'), function(err, result) {
+			bcrypt.compare(req.body[config.auth.columns.authentication.password], auth.get(config.auth.columns.authentication.password), function(err, result) {
 				if(err) {
 					res.error.add('auth.UNKNOWN').send(errorRedirect);
 				}
 				else if(!result) {
-					res.error.add('auth.INVALID_PASSWORD', 'password').send(errorRedirect);
+					res.error.add('auth.INVALID_PASSWORD', config.auth.columns.authentication.password).send(errorRedirect);
 				}
 				else {
 					req.logIn(auth.related('user'), err => {
@@ -157,7 +157,7 @@ router.post('/login', validateLocalCredentials, function(req, res, next) {
 							if(req.responseFormat() === 'html') {
 								res.redirect(
 									req.body.redirect ||
-									config.auth.local.loginRedirect ||
+									config.auth.adapters.local.loginRedirect ||
 									'/dashboard'
 								);
 							}
