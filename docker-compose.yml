@@ -1,0 +1,45 @@
+version: '2'
+services:
+  node:
+    build:
+      context: ./docker/node
+      dockerfile: Dockerfile
+    image: josecanhelp/perk/node-dev
+    volumes:
+     - .:/var/www/html
+    command: [npm, run, dev]
+    networks:
+     - appnet
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+      - redis
+  postgres:
+    image: postgres
+    volumes:
+     - pgdata:/var/lib/postgresql/data
+    networks:
+     - appnet
+    ports:
+      - 54320:5432
+    environment:
+      POSTGRES_USER: "perk"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: "myapp"
+  redis:
+    image: redis:alpine
+    volumes:
+     - redisdata:/data
+    networks:
+     - appnet
+    ports:
+      - 63790:6379
+networks:
+  appnet:
+    driver: "bridge"
+volumes:
+  pgdata:
+    driver: "local"
+  redisdata:
+    driver: "local"
