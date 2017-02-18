@@ -7,11 +7,13 @@ services:
     image: josecanhelp/perk/node-dev
     volumes:
      - .:/var/www/html
-    command: [npm, run, dev]
+    command: [./docker/node/run]
     networks:
      - appnet
     ports:
       - 3000:3000
+    environment:
+      NODE_ENV: "docker"
     depends_on:
       - postgres
       - redis
@@ -24,6 +26,7 @@ services:
     ports:
       - 54320:5432
     environment:
+      POSTGRES_HOST: "postgres"
       POSTGRES_USER: "perk"
       POSTGRES_PASSWORD: "secret"
       POSTGRES_DB: "myapp"
