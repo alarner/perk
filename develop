@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+export POSTGRES_USER=${POSTGRES_USER:-perk}
+export POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+export POSTGRES_DB=${POSTGRES_DB:-myapp}
+
+if [ $# -gt 0 ];then
+    if [ "$1" == "npm" ]; then
+        shift 1
+        docker-compose run --rm $TTY \
+            -w /var/www/html \
+            node \
+            npm "$@"
+    else
+        docker-compose "$@"
+    fi
+else
+    docker-compose ps
+fi
