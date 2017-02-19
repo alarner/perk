@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-export POSTGRES_USER=${POSTGRES_USER:-perk}
-export POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
-export POSTGRES_DB=${POSTGRES_DB:-myapp}
-
 if [ $# -gt 0 ];then
     if [ "$1" == "npm" ]; then
         shift 1
@@ -11,6 +7,12 @@ if [ $# -gt 0 ];then
             -w /var/www/html \
             node \
             npm "$@"
+    elif [ "$1" == "knex" ]; then
+        shift 1
+        docker-compose run --rm \
+            -w /var/www/html \
+            node \
+            knex "$@"
     else
         docker-compose "$@"
     fi

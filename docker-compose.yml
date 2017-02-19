@@ -28,7 +28,7 @@ services:
     networks:
      - appnet
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT}:5432
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -40,7 +40,7 @@ services:
     networks:
      - appnet
     ports:
-      - 6379:6379
+      - ${REDIS_PORT}:6379
 networks:
   appnet:
     driver: "bridge"

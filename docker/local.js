@@ -2,7 +2,7 @@ module.exports = {
 	'database': {
 		'client': 'pg',
 		'connection': {
-			'host': process.env.POSTGRES_HOST,
+			'host': 'postgres',
 			'user': process.env.POSTGRES_USER,
 			'password': process.env.POSTGRES_PASSWORD,
 			'database': process.env.POSTGRES_DB
