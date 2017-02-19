@@ -7,7 +7,7 @@ export POSTGRES_DB=${POSTGRES_DB:-myapp}
 if [ $# -gt 0 ];then
     if [ "$1" == "npm" ]; then
         shift 1
-        docker-compose run --rm $TTY \
+        docker-compose run --rm \
             -w /var/www/html \
             node \
             npm "$@"
