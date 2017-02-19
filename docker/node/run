@@ -1,5 +1,0 @@
-#!/bin/bash
-npm uninstall bcrypt
-npm rebuild node-sass
-npm install
-npm run dev

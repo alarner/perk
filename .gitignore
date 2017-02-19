@@ -9,3 +9,5 @@
 /public/styles/**/*.css
 /public/styles/**/*.map
 npm-debug.log
+.jshintrc
+.env

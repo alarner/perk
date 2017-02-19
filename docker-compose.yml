@@ -4,16 +4,20 @@ services:
     build:
       context: ./docker/node
       dockerfile: Dockerfile
-    image: josecanhelp/perk/node-dev
+    image: josecanhelp/perk/node
     volumes:
      - .:/var/www/html
-    command: [./docker/node/run]
     networks:
      - appnet
     ports:
       - 3000:3000
     environment:
-      NODE_ENV: "docker"
+      NODE_ENV: development
+      REDIS_HOST: redis
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     depends_on:
       - postgres
       - redis
@@ -24,12 +28,11 @@ services:
     networks:
      - appnet
     ports:
-      - 54320:5432
+      - 5432:5432
     environment:
-      POSTGRES_HOST: "postgres"
-      POSTGRES_USER: "perk"
-      POSTGRES_PASSWORD: "secret"
-      POSTGRES_DB: "myapp"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
   redis:
     image: redis:alpine
     volumes:
@@ -37,7 +40,7 @@ services:
     networks:
      - appnet
     ports:
-      - 63790:6379
+      - 6379:6379
 networks:
   appnet:
     driver: "bridge"
