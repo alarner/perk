@@ -11,7 +11,7 @@ export REDIS_PORT=${REDIS_PORT:-6379}
 
 
 if [ $# -gt 0 ];then
-    if [ "$1" == "initialize" ]; then
+    if [ "$1" == "init" ]; then
         cp docker/local.js config/local.js && \
         ./develop build && \
         ./develop npm install
