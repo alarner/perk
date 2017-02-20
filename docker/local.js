@@ -10,7 +10,7 @@ module.exports = {
 	},
 	'session': {
 		'store': {
-			'host': process.env.REDIS_HOST,
+			'host': 'redis',
 			'port': 6379
 		}
 	}
