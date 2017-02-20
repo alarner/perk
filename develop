@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
 if [ $# -gt 0 ];then
-    if [ "$1" == "npm" ]; then
+    if [ "$1" == "initialize" ]; then
+        cp docker/.env.example .env && \
+        cp docker/local.js config/local.js && \
+        ./develop build && \
+        ./develop npm install
+    elif [ "$1" == "npm" ]; then
         shift 1
         docker-compose run --rm \
             -w /var/www/html \
