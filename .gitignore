@@ -10,4 +10,3 @@
 /public/styles/**/*.map
 npm-debug.log
 .jshintrc
-.env
