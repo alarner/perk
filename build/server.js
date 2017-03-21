@@ -17,7 +17,7 @@ let app = {
 		process.execArgv = [ '--use_strict' ];
 
 		app.instance = fork( app.path, { silent: true, env: app.env } );
-		fs.writeFile(path.join(config.root, 'build/.pid'), app.instance.pid.toString());
+		fs.writeFileSync(path.join(config.root, 'build/.pid'), app.instance.pid.toString());
 		app.instance.stdout.pipe( process.stdout );
 		app.instance.stderr.pipe( process.stderr );
 
@@ -65,7 +65,7 @@ module.exports = function(files, cb) {
 	if(config.build.watching.poll) {
 		chokidarConf.interval = config.build.watching.interval || 100;
 	}
-		
+
 	files = files.map(file => {
 		return path.join(config.root, file);
 	});
