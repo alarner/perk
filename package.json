@@ -53,6 +53,7 @@
   "description": "A well documented set of tools for building node web applications.",
   "devDependencies": {
     "chai": "^3.5.0",
+    "co-mocha": "^1.2.0",
     "config-template": "^1.1.0",
     "eslint": "^3.11.0",
     "eslint-plugin-react": "^6.7.1",

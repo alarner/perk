@@ -1,20 +1,22 @@
 const fs = require('fs');
 const path = require('path');
 
-before((done) => {
-	global.knex = require('knex')({
-		client: 'sqlite3',
-		useNullAsDefault: true,
-		connection: {
-			filename: './test/fixtures/test.db'
-		},
-		seeds: {
-			directory: './test/seeds'
-		}//,
-		// debug: true
-	});
-	global.app = require('../app');
+global.knex = require('knex')({
+	client: 'sqlite3',
+	useNullAsDefault: true,
+	connection: {
+		filename: './test/fixtures/test.db'
+	},
+	seeds: {
+		directory: './test/seeds'
+	}//,
+	// debug: true
+});
+global.app = require('../app');
+global.bookshelf = require('bookshelf')(global.knex);
+bookshelf.plugin('registry');
 
+before((done) => {
 	knex.migrate.latest()
 	.then(() => {
 		return knex.seed.run();
