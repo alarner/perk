@@ -64,6 +64,31 @@ const Group = bookshelf.model(
 				}
 				return formattedPermissions;
 			});
+		},
+		flattenHierarchy: function(hierarchy) {
+			const permissions = {};
+
+			for(const permission of metaPermissions) {
+				permissions[permission.descriptor] = {
+					group: null,
+					value: false
+				};
+			}
+
+			for(const group of hierarchy) {
+				for(const permission of group.permissions) {
+					if(permission.value !== null) {
+						permissions[permission.descriptor] = {
+							group: {
+								id: group.id,
+								name: group.name
+							},
+							value: permission.value
+						};
+					}
+				}
+			}
+			return permissions;
 		}
 	}
 );
