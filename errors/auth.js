@@ -30,5 +30,9 @@ module.exports = {
 	NOT_LOGGED_IN: {
 		message: 'You must be logged in to perform that action.',
 		status: 403
+	},
+	NOT_PERMITTED: {
+		message: 'You are not permitted to perform that action.',
+		status: 403
 	}
 };
