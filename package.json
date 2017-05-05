@@ -28,6 +28,7 @@
     "fb": "github:alarner/facebook-node-sdk",
     "howhap-middleware": "^4.1.1",
     "include-all": "^2.0.0",
+    "ioredis": "^2.5.0",
     "knex": "^0.12.6",
     "lodash": "^4.17.2",
     "minifyify": "^7.3.4",

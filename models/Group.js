@@ -20,6 +20,9 @@ const Group = bookshelf.model(
 				}
 			});
 		},
+		permissions: function(id) {
+			return Group.permissionHierarchy(id).then(Group.flattenHierarchy);
+		},
 		permissionHierarchy: function(id) {
 			return knex.select(
 				'parent.name',

@@ -1,3 +1,4 @@
+const metaPermissions = require('../lib/permissions');
 const Permission = bookshelf.model(
 	'Permission',
 	{
@@ -9,6 +10,9 @@ const Permission = bookshelf.model(
 			type = type.toLowerCase();
 			if(!['user', 'group'].includes(type)) {
 				return Promise.reject(`Unknown type ${type}`);
+			}
+			if(!metaPermissions.find((p) => p.descriptor === descriptor)) {
+				return Promise.reject(`Unknown descriptor ${descriptor}`);
 			}
 			const forgeParams = { descriptor };
 			forgeParams[`${type}Id`] = id;

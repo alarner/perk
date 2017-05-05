@@ -1,4 +1,10 @@
 let config = require('./lib/config');
+let Redis = require('ioredis');
+
+// Defer to unit test version of redis if it's already defined
+if(!global.redis) {
+	global.redis = new Redis(config.redis);
+}
 
 // Defer to unit test version of knex if it's already defined
 if(!global.knex) {
@@ -26,7 +32,7 @@ let consolidate = require('consolidate');
 
 let app = express();
 
-let sessionConfig = _.extend({}, config.session, {store: new RedisStore(config.session.store || {})});
+let sessionConfig = _.extend({}, config.session, {store: new RedisStore({ client: global.redis })});
 app.use(session(sessionConfig));
 app.use(howhap({
 	availableErrors: config.errors,

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const Redis = require('ioredis');
 
 global.knex = require('knex')({
 	client: 'sqlite3',
@@ -12,8 +13,12 @@ global.knex = require('knex')({
 	}//,
 	// debug: true
 });
-global.app = require('../app');
+global.redis = new Redis({
+	port: 6379,
+	host: '127.0.0.1'
+});
 global.bookshelf = require('bookshelf')(global.knex);
+global.app = require('../app');
 bookshelf.plugin('registry');
 
 before((done) => {
@@ -33,9 +38,8 @@ before((done) => {
 
 beforeEach((done) => {
 	knex.seed.run()
-	.then(() => {
-		done();
-	})
+	.then(() => redis.flushdb())
+	.then(() => done())
 	.catch((err) => {
 		console.log('MIGRATION / SEED ERROR:');
 		console.log(err);

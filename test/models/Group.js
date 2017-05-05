@@ -54,15 +54,13 @@ describe('Group', function() {
 	describe('permissionHierarchy', function() {
 		it('should successfully retreive permission hierarchy for the specified group', function*() {
 			const rootGroup = yield Group.add('root');
-			const fooGroup = yield Group.add('foo', rootGroup.id);
+			yield Group.add('foo', rootGroup.id);
 			const barGroup = yield Group.add('bar', rootGroup.id);
 			const bazGroup = yield Group.add('baz', barGroup.id);
 			yield Permission.set('group', rootGroup.id, 'CREATE_USERS', true);
-			yield Permission.set('group', rootGroup.id, 'FOO', true);
 			yield Permission.set('group', rootGroup.id, 'EDIT_USERS', false);
 			yield Permission.set('group', barGroup.id, 'EDIT_USERS', true);
 			yield Permission.set('group', bazGroup.id, 'CREATE_USERS', true);
-			yield Permission.set('group', fooGroup.id, 'FOO', true);
 
 			const permissions = yield Group.permissionHierarchy(bazGroup.id);
 			expect(permissions.length, 'number of groups').to.equal(3);
@@ -97,18 +95,49 @@ describe('Group', function() {
 
 		it('should convert all permission groups into one permissions object', function*() {
 			const rootGroup = yield Group.add('root');
-			const fooGroup = yield Group.add('foo', rootGroup.id);
+			yield Group.add('foo', rootGroup.id);
 			const barGroup = yield Group.add('bar', rootGroup.id);
 			const bazGroup = yield Group.add('baz', barGroup.id);
 			yield Permission.set('group', rootGroup.id, 'CREATE_USERS', true);
-			yield Permission.set('group', rootGroup.id, 'FOO', true);
 			yield Permission.set('group', rootGroup.id, 'EDIT_USERS', false);
 			yield Permission.set('group', barGroup.id, 'EDIT_USERS', true);
 			yield Permission.set('group', bazGroup.id, 'CREATE_USERS', true);
-			yield Permission.set('group', fooGroup.id, 'FOO', true);
 
 			const hierarchy = yield Group.permissionHierarchy(bazGroup.id);
 			const permissions = Group.flattenHierarchy(hierarchy);
+
+			expect(permissions.CREATE_USERS).to.be.ok;
+			expect(permissions.EDIT_USERS).to.be.ok;
+			expect(permissions.DELETE_USERS).to.be.ok;
+			expect(permissions.FOO).to.be.undefined;
+
+			expect(permissions.CREATE_USERS.group).to.be.ok;
+			expect(permissions.CREATE_USERS.group.name).to.equal('baz');
+			expect(permissions.CREATE_USERS.value).to.equal(true);
+
+			expect(permissions.DELETE_USERS.group).to.be.null;
+			expect(permissions.DELETE_USERS.value).to.equal(false);
+
+			expect(permissions.EDIT_USERS.group).to.be.ok;
+			expect(permissions.EDIT_USERS.group.name).to.equal('bar');
+			expect(permissions.EDIT_USERS.value).to.equal(true);
+		});
+
+	});
+
+	describe('permissions', function() {
+
+		it('should fetch permission hierarcy and flatten it', function*() {
+			const rootGroup = yield Group.add('root');
+			yield Group.add('foo', rootGroup.id);
+			const barGroup = yield Group.add('bar', rootGroup.id);
+			const bazGroup = yield Group.add('baz', barGroup.id);
+			yield Permission.set('group', rootGroup.id, 'CREATE_USERS', true);
+			yield Permission.set('group', rootGroup.id, 'EDIT_USERS', false);
+			yield Permission.set('group', barGroup.id, 'EDIT_USERS', true);
+			yield Permission.set('group', bazGroup.id, 'CREATE_USERS', true);
+
+			const permissions = yield Group.permissions(bazGroup.id);
 
 			expect(permissions.CREATE_USERS).to.be.ok;
 			expect(permissions.EDIT_USERS).to.be.ok;
