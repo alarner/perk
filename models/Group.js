@@ -102,6 +102,7 @@ function addFirst(name, trx) {
 	.then((rows) => rows[0].num)
 	.then((count) => {
 		if(count) {
+			count = parseInt(count);
 			return Promise.reject(
 				'You may not add a new group without a parent if there are already existing '+
 				'permission groups.'
