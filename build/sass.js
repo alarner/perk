@@ -49,8 +49,9 @@ module.exports = function(sassDir, minify, watch, cb) {
 		if(config.build.watching.poll) {
 			chokidarConf.interval = config.build.watching.interval || 100;
 		}
-		chokidar.watch(`${path.join(config.root, sassDir)}**/*.scss`, chokidarConf).on('add', rebuildGraph);
-		chokidar.watch(`${path.join(config.root, sassDir)}**/*.scss`, chokidarConf).on('change', sassyChange);
+		const watchPath = path.join(config.root, sassDir, '**', '*.scss');
+		chokidar.watch(watchPath, chokidarConf).on('add', rebuildGraph);
+		chokidar.watch(watchPath, chokidarConf).on('change', sassyChange);
 	}
 
 	function rebuildGraph(file, cb) {
@@ -119,7 +120,7 @@ module.exports = function(sassDir, minify, watch, cb) {
 							err.toString(),
 							'error'
 						);
-					}				
+					}
 				}
 				else {
 					utils.log(
