@@ -1,0 +1,10 @@
+#!/bin/bash
+
+NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify
+rm -rf ./dist
+mkdir -p ./dist/scripts
+mkdir -p ./dist/styles
+cp ./views/index.html ./dist
+cp -R ./public/images ./dist
+cp ./public/scripts/*.min.js ./dist/scripts
+cp ./public/styles/*.scss.min.css ./dist/styles

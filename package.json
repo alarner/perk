@@ -49,7 +49,7 @@
   "scripts": {
     "test": "eslint ./ && mocha",
     "dev": "NODE_ENV=development node --use_strict ./bin/build --watch --scripts --styles --server",
-    "build": "NODE_ENV=production node --use_strict ./bin/build --scripts --styles --minify",
+    "build": "./bin/build-prod",
     "eslint": "eslint ./ || true"
   },
   "version": "1.0.1"
