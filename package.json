@@ -91,5 +91,5 @@
     "heroku-postbuild": "node --use_strict ./bin/heroku-postbuild",
     "eslint": "eslint ./ || true"
   },
-  "version": "1.0.2"
+  "version": "1.0.3"
 }
