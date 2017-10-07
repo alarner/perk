@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 
-let async = require('async');
-let config = require('../lib/config');
-let logger = require('../lib/logger');
-let utils = require('../build/utils');
-let parseArgs = require('minimist')(process.argv);
+const async = require('async');
+const fs = require('fs');
+const path = require('path');
+const packageJson = require('../package');
+const config = require('../lib/config');
+const logger = require('../lib/logger');
+const utils = require('../build/utils');
+const parseArgs = require('minimist')(process.argv);
 
 let loader = false;
 
-let defaultArgs = {
+const defaultArgs = {
 	minify: false,
 	watch: false,
 	scripts: false,
@@ -18,7 +21,7 @@ let defaultArgs = {
 	loader: config.build.scripts.loader.toLowerCase()
 };
 
-let args = Object.assign({}, defaultArgs, parseArgs);
+const args = Object.assign({}, defaultArgs, parseArgs);
 
 async.parallel(
 	{
@@ -26,14 +29,14 @@ async.parallel(
 		js: function(cb) {
 			if(args.scripts) {
 				switch(args.loader) {
-					case 'browserify':
-						loader = require('../build/browserify');
+				case 'browserify':
+					loader = require('../build/browserify');
 					break;
-					case 'webpack':
-						loader = require('../build/webpack');
+				case 'webpack':
+					loader = require('../build/webpack');
 					break;
-					default:
-						logger.error('loader does not exist: %s', config.build.loader);
+				default:
+					logger.error('loader does not exist: %s', config.build.loader);
 					break;
 				}
 
@@ -75,6 +78,9 @@ async.parallel(
 		}
 	},
 	function(err, data) {
+		if(!err) {
+			fs.writeFileSync(path.join(__dirname, '..', 'last_build'), packageJson.version);
+		}
 		if(data.server) {
 			utils.log('Server', `running at 127.0.0.1:${data.server.PORT}`, 'success');
 		}
