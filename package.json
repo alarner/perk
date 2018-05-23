@@ -1,0 +1,47 @@
+{
+  "name": "perk",
+  "version": "2.0.0",
+  "description": "A well documented set of tools for building node API's",
+  "main": "src/index.js",
+  "directories": {
+    "example": "example",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "mocha tests/**/*js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alarner/perk.git"
+  },
+  "keywords": [
+    "perk",
+    "postgres",
+    "koa",
+    "node",
+    "api",
+    "framework"
+  ],
+  "author": "Aaron Larner",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alarner/perk/issues"
+  },
+  "homepage": "https://github.com/alarner/perk#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "eslint_d": "^5.3.1",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "co-env": "^1.2.0",
+    "fs-extra": "^6.0.1",
+    "koa": "^2.5.1",
+    "koa-bodyparser": "^4.2.0",
+    "lodash": "^4.17.10",
+    "pg": "^7.4.3",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.37.8"
+  }
+}
