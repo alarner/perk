@@ -47,11 +47,6 @@ describe('index', function() {
     });
   });
   describe('database validation', function() {
-    it('should throw an error if the database configuration is missing', function() {
-      return expect(index('./fixtures/test08/config')).to.be.rejectedWith(
-        `database configuration is missing.`
-      );
-    });
     it('should throw an error if the database configuration is missing a dialect', function() {
       return expect(index('./fixtures/test09/config')).to.be.rejectedWith(
         'Database configuration error: Dialect needs to be explicitly supplied as of v4.0.0'

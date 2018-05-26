@@ -15,7 +15,6 @@ module.exports = async (name, rootDir, override, fallback) => {
         `We tried the default value "${fallback}" but it doesn't exist.`
       );
     }
-    console.log(error);
     throw new Error(`${name} value "${absolute}" does not exist.`);
   }
   return absolute;

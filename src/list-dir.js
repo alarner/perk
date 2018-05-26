@@ -2,8 +2,8 @@ const path = require('path');
 
 const fs = require('fs-extra');
 
-module.exports = async function requireDir(dirPath) {
-  const requires = {};
+module.exports = async function listDir(dirPath) {
+  let requires = [];
   const files = await fs.readdir(dirPath);
   const stats = await Promise.all(
     files.map(f => fs.lstat(path.join(dirPath, f)))
@@ -14,10 +14,10 @@ module.exports = async function requireDir(dirPath) {
       if(f.endsWith('.js')) {
         throw new Error(`Directories in ${dirPath} cannot end with ".js"`);
       }
-      requires[f] = await requireDir(path.join(dirPath, f));
+      requires = requires.concat(await listDir(path.join(dirPath, f)));
     }
     else if(f.endsWith('.js')) {
-      requires[f] = require(path.join(dirPath, f));
+      requires.push(path.join(dirPath, f));
     }
   }
   return requires;

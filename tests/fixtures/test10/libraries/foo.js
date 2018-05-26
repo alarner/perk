@@ -1,3 +1,3 @@
-const create = ({ test }) => 'foo';
+const create = ({ libraries }) => libraries.test();
 module.exports = create;
-module.exports.requires = { test: './test' };
+module.exports.requires = [ 'libraries/test' ];

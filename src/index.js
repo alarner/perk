@@ -5,11 +5,13 @@ const configLoader = require('co-env');
 const fs = require('fs-extra');
 const Koa = require('koa');
 
+const buildModuleList = require('./build-module-list');
 const checkPath = require('./check-path');
 const Controller = require('./Controller');
 const errors = require('./errors');
 const getStack = require('./get-stack');
-const requireDir = require('./require-dir');
+const ModuleList = require('./ModuleList');
+// const createDependencyResolver = require('./create-dependency-resolver');
 
 module.exports = async (configPath = 'config') => {
   const stack = getStack();
@@ -33,8 +35,13 @@ module.exports = async (configPath = 'config') => {
   config.env = env;
   config.perk = config.perk || {};
   config.perk.paths = config.perk.paths || {};
-  config.perk.features = config.perk.features || {};
   const paths = config.perk.paths;
+
+  if(config.auth && !config.database) {
+    throw new Error(
+      'The database feature must be enabled in your config in order to use the auth feature.'
+    );
+  }
 
   // Set default paths
   const defaultControllerPath = path.join(rootDir, 'controllers');
@@ -49,7 +56,7 @@ module.exports = async (configPath = 'config') => {
     paths.controllers,
     defaultControllerPath
   );
-  if(config.perk.features.email) {
+  if(config.email) {
     paths.emails = await checkPath(
       'perk.paths.emails',
       configPath,
@@ -63,50 +70,62 @@ module.exports = async (configPath = 'config') => {
     paths.libraries,
     defaultLibrariesPath
   );
-  paths.models = await checkPath('perk.paths.models', configPath, paths.models, defaultModelsPath);
-
-  const dependencies = { config };
-  if(config.perk.features.database || config.perk.features.auth) {
-    if(!config.database) {
-      throw new Error('database configuration is missing.');
-    }
-    try {
-      dependencies.database = require('./database')(dependencies);
-    }
-    catch(error) {
-      throw new Error(`Database configuration error: ${error.message}`);
-    }
+  if(config.database) {
+    paths.models = await checkPath(
+      'perk.paths.models',
+      configPath,
+      paths.models,
+      defaultModelsPath
+    );
   }
 
-  // Load controllers / routes
-  const controllerFiles = await fs.readdir(paths.controllers);
-  const routes = [];
+  const modules = new ModuleList();
 
-  for(const file of controllerFiles) {
-    const controller = require(path.join(paths.controllers, file));
-    if(!controller.routes || !Array.isArray(controller.routes)) {
-      throw new Error(
-        `Controller ${file} must export an array of routes in the routes param.`
-      );
-    }
-    if(!controller.prefix) {
-      throw new Error(
-        `Controller ${file} must export a prefix in the prefix param.`
-      );
-    }
-    const controllerRoutes = controller.routes.map(route => {
-      const pattern = path.join(`/${controller.prefix}`, route.pattern);
-      return { ...route, pattern };
-    });
-
-    routes.push(...controllerRoutes);
+  if(config.auth) {
+    modules.add('models', path.join(__dirname, 'models'), 'user.js');
+    modules.add('models', path.join(__dirname, 'models'), 'credential.js');
+  }
+  if(config.database) {
+    modules.add('core', path.join(__dirname, 'core'), 'database.js');
+  }
+  if(config.email) {
+    modules.add('core', path.join(__dirname, 'core'), 'email.js');
   }
 
-  // Load models
-  dependencies.models = await requireDir(paths.models);
+  // // Load controllers / routes
+  // const controllerFiles = await fs.readdir(paths.controllers);
+  // const routes = [];
 
-  // Load libraries
-  dependencies.libraries = await requireDir(paths.libraries);
+  // for(const file of controllerFiles) {
+  //   const controller = require(path.join(paths.controllers, file));
+  //   if(!controller.routes || !Array.isArray(controller.routes)) {
+  //     throw new Error(
+  //       `Controller ${file} must export an array of routes in the routes param.`
+  //     );
+  //   }
+  //   if(!controller.prefix) {
+  //     throw new Error(
+  //       `Controller ${file} must export a prefix in the prefix param.`
+  //     );
+  //   }
+  //   const controllerRoutes = controller.routes.map(route => {
+  //     const pattern = path.join(`/${controller.prefix}`, route.pattern);
+  //     return { ...route, pattern };
+  //   });
+
+  //   routes.push(...controllerRoutes);
+  // }
+
+  // // Load models
+  // dependencies.models = await requireDir(paths.models);
+
+  // // Load libraries
+  // dependencies.libraries = await requireDir(paths.libraries);
+
+  // const resolver = createDependencyResolver(dependencies);
+  // const unresolved = resolver();
+  // console.log(unresolved);
+  // console.log(dependencies);
 
 };
 

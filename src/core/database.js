@@ -10,3 +10,4 @@ module.exports = ({ config }) => {
     _.omit(config.database, ['name', 'user', 'password' ])
   );
 };
+module.exports.requires = [ 'config' ];
