@@ -5,13 +5,11 @@ const configLoader = require('co-env');
 const fs = require('fs-extra');
 const Koa = require('koa');
 
-const buildModuleList = require('./build-module-list');
 const checkPath = require('./check-path');
 const Controller = require('./Controller');
 const errors = require('./errors');
 const getStack = require('./get-stack');
 const ModuleList = require('./ModuleList');
-// const createDependencyResolver = require('./create-dependency-resolver');
 
 module.exports = async (configPath = 'config') => {
   const stack = getStack();
@@ -80,6 +78,7 @@ module.exports = async (configPath = 'config') => {
   }
 
   const modules = new ModuleList();
+  modules.add('core', '', 'config', config);
 
   if(config.auth) {
     modules.add('models', path.join(__dirname, 'models'), 'user.js');
@@ -91,6 +90,8 @@ module.exports = async (configPath = 'config') => {
   if(config.email) {
     modules.add('core', path.join(__dirname, 'core'), 'email.js');
   }
+
+  modules.resolve();
 
   // // Load controllers / routes
   // const controllerFiles = await fs.readdir(paths.controllers);

@@ -8,7 +8,7 @@ module.exports = class ModuleList {
     this.fallback = fallback;
   }
   add(group, basePath, modulePath, contents = null) {
-    this.modules.push(new Module(basePath, modulePath, group));
+    this.modules.push(new Module(basePath, modulePath, group, contents));
   }
   resolve() {
     const unresolved = {
@@ -35,7 +35,14 @@ module.exports = class ModuleList {
           }
           module.resolved = resolved;
           if(module.resolved) {
-            module.resolvedContents = module.contents(this.buildDependencies(module.requires));
+            try {
+              module.resolvedContents = module.contents(this.buildDependencies(module.requires));
+            }
+            catch(error) {
+              throw new Error(
+                `Error while loading module "${module.descriptor()}": ${error.message}`
+              );
+            }
           }
         }
         unresolved.current += module.resolved ? 0 : 1;

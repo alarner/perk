@@ -49,7 +49,7 @@ describe('index', function() {
   describe('database validation', function() {
     it('should throw an error if the database configuration is missing a dialect', function() {
       return expect(index('./fixtures/test09/config')).to.be.rejectedWith(
-        'Database configuration error: Dialect needs to be explicitly supplied as of v4.0.0'
+        'Error while loading module "database": Dialect needs to be explicitly supplied as of v4.0.0'
       );
     });
     it('should work if the configuration is valid', function() {
