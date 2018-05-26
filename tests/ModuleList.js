@@ -77,5 +77,14 @@ describe('ModuleList', function() {
         'fallback requires-fallback'
       );
     });
+    it('should throw an error if there are circular dependencies', function() {
+      const ml1 = new ModuleList();
+      ml1.add('test', path.join(__dirname, 'fixtures/module-list'), 'circular1');
+      ml1.add('test', path.join(__dirname, 'fixtures/module-list'), 'circular2');
+      expect(() => ml1.resolve()).to.throw(
+        'The following modules could not resolve due to circular dependencies: test/circular1, ' +
+        'test/circular2'
+      );
+    });
   });
 });

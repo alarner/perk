@@ -48,6 +48,13 @@ module.exports = class ModuleList {
         unresolved.current += module.resolved ? 0 : 1;
       }
     } while(unresolved.current !== 0 && unresolved.previous !== unresolved.current);
+    if(unresolved.current > 0) {
+      const unresolvedModules = this.modules.filter(m => m.resolved === false);
+      const unresolvedString = unresolvedModules.map(m => m.descriptor()).join(', ');
+      throw new Error(
+        `The following modules could not resolve due to circular dependencies: ${unresolvedString}`
+      );
+    }
   }
   find(descriptor) {
     const module = this.modules.find(m => m.descriptor() === descriptor);
