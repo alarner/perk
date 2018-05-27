@@ -87,4 +87,34 @@ describe('ModuleList', function() {
       );
     });
   });
+  describe('buildAllDependencies', function() {
+    it('should include fallbacks', function() {
+      const ml1 = new ModuleList();
+      ml1.add('core', path.join(__dirname, 'fixtures/module-list'), 'fallback');
+      const ml2 = new ModuleList(ml1);
+      ml2.add('test', path.join(__dirname, 'fixtures/module-list'), 'foo');
+      ml2.add('test', path.join(__dirname, 'fixtures/module-list'), 'bar');
+      ml2.add('test', path.join(__dirname, 'fixtures/module-list'), 'baz/baz1');
+      ml2.resolve();
+      const dependencies = ml2.buildAllDependencies();
+      expect(dependencies.test.foo).to.be.a('function');
+      expect(dependencies.test.bar).to.be.a('function');
+      expect(dependencies.test.baz.baz1).to.be.a('function');
+      expect(dependencies.fallback).to.be.a('function');
+    });
+    it('should not overwrite from fallbacks', function() {
+      const ml1 = new ModuleList();
+      ml1.add('test', path.join(__dirname, 'fixtures/module-list/baz'), 'foo');
+      const ml2 = new ModuleList(ml1);
+      ml2.add('test', path.join(__dirname, 'fixtures/module-list'), 'foo');
+      ml2.add('test', path.join(__dirname, 'fixtures/module-list'), 'bar');
+      ml2.add('test', path.join(__dirname, 'fixtures/module-list'), 'baz/baz1');
+      ml2.resolve();
+      const dependencies = ml2.buildAllDependencies();
+      expect(dependencies.test.foo).to.be.a('function');
+      expect(dependencies.test.bar).to.be.a('function');
+      expect(dependencies.test.baz.baz1).to.be.a('function');
+      expect(dependencies.test.foo()).to.equal('foo');
+    });
+  });
 });

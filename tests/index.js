@@ -33,8 +33,10 @@ describe('index', function() {
         `perk.paths.models is required. We tried the default value "${d}" but it doesn\'t exist.`
       );
     });
-    it('should work if all directories exist', function() {
-      return expect(index('./fixtures/test04/config')).to.be.fulfilled;
+    it('should work if all directories exist', async function() {
+      const server = await index('./fixtures/test04/config');
+      expect(server).to.be.ok;
+      server.close();
     });
     it('should throw an error if the emails directory doesn\'t exist', function() {
       const d = path.join(__dirname, 'emails');
@@ -42,8 +44,10 @@ describe('index', function() {
         `perk.paths.emails is required. We tried the default value "${d}" but it doesn\'t exist.`
       );
     });
-    it('should work if all directories exist with email', function() {
-      return expect(index('./fixtures/test06/config')).to.be.fulfilled;
+    it('should work if all directories exist with email', async function() {
+      const server = await index('./fixtures/test06/config');
+      expect(server).to.be.ok;
+      server.close();
     });
   });
   describe('database validation', function() {
@@ -52,8 +56,10 @@ describe('index', function() {
         'Error while loading module "database": Dialect needs to be explicitly supplied as of v4.0.0'
       );
     });
-    it('should work if the configuration is valid', function() {
-      return expect(index('./fixtures/test10/config')).to.be.fulfilled;
+    it('should work if the configuration is valid', async function() {
+      const server = await index('./fixtures/test10/config');
+      expect(server).to.be.ok;
+      server.close();
     });
   });
 });

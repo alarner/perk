@@ -1,5 +1,6 @@
 const path = require('path');
 
+const _ = require('lodash');
 const bodyParser = require('koa-bodyparser');
 const configLoader = require('co-env');
 const fs = require('fs-extra');
@@ -9,9 +10,12 @@ const checkPath = require('./check-path');
 const Controller = require('./Controller');
 const errors = require('./errors');
 const getStack = require('./get-stack');
+const listDir = require('./list-dir');
 const ModuleList = require('./ModuleList');
+const Router = require('./Router');
 
 module.exports = async (configPath = 'config') => {
+  // Load the config
   const stack = getStack();
   stack.shift();
   const callingFilePath = stack.shift().getFileName();
@@ -29,12 +33,12 @@ module.exports = async (configPath = 'config') => {
   }
 
   const env = process.env.NODE_ENV || 'development';
-  const config = configLoader(configPath, env);
+  const defaultConfig = configLoader(path.join(__dirname, 'config-defaults'), env);
+  const config = _.merge({}, defaultConfig, configLoader(configPath, env));
   config.env = env;
-  config.perk = config.perk || {};
-  config.perk.paths = config.perk.paths || {};
   const paths = config.perk.paths;
 
+  // Feature specific validation
   if(config.auth && !config.database) {
     throw new Error(
       'The database feature must be enabled in your config in order to use the auth feature.'
@@ -77,8 +81,11 @@ module.exports = async (configPath = 'config') => {
     );
   }
 
+  // Load all of the necessary core modules
   const modules = new ModuleList();
   modules.add('core', '', 'config', config);
+  modules.add('core', '', 'errors', errors);
+  modules.add('core', path.join(__dirname, 'core'), 'logger.js');
 
   if(config.auth) {
     modules.add('models', path.join(__dirname, 'models'), 'user.js');
@@ -93,41 +100,62 @@ module.exports = async (configPath = 'config') => {
 
   modules.resolve();
 
-  // // Load controllers / routes
-  // const controllerFiles = await fs.readdir(paths.controllers);
-  // const routes = [];
+  // Load all of the customer user modules
+  const userModulePaths = {
+    libraries: await listDir(paths.libraries)
+  };
 
-  // for(const file of controllerFiles) {
-  //   const controller = require(path.join(paths.controllers, file));
-  //   if(!controller.routes || !Array.isArray(controller.routes)) {
-  //     throw new Error(
-  //       `Controller ${file} must export an array of routes in the routes param.`
-  //     );
-  //   }
-  //   if(!controller.prefix) {
-  //     throw new Error(
-  //       `Controller ${file} must export a prefix in the prefix param.`
-  //     );
-  //   }
-  //   const controllerRoutes = controller.routes.map(route => {
-  //     const pattern = path.join(`/${controller.prefix}`, route.pattern);
-  //     return { ...route, pattern };
-  //   });
+  if(config.database) {
+    userModulePaths.models = await listDir(paths.models);
+  }
 
-  //   routes.push(...controllerRoutes);
-  // }
+  const userModules = new ModuleList(modules);
+  for(const descriptor in userModulePaths) {
+    userModulePaths[descriptor].forEach(
+      p => userModules.add(descriptor, paths[descriptor], p.substr(paths[descriptor].length))
+    );
+  }
 
-  // // Load models
-  // dependencies.models = await requireDir(paths.models);
+  userModules.resolve();
 
-  // // Load libraries
-  // dependencies.libraries = await requireDir(paths.libraries);
+  // Generate the dependency tree
+  const dependencies = userModules.buildAllDependencies();
 
-  // const resolver = createDependencyResolver(dependencies);
-  // const unresolved = resolver();
-  // console.log(unresolved);
-  // console.log(dependencies);
+  // Load controllers / routes
+  const controllerFiles = await fs.readdir(paths.controllers);
+  const routes = [];
 
+  for(const file of controllerFiles) {
+    const controller = require(path.join(paths.controllers, file));
+    if(!controller.routes || !Array.isArray(controller.routes)) {
+      throw new Error(
+        `Controller ${file} must export an array of routes in the routes param.`
+      );
+    }
+    if(!controller.prefix) {
+      throw new Error(
+        `Controller ${file} must export a prefix in the prefix param.`
+      );
+    }
+    const controllerRoutes = controller.routes.map(route => {
+      const pattern = path.join(`/${controller.prefix}`, route.pattern);
+      return { ...route, pattern };
+    });
+
+    routes.push(...controllerRoutes);
+  }
+
+  const router = new Router(routes, dependencies);
+
+  // Set up koa web server
+  const app = new Koa();
+
+  app.use(bodyParser());
+  app.use(router.middleware);
+
+  const server = app.listen(process.env.PORT || config.webserver.port);
+  dependencies.logger.info(`Started server at http://localhost:${config.webserver.port}`);
+  return server;
 };
 
 module.exports.Controller = Controller;

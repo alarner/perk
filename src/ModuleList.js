@@ -85,4 +85,42 @@ module.exports = class ModuleList {
     }
     return dependencies;
   }
+  buildAllDependencies() {
+    const dependencies = {};
+    for(const module of this.modules) {
+      const pathPieces = module.path.split(path.sep);
+      if(module.group !== 'core') {
+        pathPieces.unshift(module.group);
+      }
+      let node = dependencies;
+      for(let i = 0; i < pathPieces.length - 1; i++) {
+        const piece = pathPieces[i];
+        if(!node[piece]) {
+          node[piece] = {};
+        }
+        node = node[piece];
+      }
+      node[pathPieces[pathPieces.length - 1]] = module.resolvedContents;
+    }
+    if(this.fallback) {
+      for(const module of this.fallback.modules) {
+        const pathPieces = module.path.split(path.sep);
+        if(module.group !== 'core') {
+          pathPieces.unshift(module.group);
+        }
+        let node = dependencies;
+        for(let i = 0; i < pathPieces.length - 1; i++) {
+          const piece = pathPieces[i];
+          if(!node[piece]) {
+            node[piece] = {};
+          }
+          node = node[piece];
+        }
+        if(!node[pathPieces[pathPieces.length - 1]]) {
+          node[pathPieces[pathPieces.length - 1]] = module.resolvedContents;
+        }
+      }
+    }
+    return dependencies;
+  }
 }
