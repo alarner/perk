@@ -22,13 +22,13 @@ module.exports = class ModuleList {
         if(!module.resolved) {
           let resolved = true;
           for(const descriptor of module.requires) {
-            const module = this.find(descriptor);
-            if(!module) {
+            const requiredModule = this.find(descriptor);
+            if(!requiredModule) {
               throw new Error(
-                `Bad require path "${req}" in ${module.path}. Required file not found.`
+                `Bad require path "${descriptor}" in ${module.file()}. Required file not found.`
               );
             }
-            if(!module.resolved) {
+            if(!requiredModule.resolved) {
               resolved = false;
               break;
             }

@@ -39,9 +39,10 @@ module.exports = async (configPath = 'config') => {
   const paths = config.perk.paths;
 
   // Feature specific validation
-  if(config.auth && !config.database) {
+  if(config.authentication && !config.database) {
     throw new Error(
-      'The database feature must be enabled in your config in order to use the auth feature.'
+      'The database feature must be enabled in your config in order to use the authentication ' +
+      'feature.'
     );
   }
 
@@ -87,12 +88,13 @@ module.exports = async (configPath = 'config') => {
   modules.add('core', '', 'errors', errors);
   modules.add('core', path.join(__dirname, 'core'), 'logger.js');
 
-  if(config.auth) {
-    modules.add('models', path.join(__dirname, 'models'), 'user.js');
-    modules.add('models', path.join(__dirname, 'models'), 'credential.js');
+  if(config.authentication) {
+    modules.add('models', path.join(__dirname, 'models'), 'User.js');
+    modules.add('models', path.join(__dirname, 'models'), 'Credential.js');
   }
   if(config.database) {
     modules.add('core', path.join(__dirname, 'core'), 'database.js');
+    modules.add('models', path.join(__dirname, 'models'), 'Migration.js');
   }
   if(config.email) {
     modules.add('core', path.join(__dirname, 'core'), 'email.js');

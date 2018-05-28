@@ -7,7 +7,7 @@ module.exports = ({ config }) => {
     name,
     user,
     password,
-    _.omit(config.database, ['name', 'user', 'password' ])
+    _.omit(config.database, ['name', 'user', 'password', 'migrations' ])
   );
 };
 module.exports.requires = [ 'config' ];
