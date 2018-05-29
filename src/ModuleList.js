@@ -10,7 +10,7 @@ module.exports = class ModuleList {
   add(group, basePath, modulePath, contents = null) {
     this.modules.push(new Module(basePath, modulePath, group, contents));
   }
-  resolve() {
+  async resolve() {
     const unresolved = {
       previous: null,
       current: null
@@ -36,7 +36,7 @@ module.exports = class ModuleList {
           module.resolved = resolved;
           if(module.resolved) {
             try {
-              module.resolvedContents = module.contents(this.buildDependencies(module.requires));
+              module.resolvedContents = await module.contents(this.buildDependencies(module.requires));
             }
             catch(error) {
               throw new Error(

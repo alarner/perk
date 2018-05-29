@@ -25,19 +25,26 @@ describe('models/User', function() {
         await expect(user.addCredential(), 'missing type').to.be.rejectedWith(
           'User.prototype.addCredential requires a type.'
         );
-        await expect(user.addCredential('foo'), 'invalid type').to.be.rejectedWith(
+        await expect(user.addCredential({ type: 'foo' }), 'invalid type').to.be.rejectedWith(
           'Invalid credential type "foo".'
         );
-        await expect(user.addCredential('local'), 'missing identifier').to.be.rejectedWith(
+        await expect(user.addCredential({ type: 'local' }), 'missing identifier').to.be.rejectedWith(
           'User.prototype.addCredential requires an identifier.'
         );
-        await expect(user.addCredential('local', 'test@test.com'), 'missing secret').to.be.rejectedWith(
+        await expect(
+          user.addCredential({ type: 'local', identifier: 'test@test.com' }),
+          'missing secret'
+        ).to.be.rejectedWith(
           'User.prototype.addCredential requires a secret.'
         );
       });
       it('should add the credential', async function() {
         const user = await this.models.User.create({ email: 'test@test.com' });
-        const credential = await user.addCredential('local', 'test@test.com', 'this is a password');
+        const credential = await user.addCredential({
+          type: 'local',
+          identifier: 'test@test.com',
+          secret: 'this is a password'
+        });
         expect(credential.userId, 'userId').to.equal(user.id);
         expect(credential.identifier, 'identifier').to.equal('test@test.com');
         expect(credential.secret, 'secret').to.equal('this is a password');
@@ -48,10 +55,12 @@ describe('models/User', function() {
         await this.database.transaction(async (transaction) => {
           const user = await this.models.User.create({ email: 'test@test.com' }, { transaction });
           const credential = await user.addCredential(
-            'local',
-            'test@test.com',
-            'this is a password',
-            { foo: 'bar' },
+            {
+              type: 'local',
+              identifier: 'test@test.com',
+              secret: 'this is a password',
+              data: { foo: 'bar' }
+            },
             transaction
           );
           expect(credential.userId, 'userId').to.equal(user.id);
@@ -62,12 +71,34 @@ describe('models/User', function() {
         });
       });
     });
+    describe('storeToken', function() {
+      it('should throw the appropriate validation errors', async function() {
+        const user = await this.models.User.register('test@test.com', 'foo');
+        await expect(user.storeToken('asdf'), 'invalid token type').to.be.rejectedWith(
+          'Invalid token type "asdf".'
+        );
+        await expect(user.storeToken('foo_test'), 'invalid credential type').to.be.rejectedWith(
+          'Invalid credential type "foo_test".'
+        );
+        await expect(user.storeToken('local'), 'length missing').to.be.rejectedWith(
+          'Token type "local" missing length in authntication config.'
+        );
+      });
+      it('should work', async function() {
+        const user = await this.models.User.register('test@test.com', 'foo');
+        const credential = await user.storeToken(this.models.Credential.types.RESET_PASSWORD);
+        expect(credential.identifier.length).to.equal(15);
+        const dbCred = await this.models.Credential.findOne({ where: { id: credential.id } });
+        expect(dbCred).to.be.ok;
+        expect(dbCred.identifier).to.equal(credential.identifier);
+      });
+    });
   });
   describe('static methods', function() {
     describe('register', function() {
       it('should throw the appropriate validation errors', async function() {
         await expect(this.models.User.register(), 'missing email').to.be.rejectedWith(
-          'User is missing an email.'
+          'Action requires an email.'
         );
         await expect(this.models.User.register('kajsdhf'), 'invalid email').to.be.rejectedWith(
           'Invalid email address supplied.'
@@ -75,7 +106,7 @@ describe('models/User', function() {
         await expect(
           this.models.User.register('test@test.com'),
           'invalid email'
-        ).to.be.rejectedWith('User is missing a password.');
+        ).to.be.rejectedWith('Action requires a password.');
       });
       it('should create the user', async function() {
         const user = await this.models.User.register('test@test.com', 'foo');
@@ -95,6 +126,42 @@ describe('models/User', function() {
         const user = await this.models.User.register('test@test.com', 'foo');
         const credential = await this.models.Credential.findOne({ where: { userId: user.id }});
         expect(credential.secret).not.to.equal('foo');
+      });
+    });
+    describe('hash', function() {
+      it('should hash the input', async function() {
+        const hash = await this.models.User.hash('asdf');
+        expect(hash).to.be.ok;
+      });
+    });
+    describe('generateToken', function() {
+      it('should generate a random string', async function() {
+        const random = await this.models.User.generateToken(10);
+        expect(random.length).to.equal(10);
+      });
+    });
+    describe('initiatePasswordRecovery', function() {
+      it('should throw the appropriate validation errors', async function() {
+        await expect(
+          this.models.User.initiatePasswordRecovery(),
+          'missing email'
+        ).to.be.rejectedWith('Action requires an email.');
+        await expect(
+          this.models.User.initiatePasswordRecovery('foo'),
+          'invalid email'
+        ).to.be.rejectedWith('Invalid email address supplied.');
+        await expect(
+          this.models.User.initiatePasswordRecovery('t1@test.com'),
+          'bad user'
+        ).to.be.rejectedWith('No user with the supplied email address could be found.');
+      });
+      it('should work if the input is valid', async function() {
+        await this.models.User.register('test@test.com', 'foo');
+        const result = await this.models.User.initiatePasswordRecovery(
+          'test@test.com',
+          this.email
+        );
+        console.log(result);
       });
     });
   });

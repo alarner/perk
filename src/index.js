@@ -34,12 +34,19 @@ module.exports = async (configPath = 'config') => {
 
   const env = process.env.NODE_ENV || 'development';
   const defaultConfig = configLoader(path.join(__dirname, 'config-defaults'), env);
-  const config = _.merge({}, defaultConfig, configLoader(configPath, env));
+  const userConfig = configLoader(configPath, env);
+  const config = _.merge({}, defaultConfig, userConfig);
   config.env = env;
   const paths = config.perk.paths;
 
+  const features = {
+    database: Boolean(userConfig.database),
+    authentication: Boolean(userConfig.authentication),
+    email: Boolean(userConfig.email)
+  };
+
   // Feature specific validation
-  if(config.authentication && !config.database) {
+  if(features.authentication && !features.database) {
     throw new Error(
       'The database feature must be enabled in your config in order to use the authentication ' +
       'feature.'
@@ -59,7 +66,7 @@ module.exports = async (configPath = 'config') => {
     paths.controllers,
     defaultControllerPath
   );
-  if(config.email) {
+  if(features.email) {
     paths.emails = await checkPath(
       'perk.paths.emails',
       configPath,
@@ -73,7 +80,7 @@ module.exports = async (configPath = 'config') => {
     paths.libraries,
     defaultLibrariesPath
   );
-  if(config.database) {
+  if(features.database) {
     paths.models = await checkPath(
       'perk.paths.models',
       configPath,
@@ -88,26 +95,26 @@ module.exports = async (configPath = 'config') => {
   modules.add('core', '', 'errors', errors);
   modules.add('core', path.join(__dirname, 'core'), 'logger.js');
 
-  if(config.authentication) {
+  if(features.authentication) {
     modules.add('models', path.join(__dirname, 'models'), 'User.js');
     modules.add('models', path.join(__dirname, 'models'), 'Credential.js');
   }
-  if(config.database) {
+  if(features.database) {
     modules.add('core', path.join(__dirname, 'core'), 'database.js');
     modules.add('models', path.join(__dirname, 'models'), 'Migration.js');
   }
-  if(config.email) {
+  if(features.email) {
     modules.add('core', path.join(__dirname, 'core'), 'email.js');
   }
 
-  modules.resolve();
+  await modules.resolve();
 
   // Load all of the customer user modules
   const userModulePaths = {
     libraries: await listDir(paths.libraries)
   };
 
-  if(config.database) {
+  if(features.database) {
     userModulePaths.models = await listDir(paths.models);
   }
 
@@ -118,7 +125,7 @@ module.exports = async (configPath = 'config') => {
     );
   }
 
-  userModules.resolve();
+  await userModules.resolve();
 
   // Generate the dependency tree
   const dependencies = userModules.buildAllDependencies();

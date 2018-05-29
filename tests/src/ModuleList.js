@@ -1,8 +1,12 @@
 const path = require('path');
 
-const { expect } = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+const chai = require('chai');
 
 const ModuleList = require('../../src/ModuleList');
+
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 describe('ModuleList', function() {
   describe('constructor', function() {
@@ -47,32 +51,32 @@ describe('ModuleList', function() {
   describe('resolve', function() {
     it('should work if there are no modules', function() {
       const ml = new ModuleList();
-      expect(() => ml.resolve()).not.to.throw();
+      expect(ml.resolve()).to.be.fulfilled;
     });
-    it('should work if there are no dependencies', function() {
+    it('should work if there are no dependencies', async function() {
       const ml1 = new ModuleList();
       ml1.add('test', path.join(__dirname, '../fixtures/module-list'), 'foo');
       ml1.add('test', path.join(__dirname, '../fixtures/module-list'), 'bar');
       ml1.add('test', path.join(__dirname, '../fixtures/module-list'), 'baz/baz1');
-      ml1.resolve();
+      await ml1.resolve();
       ml1.modules.forEach(m => expect(m.resolved).to.be.true);
     });
-    it('should work if there are dependencies', function() {
+    it('should work if there are dependencies', async function() {
       const ml1 = new ModuleList();
       ml1.add('test', path.join(__dirname, '../fixtures/module-list'), 'baz/baz1');
       ml1.add('test', path.join(__dirname, '../fixtures/module-list'), 'baz/baz2');
-      ml1.resolve();
+      await ml1.resolve();
       ml1.modules.forEach(m => expect(m.resolved).to.be.true);
       expect(ml1.find('test/baz/baz2').resolvedContents()).to.equal('baz1 baz2');
     });
-    it('should work if there is a fallback dependency', function() {
+    it('should work if there is a fallback dependency', async function() {
       const ml1 = new ModuleList();
       ml1.add('core', path.join(__dirname, '../fixtures/module-list'), 'fallback');
       const ml2 = new ModuleList(ml1);
       ml2.add('test', path.join(__dirname, '../fixtures/module-list'), 'baz/baz1');
       ml2.add('test', path.join(__dirname, '../fixtures/module-list'), 'baz/baz2');
       ml2.add('test', path.join(__dirname, '../fixtures/module-list'), 'requires-fallback');
-      ml2.resolve();
+      await ml2.resolve();
       expect(ml2.find('test/requires-fallback').resolvedContents()).to.equal(
         'fallback requires-fallback'
       );
@@ -81,35 +85,35 @@ describe('ModuleList', function() {
       const ml1 = new ModuleList();
       ml1.add('test', path.join(__dirname, '../fixtures/module-list'), 'circular1');
       ml1.add('test', path.join(__dirname, '../fixtures/module-list'), 'circular2');
-      expect(() => ml1.resolve()).to.throw(
+      return expect(ml1.resolve()).to.be.rejectedWith(
         'The following modules could not resolve due to circular dependencies: test/circular1, ' +
         'test/circular2'
       );
     });
   });
   describe('buildAllDependencies', function() {
-    it('should include fallbacks', function() {
+    it('should include fallbacks', async function() {
       const ml1 = new ModuleList();
       ml1.add('core', path.join(__dirname, '../fixtures/module-list'), 'fallback');
       const ml2 = new ModuleList(ml1);
       ml2.add('test', path.join(__dirname, '../fixtures/module-list'), 'foo');
       ml2.add('test', path.join(__dirname, '../fixtures/module-list'), 'bar');
       ml2.add('test', path.join(__dirname, '../fixtures/module-list'), 'baz/baz1');
-      ml2.resolve();
+      await ml2.resolve();
       const dependencies = ml2.buildAllDependencies();
       expect(dependencies.test.foo).to.be.a('function');
       expect(dependencies.test.bar).to.be.a('function');
       expect(dependencies.test.baz.baz1).to.be.a('function');
       expect(dependencies.fallback).to.be.a('function');
     });
-    it('should not overwrite from fallbacks', function() {
+    it('should not overwrite from fallbacks', async function() {
       const ml1 = new ModuleList();
       ml1.add('test', path.join(__dirname, '../fixtures/module-list/baz'), 'foo');
       const ml2 = new ModuleList(ml1);
       ml2.add('test', path.join(__dirname, '../fixtures/module-list'), 'foo');
       ml2.add('test', path.join(__dirname, '../fixtures/module-list'), 'bar');
       ml2.add('test', path.join(__dirname, '../fixtures/module-list'), 'baz/baz1');
-      ml2.resolve();
+      await ml2.resolve();
       const dependencies = ml2.buildAllDependencies();
       expect(dependencies.test.foo).to.be.a('function');
       expect(dependencies.test.bar).to.be.a('function');

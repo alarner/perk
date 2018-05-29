@@ -64,7 +64,8 @@ module.exports = ({ database, models }) => {
   });
 
   Credential.types = {
-    LOCAL: 'local'
+    LOCAL: 'local',
+    RESET_PASSWORD: 'reset_password'
   };
   return Credential;
 };

@@ -13,6 +13,7 @@ describe('list-dir', function() {
     const expectations = [
       'tests/fixtures/test10/bar.js',
       'tests/fixtures/test10/config/database.js',
+      'tests/fixtures/test10/config/email.js',
       'tests/fixtures/test10/config/logger.js',
       'tests/fixtures/test10/config/perk.js',
       'tests/fixtures/test10/controllers/auth.js',
@@ -20,7 +21,7 @@ describe('list-dir', function() {
       'tests/fixtures/test10/libraries/test.js'
     ];
     const results = await listDir(path.join(__dirname, '../fixtures', 'test10'));
-    expect(results.length).to.equal(7);
+    expect(results.length).to.equal(8);
     results.forEach((result, i) => expect(result.endsWith(expectations[i]), result).to.be.true);
   });
 });
