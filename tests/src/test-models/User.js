@@ -2,6 +2,8 @@ const path = require('path');
 
 const chaiAsPromised = require('chai-as-promised');
 const chai = require('chai');
+const { DateTime } = require('luxon');
+const { Op } = require('sequelize');
 
 const createUser = require('../../../src/models/User');
 
@@ -93,6 +95,107 @@ describe('models/User', function() {
         expect(dbCred.identifier).to.equal(credential.identifier);
       });
     });
+    describe('validateToken', function() {
+      it(`should throw an error if the token doesn't exist`, async function() {
+        const user = await this.models.User.register('test@test.com', 'foo');
+        const result = user.validateToken(
+          this.models.Credential.types.RESET_PASSWORD,
+          'asdf',
+          false
+        );
+        await expect(result).to.be.rejectedWith('Invalid token supplied.');
+      });
+      it(`should throw an error if the token is expired`, async function() {
+        const user = await this.models.User.register('test@test.com', 'foo');
+        const credential = await user.addCredential({
+          type: this.models.Credential.types.RESET_PASSWORD,
+          identifier: 'asdf',
+          secret: 'asdf'
+        });
+        await credential.update({ expiresAt: DateTime.utc().minus({ minutes: 3 }).toISO() });
+        const result = user.validateToken(
+          this.models.Credential.types.RESET_PASSWORD,
+          'asdf',
+          false
+        );
+        await expect(result).to.be.rejectedWith('Token has expired.');
+      });
+      it(`should work if the token is valid`, async function() {
+        const user = await this.models.User.register('test@test.com', 'foo');
+        const credential = await user.addCredential({
+          type: this.models.Credential.types.RESET_PASSWORD,
+          identifier: 'asdf',
+          secret: 'asdf'
+        });
+        const result = await user.validateToken(
+          this.models.Credential.types.RESET_PASSWORD,
+          'asdf',
+          false
+        );
+        expect(result).to.be.true;
+        const credential2 = await this.models.Credential.findOne({
+          where: {
+            type: this.models.Credential.types.RESET_PASSWORD,
+            userId: user.id,
+            identifier: 'asdf',
+            secret: 'asdf'
+          }
+        });
+        expect(credential2.deletedAt).to.be.null;
+      });
+      it(`should delete the token if instructed to`, async function() {
+        const user = await this.models.User.register('test@test.com', 'foo');
+        const credential = await user.addCredential({
+          type: this.models.Credential.types.RESET_PASSWORD,
+          identifier: 'asdf',
+          secret: 'asdf'
+        });
+        const result = await user.validateToken(
+          this.models.Credential.types.RESET_PASSWORD,
+          'asdf',
+          true
+        );
+        expect(result).to.be.true;
+        const credential2 = await this.models.Credential.findOne({
+          where: {
+            type: this.models.Credential.types.RESET_PASSWORD,
+            userId: user.id,
+            identifier: 'asdf',
+            secret: 'asdf'
+          }
+        });
+        expect(credential2.deletedAt).not.to.be.null;
+      });
+      it(`should not be able to use a token twice`, async function() {
+        const user = await this.models.User.register('test@test.com', 'foo');
+        const credential = await user.addCredential({
+          type: this.models.Credential.types.RESET_PASSWORD,
+          identifier: 'asdf',
+          secret: 'asdf'
+        });
+        const result = await user.validateToken(
+          this.models.Credential.types.RESET_PASSWORD,
+          'asdf',
+          true
+        );
+        expect(result).to.be.true;
+        const credential2 = await this.models.Credential.findOne({
+          where: {
+            type: this.models.Credential.types.RESET_PASSWORD,
+            userId: user.id,
+            identifier: 'asdf',
+            secret: 'asdf'
+          }
+        });
+        expect(credential2.deletedAt).not.to.be.null;
+        const result2 = user.validateToken(
+          this.models.Credential.types.RESET_PASSWORD,
+          'asdf',
+          true
+        );
+        await expect(result2).to.be.rejectedWith('Invalid token supplied.');
+      });
+    });
   });
   describe('static methods', function() {
     describe('register', function() {
@@ -159,9 +262,58 @@ describe('models/User', function() {
         await this.models.User.register('test@test.com', 'foo');
         const result = await this.models.User.initiatePasswordRecovery(
           'test@test.com',
-          this.email
+          this.email,
+          'reset-password'
         );
-        console.log(result);
+        expect(result).to.be.true;
+      });
+    });
+    describe('changePassword', function() {
+      it('should throw the appropriate validation errors', async function() {
+        await this.models.User.register('test@test.com', 'foo');
+        await expect(
+          this.models.User.changePassword(),
+          'missing email'
+        ).to.be.rejectedWith('Action requires an email.');
+        await expect(
+          this.models.User.changePassword('foo'),
+          'invalid email'
+        ).to.be.rejectedWith('Invalid email address supplied.');
+        await expect(
+          this.models.User.changePassword('t1@test.com'),
+          'missing token'
+        ).to.be.rejectedWith('Action requires a token.');
+        await expect(
+          this.models.User.changePassword('t1@test.com', 'asdf'),
+          'missing password'
+        ).to.be.rejectedWith('Action requires a password.');
+        await expect(
+          this.models.User.changePassword('t1@test.com', 'asdf', 'foo'),
+          'missing password'
+        ).to.be.rejectedWith('No user with the supplied email address could be found.');
+        await expect(
+          this.models.User.changePassword('test@test.com', 'asdf', 'foo'),
+          'invalid token'
+        ).to.be.rejectedWith('Invalid token supplied.');
+      });
+      it('should work when the input is valid', async function() {
+        const user = await this.models.User.register('test@test.com', 'foo');
+        const credential = await user.storeToken(this.models.Credential.types.RESET_PASSWORD);
+        const result = await this.models.User.changePassword(
+          'test@test.com',
+          credential.secret,
+          'asddfsg',
+          this.email,
+          'reset-password-notification'
+        );
+        expect(result).to.be.ok;
+        const credentials = await this.models.Credential.findAll({ where: {
+          type: this.models.Credential.types.LOCAL,
+          deletedAt: {
+            [Op.eq]: null
+          }
+        }});
+        expect(credentials.length).to.equal(1);
       });
     });
   });

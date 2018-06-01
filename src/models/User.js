@@ -4,6 +4,8 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { DateTime } = require('luxon');
 
+const Op = Sequelize.Op;
+
 module.exports = ({ database, config, errors, models }) => {
   const User = database.define('users', {
     id: {
@@ -61,7 +63,22 @@ module.exports = ({ database, config, errors, models }) => {
       'A user with that email has already registered.',
       'EmailExists',
       'email'
-    )
+    ),
+    MissingToken: errors.BadRequest(
+      'Action requires a token.',
+      'MissingToken',
+      'default'
+    ),
+    InvalidToken: errors.BadRequest(
+      'Invalid token supplied.',
+      'InvalidToken',
+      'default'
+    ),
+    ExpiredToken: errors.BadRequest(
+      'Token has expired.',
+      'ExpiredToken',
+      'default'
+    ),
   };
 
   User.prototype.addCredential = async function(credential = {}, transaction = null) {
@@ -85,17 +102,32 @@ module.exports = ({ database, config, errors, models }) => {
       options.transaction = transaction;
     }
 
-    let cred = await models.Credential.findOne(
-      {
-        where: { type, identifier, userId: this.id }
-      },
-      options
-    );
-    if(cred) {
-      throw new User.errors.EmailExists();
+    // Don't allow more than one local password at a time
+    if(type === models.Credential.types.LOCAL) {
+      const cred = await models.Credential.findOne(
+        {
+          where: {
+            type, userId:
+            this.id,
+            deletedAt: {
+              [Op.eq]: null
+            }
+          },
+          transaction
+        }
+      );
+      if(cred) {
+        throw new User.errors.EmailExists();
+      }
     }
-    cred = { type, identifier, secret, data, expiresAt, userId: this.id };
-    return await models.Credential.create(cred, options);
+    return await models.Credential.create({
+      type,
+      identifier,
+      secret,
+      data,
+      expiresAt,
+      userId: this.id
+    }, options);
   };
 
   User.prototype.storeToken = async function(type) {
@@ -118,6 +150,30 @@ module.exports = ({ database, config, errors, models }) => {
       credential.expiresAt = DateTime.utc().plus(config.authentication.token[type].expireMs);
     }
     return this.addCredential(credential);
+  };
+
+  User.prototype.validateToken = async function(type, token, use, transaction) {
+    const credential = await models.Credential.findOne({
+      where: {
+        type,
+        identifier: token,
+        secret: token,
+        userId: this.id,
+        deletedAt: {
+          [Op.eq]: null
+        }
+      }
+    });
+    if(!credential) {
+      throw new User.errors.InvalidToken();
+    }
+    if(credential.expiresAt && credential.expiresAt.toISOString() < DateTime.utc().toISO()) {
+      throw new User.errors.ExpiredToken();
+    }
+    if(use) {
+      await credential.update({ deletedAt: new Date() }, { transaction });
+    }
+    return true;
   };
 
   User.register = async function(email, password, data = {}) {
@@ -184,9 +240,63 @@ module.exports = ({ database, config, errors, models }) => {
       throw new User.errors.UserWithEmailNotFound();
     }
     const credential = await user.storeToken(models.Credential.types.RESET_PASSWORD);
-    await email(template, { ...user.toJSON(), ...credential.toJSON() });
+    await email(user.email, template, { ...user.toJSON(), ...credential.toJSON() });
     return true;
   };
+
+  User.changePassword = async function(userEmail, token, newPassword, email, template) {
+    if(!userEmail) {
+      throw new User.errors.MissingEmail();
+    }
+    if(!validator.isEmail(userEmail)) {
+      throw new User.errors.InvalidEmail();
+    }
+    if(!token) {
+      throw new User.errors.MissingToken();
+    }
+    if(!newPassword) {
+      throw new User.errors.MissingPassword();
+    }
+    const user = await User.findOne({ where: { email: userEmail } });
+    if(!user) {
+      throw new User.errors.UserWithEmailNotFound();
+    }
+    return await database.transaction(async (transaction) => {
+      await user.validateToken(
+        models.Credential.types.RESET_PASSWORD,
+        token,
+        true,
+        transaction
+      );
+
+      // Delete existing
+      const result = await models.Credential.update(
+        { deletedAt: new Date() },
+        {
+          where: {
+            userId: user.id,
+            type: models.Credential.types.LOCAL,
+            deletedAt: {
+              [Op.eq]: null
+            }
+          },
+          transaction
+        }
+      );
+
+      const secret = await User.hash(newPassword);
+      await user.addCredential(
+        {
+          type: models.Credential.types.LOCAL,
+          identifier: userEmail,
+          secret,
+          data: {},
+        },
+        transaction
+      );
+      return user;
+    });
+  }
 
   return User;
 };

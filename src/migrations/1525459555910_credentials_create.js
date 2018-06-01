@@ -61,16 +61,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
-    await query.addConstraint('credentials', ['user_id'], {
-      type: 'foreign key',
-      references: {
-        table: 'users',
-        field: 'id'
-      },
-      onDelete: 'cascade',
-      onUpdate: 'cascade'
-    });
-    await query.addConstraint('credentials', ['type', 'identifier', 'user_id'], {
+    await query.addConstraint('credentials', ['type', 'identifier', 'user_id', 'deleted_at'], {
       type: 'unique'
     });
   },
