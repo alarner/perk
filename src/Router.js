@@ -1,3 +1,4 @@
+const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
 const pathToRegexp = require('path-to-regexp');
@@ -78,7 +79,7 @@ module.exports = class Router {
             let file = '';
             if(stack[0]) {
               const match = stack[0].match(/.*\((.*?)\).*/);
-              file = match[1].substr(__dirname.length);
+              file = match[1].substr(path.join(__dirname, '..', '..', '..').length + 1);
             }
             ctx.body.file = file;
             ctx.body.stack = stack;

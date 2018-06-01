@@ -162,8 +162,10 @@ module.exports = async (configPath = 'config') => {
   app.use(bodyParser());
   app.use(router.middleware);
 
-  const server = app.listen(process.env.PORT || config.webserver.port);
-  dependencies.logger.info(`Started server at http://localhost:${config.webserver.port}`);
+  const port = process.env.PORT || config.webserver.port;
+
+  const server = app.listen(port);
+  dependencies.logger.info(`Started server at http://localhost:${port}`);
   return server;
 };
 
