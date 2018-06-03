@@ -6,7 +6,7 @@ const { DateTime } = require('luxon');
 
 const Op = Sequelize.Op;
 
-module.exports = ({ database, config, errors, models }) => {
+module.exports = ({ database, config, errors, models, logger }) => {
   const User = database.define('users', {
     id: {
       allowNull: false,
@@ -300,4 +300,4 @@ module.exports = ({ database, config, errors, models }) => {
 
   return User;
 };
-module.exports.requires = [ 'database', 'config', 'errors', 'models/Credential' ];
+module.exports.requires = [ 'database', 'config', 'errors', 'models/Credential', 'logger' ];

@@ -27,6 +27,7 @@ module.exports = class Router {
   }
 
   async middleware(ctx) {
+    const { logger, config } = this.dependencies;
     const parsedUrl = url.parse(ctx.originalUrl);
     const pathname = parsedUrl.pathname;
     const query = querystring.parse(parsedUrl.query);
@@ -71,7 +72,7 @@ module.exports = class Router {
             };
           }
 
-          if(this.dependencies.config.webserver.verboseErrors) {
+          if(config.webserver.errors.verbose) {
             let stack = [];
             if(error.stack) {
               stack = error.stack.split('\n').slice(1);
@@ -84,6 +85,10 @@ module.exports = class Router {
             ctx.body.file = file;
             ctx.body.stack = stack;
             ctx.body.message = error.message;
+          }
+
+          if(config.webserver.errors.log) {
+            logger[config.webserver.errors.level](error.message);
           }
         }
       }
