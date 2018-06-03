@@ -5,7 +5,10 @@ const _ = require('lodash');
 module.exports = class Module {
   constructor(basePath, modulePath, group, contents = null) {
     this.basePath = basePath;
-    this.path = _.trim(_.trim(modulePath, path.sep), '.js');
+    this.path = _.trim(modulePath, path.sep);
+    const pieces = this.path.split(path.sep);
+    pieces[pieces.length - 1] = path.basename(pieces[pieces.length - 1], '.js');
+    this.path = pieces.join(path.sep);
     this.group = group;
     try {
       this.contents = contents || require(this.file());
