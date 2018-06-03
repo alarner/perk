@@ -63,7 +63,7 @@ module.exports = async ({ config }) => {
 
   const baseCss = await fs.readFile(
     path.join(
-      __dirname, '..', '..', 'node_modules', 'foundation-emails', 'dist', 'foundation-emails.css'
+      __dirname, '..', 'assets', 'foundation-emails.css'
     )
   );
 
