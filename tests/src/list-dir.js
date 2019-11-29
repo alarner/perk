@@ -11,17 +11,18 @@ const { expect } = chai;
 describe('list-dir', function() {
   it('should recursively load every javascript file', async function() {
     const expectations = [
-      'tests/fixtures/test10/bar.js',
-      'tests/fixtures/test10/config/database.js',
-      'tests/fixtures/test10/config/email.js',
-      'tests/fixtures/test10/config/logger.js',
-      'tests/fixtures/test10/config/perk.js',
-      'tests/fixtures/test10/controllers/auth.js',
-      'tests/fixtures/test10/libraries/foo.js',
-      'tests/fixtures/test10/libraries/test.js'
+      '/tests/fixtures/list-dir/bar.js',
+      '/tests/fixtures/list-dir/baz/baz1.js',
+      '/tests/fixtures/list-dir/baz/baz2.js',
+      '/tests/fixtures/list-dir/baz/foo.js',
+      '/tests/fixtures/list-dir/circular1.js',
+      '/tests/fixtures/list-dir/circular2.js',
+      '/tests/fixtures/list-dir/fallback.js',
+      '/tests/fixtures/list-dir/foo.js',
+      '/tests/fixtures/list-dir/requires-fallback.js'
     ];
-    const results = await listDir(path.join(__dirname, '../fixtures', 'test10'));
-    expect(results.length).to.equal(8);
+    const results = await listDir(path.join(__dirname, '../fixtures', 'list-dir'));
+    expect(results.length).to.equal(9);
     results.forEach((result, i) => expect(result.endsWith(expectations[i]), result).to.be.true);
   });
 });
