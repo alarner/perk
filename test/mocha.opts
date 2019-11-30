@@ -1,3 +1,0 @@
---compilers js:babel-register
---recursive
---timeout 5000
