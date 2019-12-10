@@ -12,6 +12,9 @@
   },
   "author": "Aaron Larner",
   "license": "MIT",
+  "bin": {
+    "migrator": "./src/cli/index.js"
+  },
   "bugs": {
     "url": "https://github.com/alarner/perk/issues"
   },
@@ -22,5 +25,8 @@
     "koa-bodyparser": "^4.2.1",
     "path-to-regexp": "^6.1.0",
     "pg": "^7.14.0"
+  },
+  "devDependencies": {
+    "commander": "^4.0.1"
   }
 }

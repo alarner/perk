@@ -2,38 +2,32 @@ const fs = require('fs').promises;
 const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
-const bodyParser = require('koa-bodyparser');
+const repl = require('repl');
 
+const bodyParser = require('koa-bodyparser');
 const { pathToRegexp } = require('path-to-regexp');
 const Koa = require('koa');
 
-const Error = require('./errors');
+const HTTPError = require('./HTTPError');
 const db = require('./db');
-const getStack = require('./getStack');
+const configBuilder = require('./configBuilder');
 
 
 module.exports = async config => {
-	// Validate config
-	if(!config.routesDirectory) {
-		throw new Error('config.routesDirectory is required');
-	}
-
-	if(!path.isAbsolute(config.routesDirectory)) {
-		const callFile = getStack()[1].getFileName();
-		config.routesDirectory = path.join(path.dirname(callFile), config.routesDirectory);
-	}
+	// Validate config and fix paths
+	config = configBuilder(config);
 
 	if(config.database) {
 		db.connect(config.database);
 	}
 
 	// Load all routes
-	const routePaths = await fs.readdir(config.routesDirectory);
+	const routePaths = await fs.readdir(config.routes.directory);
 	const routes = [];
 	for(const routePath of routePaths) {
 		if(routePath.endsWith('.js')) {
 			const route = routePath.substr(0, routePath.length - 3);
-			const endpoints = require(path.join(config.routesDirectory, routePath));
+			const endpoints = require(path.join(config.routes.directory, routePath));
 			for(const key in endpoints) {
 				const [method, subPattern] = key.split(' ');
 				if(!['GET', 'POST', 'PUT', 'DELETE'].includes(method)) {
