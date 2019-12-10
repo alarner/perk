@@ -8,7 +8,7 @@ module.exports = config => {
 
 	const callFile = getStack()[0].getFileName();
 	const perkSrcDir = path.dirname(callFile);
-	const rootDir = path.join(perkSrcDir, '..', '..');
+	const rootDir = path.join(perkSrcDir, '..', '..', '..');
 
 	if(!path.isAbsolute(config.routes.directory)) {
 		config.routes.directory = path.join(rootDir, config.routes.directory);

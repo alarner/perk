@@ -77,11 +77,11 @@ module.exports = async config => {
 				ctx.body = result;
 			}
 			else {
-				throw new Error.NotFound('NOT_FOUND');
+				throw new HTTPError.NotFound('NOT_FOUND');
 			}
 		}
 		catch(error) {
-			if(error instanceof Error.HTTPError) {
+			if(error instanceof HTTPError.HTTPError) {
 				ctx.response.status = error.status;
 				ctx.body = { code: error.message };
 			}
