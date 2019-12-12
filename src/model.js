@@ -1,7 +1,7 @@
 const db = require('./db');
 
-module.exports = (table, fns, { idAttribute }) => {
-	idAttribute = idAttribute || 'id';
+module.exports = (table, fns, options = {}) => {
+	const idAttribute = options.idAttribute || 'id';
 
 	const model = {
 		async save(record, returnNew) {
