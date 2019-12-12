@@ -5,6 +5,9 @@ module.exports = (table, fns, options = {}) => {
 
 	const model = {
 		async save(record, returnNew) {
+			if(!record[idAttribute]) {
+				throw new Error(`Missing record id: "${idAttribute}"`);
+			}
 			const keys = Object.keys(record).filter(k => k !== idAttribute);
 			if(!keys.length) {
 				throw new Error('Record has nothing new to save.');
@@ -18,17 +21,20 @@ module.exports = (table, fns, options = {}) => {
 				}
 				params.push(idAttribute);
 				params.push(record[idAttribute]);
-				return await db.query(
+				await db.query(
 					`update ?? set ${keys.map(k => '?? = ?').join(', ')} where ?? = ?`,
 					params
 				);
 			}
 			else {
 				const params = [table].concat(keys).concat(keys.map(k => record[k]));
-				return await db.query(`
+				await db.query(`
 					insert into ?? (${keys.map(k => '??').join(', ')})
 					values (${keys.map(k => '?').join(', ')})
 				`, params);
+			}
+			if(returnNew) {
+				return this.fetch({ [idAttribute]: record[idAttribute] });
 			}
 		},
 		async fetch(record) {
