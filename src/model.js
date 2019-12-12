@@ -5,15 +5,15 @@ module.exports = (table, fns, options = {}) => {
 
 	const model = {
 		async save(record, returnNew) {
-			if(!record[idAttribute]) {
-				throw new Error(`Missing record id: "${idAttribute}"`);
-			}
 			const keys = Object.keys(record).filter(k => k !== idAttribute);
 			if(!keys.length) {
 				throw new Error('Record has nothing new to save.');
 			}
 
 			if(record[idAttribute] !== undefined) {
+				if(!record.updated_at) {
+					record.updated_at = new Date();
+				}
 				const params = [table];
 				for(const key of keys) {
 					params.push(key);
@@ -27,6 +27,9 @@ module.exports = (table, fns, options = {}) => {
 				);
 			}
 			else {
+				if(!record.created_at) {
+					record.created_at = new Date();
+				}
 				const params = [table].concat(keys).concat(keys.map(k => record[k]));
 				await db.query(`
 					insert into ?? (${keys.map(k => '??').join(', ')})
