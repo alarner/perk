@@ -67,7 +67,8 @@ module.exports = async config => {
 				}
 				const context = {
 					query: parsedQuery,
-					params
+					params,
+					body: ctx.request.body
 				};
 				let result = null;
 
