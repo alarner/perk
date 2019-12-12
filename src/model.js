@@ -43,13 +43,13 @@ module.exports = (table, fns, options = {}) => {
 					params.push(record[key]);
 				}
 			}
-			const record = await db.query(`
+			const results = await db.query(`
 				select * from ?? where
 				${keys.map(k => record[k] === null ? '?? IS NULL' : '?? = ?').join(' and ')}
 				limit 1
 			`, params);
 
-			return record.rows[0] || null;
+			return results.rows[0] || null;
 		}
 	};
 
