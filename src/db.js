@@ -7,6 +7,11 @@ class Db {
 	query(sql, params) {
 		return this.db.raw(sql, params);
 	}
+	close() {
+		return new Promise((resolve, reject) => {
+			this.db.destroy(err => err ? reject(err) : resolve());
+		});
+	}
 }
 
 module.exports = new Db();
