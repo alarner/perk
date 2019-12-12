@@ -1,15 +1,21 @@
 const db = require('./db');
 module.exports = config => ({
-	create(name) {
+	async create(name) {
 		db.connect(config.database);
-		return db.db.migrate.make(name, config);
+		const result = await db.db.migrate.make(name, config);
+		await db.disconnect();
+		return result;
 	},
-	latest() {
+	async latest() {
 		db.connect(config.database);
-		return db.db.migrate.latest(config);
+		const result = await  db.db.migrate.latest(config);
+		await db.disconnect();
+		return result;
 	},
-	rollback() {
+	async rollback() {
 		db.connect(config.database);
-		return db.db.migrate.rollback(config);
+		const result = await  db.db.migrate.rollback(config);
+		await db.disconnect();
+		return result;
 	}
 })

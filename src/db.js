@@ -13,11 +13,13 @@ class Db {
 		return this.db.raw(sql, params);
 	}
 	async disconnect() {
-		await this.db.destroy();
-		this.db = null;
+		if(this.isConnected()) {
+			await this.db.destroy();
+			this.db = null;
+		}
 	}
 	isConnected() {
-		!!this.db;
+		return !!this.db;
 	}
 }
 
