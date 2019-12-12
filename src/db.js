@@ -10,6 +10,9 @@ class Db {
 		}
 	}
 	query(sql, params) {
+		if(!this.isConnected()) {
+			throw new Error('Cannot query database before we have connected');
+		}
 		return this.db.raw(sql, params);
 	}
 	async disconnect() {
