@@ -1,16 +1,23 @@
 const knex = require('knex');
 
 class Db {
+	constructor() {
+		this.db = null;
+	}
 	connect(config) {
-		this.db = knex(config);
+		if(!this.isConnected()) {
+			this.db = knex(config);
+		}
 	}
 	query(sql, params) {
 		return this.db.raw(sql, params);
 	}
-	close() {
-		return new Promise((resolve, reject) => {
-			this.db.destroy(err => err ? reject(err) : resolve());
-		});
+	async disconnect() {
+		await this.db.destroy();
+		this.db = null;
+	}
+	isConnected() {
+		!!this.db;
 	}
 }
 
