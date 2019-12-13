@@ -47,7 +47,7 @@ module.exports = (table, fns, options = {}) => {
 			}
 		},
 		async fetch(record) {
-			const keys = Object.keys(record).filter(k => k !== idAttribute);
+			const keys = Object.keys(record);
 			if(!keys.length) {
 				throw new Error('No filters supplied to fetch.');
 			}
