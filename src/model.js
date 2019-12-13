@@ -13,6 +13,7 @@ module.exports = (table, fns, options = {}) => {
 			if(record[idAttribute] !== undefined) {
 				if(!record.updated_at) {
 					record.updated_at = new Date();
+					keys.push('updated_at');
 				}
 				const params = [table];
 				for(const key of keys) {
@@ -29,6 +30,7 @@ module.exports = (table, fns, options = {}) => {
 			else {
 				if(!record.created_at) {
 					record.created_at = new Date();
+					keys.push('created_at');
 				}
 				const params = [table].concat(keys).concat(keys.map(k => record[k]));
 				await db.query(`
