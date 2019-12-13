@@ -10,6 +10,8 @@ module.exports = (table, fns, options = {}) => {
 				throw new Error('Record has nothing new to save.');
 			}
 
+			let id = record[idAttribute];
+
 			if(record[idAttribute] !== undefined) {
 				if(!record.updated_at) {
 					record.updated_at = new Date();
@@ -32,14 +34,16 @@ module.exports = (table, fns, options = {}) => {
 					record.created_at = new Date();
 					keys.push('created_at');
 				}
-				const params = [table].concat(keys).concat(keys.map(k => record[k]));
-				await db.query(`
+				const params = [table].concat(keys).concat(keys.map(k => record[k])).concat(idAttribute);;
+				const result = await db.query(`
 					insert into ?? (${keys.map(k => '??').join(', ')})
 					values (${keys.map(k => '?').join(', ')})
+					returning ??
 				`, params);
+				id = result.rows[0][idAttribute];
 			}
 			if(returnNew) {
-				return this.fetch({ [idAttribute]: record[idAttribute] });
+				return this.fetch({ [idAttribute]: id });
 			}
 		},
 		async fetch(record) {
