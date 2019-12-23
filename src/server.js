@@ -13,7 +13,12 @@ module.exports = async config => {
 	app.use(bodyParser({ enableTypes: ['json'] }));
 	app.use(async ctx => {
 		try {
-			ctx.body = await handleRequest(ctx.request.method, ctx.request.url, ctx.request.body);
+			ctx.body = await handleRequest(
+				ctx.request.method,
+				ctx.request.url,
+				ctx.request.body,
+				ctx.request.header
+			);
 		}
 		catch(error) {
 			if(error instanceof HTTPError.HTTPError) {

@@ -29,7 +29,7 @@ module.exports = async config => {
 				if(!['GET', 'POST', 'PUT', 'DELETE'].includes(method)) {
 					throw new Error(`Endpoint "${key}" in route "${routePath}" does not start with a valid request type (GET, POST, PUT or DELETE)`);
 				}
-				const pattern = `/${route}${subPattern}`;
+				const pattern = subPattern === '/' ? `/${route}` : `/${route}${subPattern}`;
 				const keys = [];
 				const regexp = pathToRegexp(pattern, keys);
 				const fns = Array.isArray(endpoints[key]) ? endpoints[key] : [ endpoints[key] ];
@@ -39,7 +39,7 @@ module.exports = async config => {
 	}
 
 	return {
-		async handleRequest(method, requestUrl, body) {
+		async handleRequest(method, requestUrl, body, headers) {
 			const { pathname, query } = url.parse(requestUrl);
 			const parsedQuery = querystring.parse(query);
 			let matchedRoute = null;
@@ -61,7 +61,8 @@ module.exports = async config => {
 				const context = {
 					query: parsedQuery,
 					params,
-					body
+					body,
+					headers
 				};
 				let result = null;
 
@@ -76,4 +77,3 @@ module.exports = async config => {
 		}
 	}
 };
-
