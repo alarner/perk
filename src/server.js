@@ -1,5 +1,7 @@
 const bodyParser = require('koa-bodyparser');
+const cors = require('@koa/cors');
 const Koa = require('koa');
+
 
 const HTTPError = require('./HTTPError');
 const bootstrap = require('./bootstrap');
@@ -11,6 +13,9 @@ module.exports = async config => {
 	// Start the server
 	const app = new Koa();
 	app.use(bodyParser({ enableTypes: ['json'] }));
+	if(config.server && config.server.cors) {
+		app.use(cors(config.server.cors));
+	}
 	app.use(async ctx => {
 		try {
 			ctx.body = await handleRequest(
@@ -31,5 +36,5 @@ module.exports = async config => {
 			}
 		}
 	});
-	app.listen(config.port || 3000);
+	app.listen(config.server && config.server.port || 3000);
 };
