@@ -37,4 +37,5 @@ module.exports = async config => {
 		}
 	});
 	app.listen(config.server && config.server.port || 3000);
+	return app;
 };

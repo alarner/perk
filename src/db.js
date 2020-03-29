@@ -24,6 +24,9 @@ class Db {
 	isConnected() {
 		return !!this.db;
 	}
+	transaction(callback) {
+		return this.db.transaction(callback);
+	}
 }
 
 module.exports = new Db();

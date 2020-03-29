@@ -4,7 +4,8 @@ module.exports = (table, fns, options = {}) => {
 	const idAttribute = options.idAttribute || 'id';
 
 	const model = {
-		async save(record, returnNew) {
+		async save(record, { returnNew, trx }) {
+			let dbx = trx || db;
 			const keys = Object.keys(record).filter(k => k !== idAttribute);
 			if(!keys.length) {
 				throw new Error('Record has nothing new to save.');
@@ -24,7 +25,7 @@ module.exports = (table, fns, options = {}) => {
 				}
 				params.push(idAttribute);
 				params.push(record[idAttribute]);
-				await db.query(
+				await dbx.query(
 					`update ?? set ${keys.map(k => '?? = ?').join(', ')} where ?? = ?`,
 					params
 				);
@@ -35,7 +36,7 @@ module.exports = (table, fns, options = {}) => {
 					keys.push('created_at');
 				}
 				const params = [table].concat(keys).concat(keys.map(k => record[k])).concat(idAttribute);;
-				const result = await db.query(`
+				const result = await dbx.query(`
 					insert into ?? (${keys.map(k => '??').join(', ')})
 					values (${keys.map(k => '?').join(', ')})
 					returning ??
@@ -43,10 +44,11 @@ module.exports = (table, fns, options = {}) => {
 				id = result.rows[0][idAttribute];
 			}
 			if(returnNew) {
-				return this.fetch({ [idAttribute]: id });
+				return this.fetch({ [idAttribute]: id }, { trx });
 			}
 		},
-		async fetch(record) {
+		async fetch(record, { trx }) {
+			let dbx = trx || db;
 			const keys = Object.keys(record);
 			if(!keys.length) {
 				throw new Error('No filters supplied to fetch.');
@@ -58,7 +60,7 @@ module.exports = (table, fns, options = {}) => {
 					params.push(record[key]);
 				}
 			}
-			const results = await db.query(`
+			const results = await dbx.query(`
 				select * from ?? where
 				${keys.map(k => record[k] === null ? '?? IS NULL' : '?? = ?').join(' and ')}
 				limit 1
