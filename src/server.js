@@ -4,6 +4,7 @@ const Koa = require('koa');
 
 
 const HTTPError = require('./HTTPError');
+const HTTPRedirect = require('./HTTPRedirect');
 const bootstrap = require('./bootstrap');
 
 
@@ -18,12 +19,19 @@ module.exports = async config => {
 	}
 	app.use(async ctx => {
 		try {
-			ctx.body = await handleRequest(
+			const result = await handleRequest(
 				ctx.request.method,
 				ctx.request.url,
 				ctx.request.body,
 				ctx.request.header
 			);
+			if(result instanceof HTTPRedirect) {
+				ctx.status = result.status;
+				ctx.redirect(result.location);
+			}
+			else {
+				ctx.body = result;
+			}
 		}
 		catch(error) {
 			if(error instanceof HTTPError.HTTPError) {
