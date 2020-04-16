@@ -39,6 +39,9 @@ module.exports = async config => {
 				ctx.body = { code: error.message };
 			}
 			else {
+				if(config.server.debug) {
+					console.error(error);
+				}
 				ctx.response.status = 500;
 				ctx.body = { code: 'INTERNAL_SERVER_ERROR' };
 			}
