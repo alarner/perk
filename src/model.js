@@ -4,7 +4,8 @@ module.exports = (table, fns, options = {}) => {
 	const idAttribute = options.idAttribute || 'id';
 
 	const model = {
-		async save(record, { returnNew, trx }) {
+		async save(record, opts={}) {
+			const { returnNew, trx } = opts;
 			let dbx = trx || db;
 			const keys = Object.keys(record).filter(k => k !== idAttribute);
 			if(!keys.length) {
@@ -47,7 +48,8 @@ module.exports = (table, fns, options = {}) => {
 				return this.fetch({ [idAttribute]: id }, { trx });
 			}
 		},
-		async fetch(record, { trx }) {
+		async fetch(record, opts={}) {
+			const { trx } = opts;
 			let dbx = trx || db;
 			const keys = Object.keys(record);
 			if(!keys.length) {
