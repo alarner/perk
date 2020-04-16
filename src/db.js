@@ -25,7 +25,9 @@ class Db {
 		return !!this.db;
 	}
 	transaction(callback) {
-		return this.db.transaction(callback);
+		return this.db.transaction(trx => {
+			callback({ query: trx.raw.bind(trx) });
+		});
 	}
 }
 
