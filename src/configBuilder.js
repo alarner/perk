@@ -14,6 +14,10 @@ module.exports = config => {
 		config.routes.directory = path.join(rootDir, config.routes.directory);
 	}
 
+	if(config.public && config.public.directory && !path.isAbsolute(config.routes.directory)) {
+		config.public.directory = path.join(rootDir, config.public.directory);
+	}
+
 	if(config.database) {
 		if(!config.database.migrations || !config.database.migrations.directory) {
 			throw new Error('config.database.migrations.directory is required');

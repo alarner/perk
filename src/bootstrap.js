@@ -1,4 +1,4 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
@@ -18,7 +18,7 @@ module.exports = async config => {
 	}
 
 	// Load all routes
-	const routePaths = await fs.readdir(config.routes.directory);
+	const routePaths = await fs.promises.readdir(config.routes.directory);
 	const routes = [];
 	for(const routePath of routePaths) {
 		if(routePath.endsWith('.js')) {
@@ -72,6 +72,16 @@ module.exports = async config => {
 				return result;
 			}
 			else {
+				if(config.public && config.public.directory) {
+					let p = path.join(config.public.directory, pathname);
+					if(await fs.promises.access(p, fs.constants.F_OK)) {
+						return fs.createReadStream(p);
+					}
+					p = path.join(p, 'index.html');
+					if(await fs.promises.access(p, fs.constants.F_OK)) {
+						return fs.createReadStream(p);
+					}
+				}
 				throw new HTTPError.NotFound('NOT_FOUND');
 			}
 		},
