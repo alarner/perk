@@ -1,5 +1,9 @@
 const db = require('./db');
 
+const isFunction = functionToCheck => {
+ return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+
 module.exports = (table, fns, options = {}) => {
 	const idAttribute = options.idAttribute || 'id';
 
@@ -69,8 +73,15 @@ module.exports = (table, fns, options = {}) => {
 			`, params);
 
 			return results.rows[0] || null;
-		}
+		},
+		...fns
 	};
 
-	return { ...model, ... fns };
+	for(const key in model) {
+		if(isFunction(model[key])) {
+			model[key] = model[key].bind(model);
+		}
+	}
+
+	return model;
 };
