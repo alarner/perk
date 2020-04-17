@@ -74,6 +74,7 @@ module.exports = async config => {
 			else {
 				throw new HTTPError.NotFound('NOT_FOUND');
 			}
-		}
+		},
+		config
 	}
 };
