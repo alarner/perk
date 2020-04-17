@@ -59,16 +59,29 @@ module.exports = (table, fns, options = {}) => {
 			if(!keys.length) {
 				throw new Error('No filters supplied to fetch.');
 			}
-			const params = [table];
+			let params = [table];
 			for(const key of keys) {
 				params.push(key);
 				if(record[key] !== null) {
-					params.push(record[key]);
+					if(Array.isArray(record[key])) {
+						params = [ ...params, ...record[key] ];
+					}
+					else {
+						params.push(record[key]);
+					}
 				}
 			}
 			const results = await dbx.query(`
 				select * from ?? where
-				${keys.map(k => record[k] === null ? '?? IS NULL' : '?? = ?').join(' and ')}
+				${keys.map(k => {
+					if(record[k] === null) {
+						return '?? IS NULL';
+					}
+					if(Array.isArray(record[k])) {
+						return `?? IN (${record[k].map(() => '?').join(',')})`;
+					}
+					return '?? = ?';
+				}).join(' and ')}
 				limit 1
 			`, params);
 
@@ -76,12 +89,6 @@ module.exports = (table, fns, options = {}) => {
 		},
 		...fns
 	};
-
-	for(const key in model) {
-		if(isFunction(model[key])) {
-			model[key] = model[key].bind(model);
-		}
-	}
 
 	return model;
 };
