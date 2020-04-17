@@ -1,6 +1,8 @@
+const fs = require('fs');
 const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
 const Koa = require('koa');
+const mime = require('mime-types');
 
 
 const HTTPError = require('./HTTPError');
@@ -28,6 +30,10 @@ module.exports = async config => {
 			if(result instanceof HTTPRedirect) {
 				ctx.status = result.status;
 				ctx.redirect(result.location);
+			}
+			else if(result instanceof fs.ReadStream) {
+				ctx.type = mime.contentType(result.path);
+				ctx.body = result;
 			}
 			else {
 				ctx.body = result;

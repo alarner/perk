@@ -73,13 +73,22 @@ module.exports = async config => {
 			}
 			else {
 				if(config.public && config.public.directory) {
-					let p = path.join(config.public.directory, pathname);
-					if(await fs.promises.access(p, fs.constants.F_OK)) {
-						return fs.createReadStream(p);
+					try {
+						let p = path.join(config.public.directory, pathname);
+						let stat = await fs.promises.stat(p);
+						if(!stat.isDirectory()) {
+							return fs.createReadStream(p);
+						}
+						else {
+							p = path.join(p, 'index.html');
+							stat = await fs.promises.stat(p);
+							return fs.createReadStream(p);
+						}
 					}
-					p = path.join(p, 'index.html');
-					if(await fs.promises.access(p, fs.constants.F_OK)) {
-						return fs.createReadStream(p);
+					catch(error) {
+						if(!['ENOENT'].includes(error.code)) {
+							throw error;
+						}
 					}
 				}
 				throw new HTTPError.NotFound('NOT_FOUND');

@@ -24,6 +24,7 @@
     "knex": "^0.20.3",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
+    "mime-types": "^2.1.26",
     "path-to-regexp": "^6.1.0",
     "pg": "^7.14.0"
   },
