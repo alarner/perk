@@ -89,6 +89,28 @@ module.exports = async config => {
 						if(!['ENOENT'].includes(error.code)) {
 							throw error;
 						}
+						else if(config.public.notFound) {
+							try {
+								let p = path.join(config.public.directory, config.public.notFound);
+								let stat = await fs.promises.stat(p);
+								if(!stat.isDirectory()) {
+									return fs.createReadStream(p);
+								}
+								else {
+									p = path.join(p, 'index.html');
+									stat = await fs.promises.stat(p);
+									return fs.createReadStream(p);
+								}
+							}
+							catch(error) {
+								if(!['ENOENT'].includes(error.code)) {
+									throw error;
+								}
+								else {
+									throw new HTTPError.InternalServerError('INVALID_NOT_FOUND_PAGE');
+								}
+							}
+						}
 					}
 				}
 				throw new HTTPError.NotFound('NOT_FOUND');
