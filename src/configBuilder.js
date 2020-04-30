@@ -34,5 +34,13 @@ module.exports = config => {
 			config.database.migrations.stub = path.join(perkSrcDir, 'migrationTemplate.js');
 		}
 	}
+	if(config.server) {
+		if(config.server.keyFilePath && !path.isAbsolute(config.server.keyFilePath)) {
+			config.server.keyFilePath = path.join(rootDir, config.server.keyFilePath);
+		}
+		if(config.server.certFilePath && !path.isAbsolute(config.server.certFilePath)) {
+			config.server.certFilePath = path.join(rootDir, config.server.certFilePath);
+		}
+	}
 	return config;
 };

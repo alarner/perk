@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const https = require('https');
 const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
 const Koa = require('koa');
@@ -54,6 +56,17 @@ module.exports = async config => {
 			}
 		}
 	});
-	app.listen(config.server && config.server.port || 3000);
+	const options = {};
+	let httpOrHttps = http;
+	if(config.server && config.server.keyFilePath && config.server.certFilePath) {
+		const [keyFilePath, certFilePath ] = await Promise.all([
+			fs.promises.readFile(config.server.keyFilePath),
+			fs.promises.readFile(config.server.certFilePath),
+		])
+		options.keyFilePath = keyFilePath;
+		options.certFilePath = certFilePath;
+		httpOrHttps = https;
+	}
+	httpOrHttps.createServer(options, app.callback()).listen(config.server && config.server.port || 3000);
 	return app;
 };
