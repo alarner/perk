@@ -63,8 +63,8 @@ module.exports = async config => {
 			fs.promises.readFile(config.server.keyFilePath),
 			fs.promises.readFile(config.server.certFilePath),
 		])
-		options.keyFilePath = keyFilePath;
-		options.certFilePath = certFilePath;
+		options.key = keyFilePath;
+		options.cert = certFilePath;
 		httpOrHttps = https;
 	}
 	httpOrHttps.createServer(options, app.callback()).listen(config.server && config.server.port || 3000);
