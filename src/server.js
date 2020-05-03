@@ -59,11 +59,9 @@ module.exports = async config => {
 	if(config.server) {
 		const servers = [];
 		if(config.server.http) {
-			console.log('http');
 			servers.push({ server: http, options: {}, port: config.server.http.port });
 		}
 		if(config.server.https) {
-			console.log('https');
 			const s = { server: https, options: {}, port: config.server.https.port };
 			if(config.server.https.keyFilePath && config.server.https.certFilePath) {
 				const [key, cert ] = await Promise.all([
