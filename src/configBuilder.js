@@ -35,11 +35,16 @@ module.exports = config => {
 		}
 	}
 	if(config.server) {
-		if(config.server.keyFilePath && !path.isAbsolute(config.server.keyFilePath)) {
-			config.server.keyFilePath = path.join(rootDir, config.server.keyFilePath);
+		if(config.server.https) {
+			if(config.server.https.keyFilePath && !path.isAbsolute(config.server.https.keyFilePath)) {
+				config.server.https.keyFilePath = path.join(rootDir, config.server.https.keyFilePath);
+			}
+			if(config.server.https.certFilePath && !path.isAbsolute(config.server.https.certFilePath)) {
+				config.server.https.certFilePath = path.join(rootDir, config.server.https.certFilePath);
+			}
 		}
-		if(config.server.certFilePath && !path.isAbsolute(config.server.certFilePath)) {
-			config.server.certFilePath = path.join(rootDir, config.server.certFilePath);
+		if(!config.server.http && !config.server.https) {
+			config.server.http = { port: config.server.port || 3000 };
 		}
 	}
 	return config;

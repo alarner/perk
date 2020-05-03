@@ -56,17 +56,28 @@ module.exports = async config => {
 			}
 		}
 	});
-	const options = {};
-	let httpOrHttps = http;
-	if(config.server && config.server.keyFilePath && config.server.certFilePath) {
-		const [keyFilePath, certFilePath ] = await Promise.all([
-			fs.promises.readFile(config.server.keyFilePath),
-			fs.promises.readFile(config.server.certFilePath),
-		])
-		options.key = keyFilePath;
-		options.cert = certFilePath;
-		httpOrHttps = https;
+	if(config.server) {
+		const servers = [];
+		if(config.server.http) {
+			console.log('http');
+			servers.push({ server: http, options: {}, port: config.server.http.port });
+		}
+		if(config.server.https) {
+			console.log('https');
+			const s = { server: https, options: {}, port: config.server.https.port };
+			if(config.server.https.keyFilePath && config.server.https.certFilePath) {
+				const [key, cert ] = await Promise.all([
+					fs.promises.readFile(config.server.https.keyFilePath),
+					fs.promises.readFile(config.server.https.certFilePath),
+				])
+				s.options.key = key;
+				s.options.cert = cert;
+			}
+			servers.push(s);
+		}
+		for(const s of servers) {
+			s.server.createServer(s.options, app.callback()).listen(s.port);
+		}
 	}
-	httpOrHttps.createServer(options, app.callback()).listen(config.server && config.server.port || 3000);
 	return app;
 };
