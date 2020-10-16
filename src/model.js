@@ -1,93 +1,109 @@
-const db = require('./db');
+const db = require("./db");
 
-const isFunction = functionToCheck => {
- return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
-}
+const isFunction = (functionToCheck) => {
+	return (
+		functionToCheck &&
+		{}.toString.call(functionToCheck) === "[object Function]"
+	);
+};
 
 module.exports = (table, fns, options = {}) => {
-	const idAttribute = options.idAttribute || 'id';
+	const idAttribute = options.idAttribute || "id";
 
 	const model = {
-		async save(record, opts={}) {
+		async save(record, opts = {}) {
 			const { returnNew, trx } = opts;
 			let dbx = trx || db;
-			const keys = Object.keys(record).filter(k => k !== idAttribute);
-			if(!keys.length) {
-				throw new Error('Record has nothing new to save.');
+			const keys = Object.keys(record).filter((k) => k !== idAttribute);
+			if (!keys.length) {
+				throw new Error("Record has nothing new to save.");
 			}
 
 			let id = record[idAttribute];
 
-			if(record[idAttribute] !== undefined) {
-				if(!record.updated_at) {
+			if (record[idAttribute] !== undefined) {
+				if (!record.updated_at) {
 					record.updated_at = new Date();
-					keys.push('updated_at');
+					keys.push("updated_at");
 				}
 				const params = [table];
-				for(const key of keys) {
+				for (const key of keys) {
 					params.push(key);
 					params.push(record[key]);
 				}
 				params.push(idAttribute);
 				params.push(record[idAttribute]);
 				await dbx.query(
-					`update ?? set ${keys.map(k => '?? = ?').join(', ')} where ?? = ?`,
+					`update ?? set ${keys
+						.map((k) => "?? = ?")
+						.join(", ")} where ?? = ?`,
 					params
 				);
-			}
-			else {
-				if(!record.created_at) {
+			} else {
+				if (!record.created_at) {
 					record.created_at = new Date();
-					keys.push('created_at');
+					keys.push("created_at");
 				}
-				const params = [table].concat(keys).concat(keys.map(k => record[k])).concat(idAttribute);;
-				const result = await dbx.query(`
-					insert into ?? (${keys.map(k => '??').join(', ')})
-					values (${keys.map(k => '?').join(', ')})
+				const params = [table]
+					.concat(keys)
+					.concat(keys.map((k) => record[k]))
+					.concat(idAttribute);
+				const result = await dbx.query(
+					`
+					insert into ?? (${keys.map((k) => "??").join(", ")})
+					values (${keys.map((k) => "?").join(", ")})
 					returning ??
-				`, params);
+				`,
+					params
+				);
 				id = result.rows[0][idAttribute];
 			}
-			if(returnNew) {
+			if (returnNew) {
 				return this.fetch({ [idAttribute]: id }, { trx });
 			}
 		},
-		async fetch(record, opts={}) {
+		async fetch(record, opts = {}) {
 			const { trx } = opts;
 			let dbx = trx || db;
 			const keys = Object.keys(record);
-			if(!keys.length) {
-				throw new Error('No filters supplied to fetch.');
+			if (!keys.length) {
+				throw new Error("No filters supplied to fetch.");
 			}
 			let params = [table];
-			for(const key of keys) {
+			for (const key of keys) {
 				params.push(key);
-				if(record[key] !== null) {
-					if(Array.isArray(record[key])) {
-						params = [ ...params, ...record[key] ];
-					}
-					else {
+				if (record[key] !== null) {
+					if (Array.isArray(record[key])) {
+						params = [...params, ...record[key]];
+					} else {
 						params.push(record[key]);
 					}
 				}
 			}
-			const results = await dbx.query(`
+			const results = await dbx.query(
+				`
 				select * from ?? where
-				${keys.map(k => {
-					if(record[k] === null) {
-						return '?? IS NULL';
-					}
-					if(Array.isArray(record[k])) {
-						return `?? IN (${record[k].map(() => '?').join(',')})`;
-					}
-					return '?? = ?';
-				}).join(' and ')}
+				${keys
+					.map((k) => {
+						if (record[k] === null) {
+							return "?? IS NULL";
+						}
+						if (Array.isArray(record[k])) {
+							return `?? IN (${record[k]
+								.map(() => "?")
+								.join(",")})`;
+						}
+						return "?? = ?";
+					})
+					.join(" and ")}
 				limit 1
-			`, params);
+			`,
+				params
+			);
 
 			return results.rows[0] || null;
 		},
-		...fns
+		...fns,
 	};
 
 	return model;

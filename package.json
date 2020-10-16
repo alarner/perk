@@ -2,9 +2,17 @@
   "name": "perk",
   "version": "2.5.2",
   "description": "A well documented set of tools for building node web applications.",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest src",
+    "test:watch": "jest src --watch",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -21,6 +29,7 @@
   "homepage": "https://github.com/alarner/perk#readme",
   "dependencies": {
     "@koa/cors": "^2.2.3",
+    "@types/node": "^14.11.8",
     "knex": "^0.20.3",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
@@ -29,6 +38,13 @@
     "pg": "^7.14.0"
   },
   "devDependencies": {
-    "commander": "^4.0.1"
+    "@types/jest": "^26.0.14",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa__cors": "^3.0.2",
+    "@types/mime-types": "^2.1.0",
+    "jest": "^26.5.3",
+    "prettier": "^2.1.2",
+    "ts-jest": "^26.4.1",
+    "typescript": "^4.0.3"
   }
 }
