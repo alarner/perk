@@ -4,15 +4,16 @@ import { Key } from "path-to-regexp";
 
 export interface ModelOptions_T {
 	idAttribute?: string;
+	updateAttribute?: string;
 }
 
 export interface ModelSaveOptions_T {
 	returnNew?: boolean;
-	transaction?: Transaction;
+	query?: DbQueryFn_T;
 }
 
 export interface ModelFetchOptions_T {
-	transaction?: Transaction;
+	query?: DbQueryFn_T;
 }
 
 export type DbQueryFn_T = (sql: string, params: GenericObject_T) => Raw<any>;

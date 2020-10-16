@@ -1,12 +1,18 @@
 import { db } from "./db";
+import {
+	ModelFetchOptions_T,
+	ModelOptions_T,
+	ModelSaveOptions_T,
+} from "./types";
 
-export const model = (table, fns, options = {}) => {
+export const model = (table, fns, options: ModelOptions_T = {}) => {
 	const idAttribute = options.idAttribute || "id";
+	const updateAttribute = options.updateAttribute || "updated_at";
 
 	const model = {
-		async save(record, opts = {}) {
-			const { returnNew, trx } = opts;
-			let dbx = trx || db;
+		async save(record, opts: ModelSaveOptions_T = {}) {
+			const { returnNew, query } = opts;
+			const dbQuery = query || db.query.bind(db);
 			const keys = Object.keys(record).filter((k) => k !== idAttribute);
 			if (!keys.length) {
 				throw new Error("Record has nothing new to save.");
@@ -15,9 +21,9 @@ export const model = (table, fns, options = {}) => {
 			let id = record[idAttribute];
 
 			if (record[idAttribute] !== undefined) {
-				if (!record.updated_at) {
-					record.updated_at = new Date();
-					keys.push("updated_at");
+				if (!record[updateAttribute]) {
+					record[updateAttribute] = new Date();
+					keys.push(updateAttribute);
 				}
 				const params = [table];
 				for (const key of keys) {
@@ -26,7 +32,7 @@ export const model = (table, fns, options = {}) => {
 				}
 				params.push(idAttribute);
 				params.push(record[idAttribute]);
-				await dbx.query(
+				await dbQuery(
 					`update ?? set ${keys
 						.map((k) => "?? = ?")
 						.join(", ")} where ?? = ?`,
@@ -41,7 +47,7 @@ export const model = (table, fns, options = {}) => {
 					.concat(keys)
 					.concat(keys.map((k) => record[k]))
 					.concat(idAttribute);
-				const result = await dbx.query(
+				const result = await dbQuery(
 					`
 					insert into ?? (${keys.map((k) => "??").join(", ")})
 					values (${keys.map((k) => "?").join(", ")})
@@ -52,12 +58,12 @@ export const model = (table, fns, options = {}) => {
 				id = result.rows[0][idAttribute];
 			}
 			if (returnNew) {
-				return this.fetch({ [idAttribute]: id }, { trx });
+				return this.fetch({ [idAttribute]: id }, { query });
 			}
 		},
-		async fetch(record, opts = {}) {
-			const { trx } = opts;
-			let dbx = trx || db;
+		async fetch(record, opts: ModelFetchOptions_T = {}) {
+			const { query } = opts;
+			const dbQuery = query || db.query.bind(db);
 			const keys = Object.keys(record);
 			if (!keys.length) {
 				throw new Error("No filters supplied to fetch.");
@@ -73,7 +79,7 @@ export const model = (table, fns, options = {}) => {
 					}
 				}
 			}
-			const results = await dbx.query(
+			const results = await dbQuery(
 				`
 				select * from ?? where
 				${keys
