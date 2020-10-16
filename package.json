@@ -20,9 +20,6 @@
   },
   "author": "Aaron Larner",
   "license": "MIT",
-  "bin": {
-    "migrator": "./src/cli/index.js"
-  },
   "bugs": {
     "url": "https://github.com/alarner/perk/issues"
   },
