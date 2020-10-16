@@ -1,16 +1,22 @@
 import { db } from "./db";
 import {
+	GenericObject_T,
 	ModelFetchOptions_T,
+	ModelMethods_T,
 	ModelOptions_T,
 	ModelSaveOptions_T,
 } from "./types";
 
-export const model = (table, fns, options: ModelOptions_T = {}) => {
+export const model = (
+	table: string,
+	fns: ModelMethods_T,
+	options: ModelOptions_T = {}
+) => {
 	const idAttribute = options.idAttribute || "id";
 	const updateAttribute = options.updateAttribute || "updated_at";
 
 	const model = {
-		async save(record, opts: ModelSaveOptions_T = {}) {
+		async save(record: GenericObject_T, opts: ModelSaveOptions_T = {}) {
 			const { returnNew, query } = opts;
 			const dbQuery = query || db.query.bind(db);
 			const keys = Object.keys(record).filter((k) => k !== idAttribute);
@@ -61,7 +67,7 @@ export const model = (table, fns, options: ModelOptions_T = {}) => {
 				return this.fetch({ [idAttribute]: id }, { query });
 			}
 		},
-		async fetch(record, opts: ModelFetchOptions_T = {}) {
+		async fetch(record: GenericObject_T, opts: ModelFetchOptions_T = {}) {
 			const { query } = opts;
 			const dbQuery = query || db.query.bind(db);
 			const keys = Object.keys(record);
