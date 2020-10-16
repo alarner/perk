@@ -41,7 +41,7 @@ export const server = async (config: Config_T) => {
 				ctx.body = result;
 			}
 		} catch (error) {
-			if (error instanceof HTTPError.HTTPError) {
+			if (error instanceof HTTPError.BaseError) {
 				ctx.response.status = error.status;
 				ctx.body = { code: error.message };
 			} else {
