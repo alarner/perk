@@ -1,6 +1,6 @@
 {
   "name": "perk",
-  "version": "2.9.4",
+  "version": "2.9.5",
   "description": "A well documented set of tools for building node web applications.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,7 +8,7 @@
     "test": "jest src",
     "test:watch": "jest src --watch",
     "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
     "version": "npm run format && git add -A src",
