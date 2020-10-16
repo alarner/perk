@@ -1,6 +1,6 @@
 {
   "name": "perk",
-  "version": "2.5.2",
+  "version": "2.6.0",
   "description": "A well documented set of tools for building node web applications.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
