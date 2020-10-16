@@ -1,4 +1,4 @@
-export class HTTPError extends Error {
+export class BaseError extends Error {
 	name: string;
 	status: number;
 	constructor(message: string) {
@@ -12,273 +12,273 @@ export class HTTPError extends Error {
 	}
 }
 
-export class BadRequest extends HTTPError {
+export class BadRequest extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 400;
 	}
 }
 
-export class Unauthorized extends HTTPError {
+export class Unauthorized extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 401;
 	}
 }
 
-export class PaymentRequired extends HTTPError {
+export class PaymentRequired extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 402;
 	}
 }
 
-export class Forbidden extends HTTPError {
+export class Forbidden extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 403;
 	}
 }
 
-export class NotFound extends HTTPError {
+export class NotFound extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 404;
 	}
 }
 
-export class MethodNotAllowed extends HTTPError {
+export class MethodNotAllowed extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 405;
 	}
 }
 
-export class NotAcceptable extends HTTPError {
+export class NotAcceptable extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 406;
 	}
 }
 
-export class ProxyAuthenticationRequired extends HTTPError {
+export class ProxyAuthenticationRequired extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 407;
 	}
 }
 
-export class RequestTimeout extends HTTPError {
+export class RequestTimeout extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 408;
 	}
 }
 
-export class Conflict extends HTTPError {
+export class Conflict extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 409;
 	}
 }
 
-export class Gone extends HTTPError {
+export class Gone extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 410;
 	}
 }
 
-export class LengthRequired extends HTTPError {
+export class LengthRequired extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 411;
 	}
 }
 
-export class PreconditionFailed extends HTTPError {
+export class PreconditionFailed extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 412;
 	}
 }
 
-export class PayloadTooLarge extends HTTPError {
+export class PayloadTooLarge extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 413;
 	}
 }
 
-export class URITooLong extends HTTPError {
+export class URITooLong extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 414;
 	}
 }
 
-export class UnsupportedMediaType extends HTTPError {
+export class UnsupportedMediaType extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 415;
 	}
 }
 
-export class RangeNotSatisfiable extends HTTPError {
+export class RangeNotSatisfiable extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 416;
 	}
 }
 
-export class ExpectationFailed extends HTTPError {
+export class ExpectationFailed extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 417;
 	}
 }
 
-export class MisdirectedRequest extends HTTPError {
+export class MisdirectedRequest extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 421;
 	}
 }
 
-export class UnprocessableEntity extends HTTPError {
+export class UnprocessableEntity extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 422;
 	}
 }
 
-export class Locked extends HTTPError {
+export class Locked extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 423;
 	}
 }
 
-export class FailedDependency extends HTTPError {
+export class FailedDependency extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 424;
 	}
 }
 
-export class TooEarly extends HTTPError {
+export class TooEarly extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 425;
 	}
 }
 
-export class UpgradeRequired extends HTTPError {
+export class UpgradeRequired extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 426;
 	}
 }
 
-export class PreconditionRequired extends HTTPError {
+export class PreconditionRequired extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 428;
 	}
 }
 
-export class TooManyRequests extends HTTPError {
+export class TooManyRequests extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 429;
 	}
 }
 
-export class RequestHeaderFieldsTooLarge extends HTTPError {
+export class RequestHeaderFieldsTooLarge extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 431;
 	}
 }
 
-export class UnavailableForLegalReasons extends HTTPError {
+export class UnavailableForLegalReasons extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 451;
 	}
 }
 
-export class InternalServerError extends HTTPError {
+export class InternalServerError extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 500;
 	}
 }
 
-export class NotImplemented extends HTTPError {
+export class NotImplemented extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 501;
 	}
 }
 
-export class BadGateway extends HTTPError {
+export class BadGateway extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 502;
 	}
 }
 
-export class ServiceUnavailable extends HTTPError {
+export class ServiceUnavailable extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 503;
 	}
 }
 
-export class GatewayTimeout extends HTTPError {
+export class GatewayTimeout extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 504;
 	}
 }
 
-export class HTTPVersionNotSupported extends HTTPError {
+export class HTTPVersionNotSupported extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 505;
 	}
 }
 
-export class VariantAlsoNegotiates extends HTTPError {
+export class VariantAlsoNegotiates extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 506;
 	}
 }
 
-export class InsufficientStorage extends HTTPError {
+export class InsufficientStorage extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 507;
 	}
 }
 
-export class LoopDetected extends HTTPError {
+export class LoopDetected extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 508;
 	}
 }
 
-export class NotExtended extends HTTPError {
+export class NotExtended extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 510;
 	}
 }
 
-export class NetworkAuthenticationRequired extends HTTPError {
+export class NetworkAuthenticationRequired extends BaseError {
 	constructor(message: string) {
 		super(message);
 		this.status = 511;

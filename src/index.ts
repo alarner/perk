@@ -6,12 +6,10 @@ const db = require("./db");
 const configBuilder = require("./configBuilder");
 const bootstrap = require("./bootstrap");
 
-module.exports = {
-	HTTPError,
-	HTTPRedirect,
-	server,
-	model,
-	db,
-	configBuilder,
-	bootstrap,
-};
+export * as HTTPError from "./HTTPError";
+export { HTTPRedirect } from "./HTTPRedirect";
+export { server } from "./server";
+export { model } from "./model";
+export { db } from "./db";
+export { configBuilder } from "./configBuilder";
+export { bootstrap } from "./bootstrap";

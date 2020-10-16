@@ -1,13 +1,6 @@
-const db = require("./db");
+import { db } from "./db";
 
-const isFunction = (functionToCheck) => {
-	return (
-		functionToCheck &&
-		{}.toString.call(functionToCheck) === "[object Function]"
-	);
-};
-
-module.exports = (table, fns, options = {}) => {
+export const model = (table, fns, options = {}) => {
 	const idAttribute = options.idAttribute || "id";
 
 	const model = {
