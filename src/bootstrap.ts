@@ -8,9 +8,19 @@ import { Key, pathToRegexp } from "path-to-regexp";
 import * as HTTPError from "./HTTPError";
 import { db } from "./db";
 import { configBuilder } from "./configBuilder";
-import { Config_T, GenericObject_T, Method_T, RouteMetadata_T } from "./types";
+import {
+	Bootstrap_T,
+	Config_T,
+	Context_T,
+	JSONObject_T,
+	Method_T,
+	RouteMetadata_T,
+	StringValueObject_T,
+} from "./types";
 
-export const bootstrap = async (config: Config_T) => {
+export const bootstrap = async <T extends Context_T>(
+	config: Config_T
+): Promise<Bootstrap_T> => {
 	// Validate config and fix paths
 	config = configBuilder(config);
 
@@ -19,24 +29,55 @@ export const bootstrap = async (config: Config_T) => {
 	}
 
 	// Load all routes
-	const routePaths = await fs.promises.readdir(config.routes.directory);
-	const routes: RouteMetadata_T[] = [];
+	let routePaths: string[] = [];
+	try {
+		routePaths = await fs.promises.readdir(config.routes.directory);
+	} catch (error) {
+		if (error.code === "ENOENT") {
+			throw new Error(
+				`The routes directory does not exist: "${config.routes.directory}"`
+			);
+		}
+		throw error;
+	}
+	if (config.routes.excludeRegex) {
+		const excludeRegex = new RegExp(config.routes.excludeRegex);
+		routePaths = routePaths.filter((path) => {
+			return !path.match(excludeRegex);
+		});
+	}
+
+	const routes: RouteMetadata_T<T>[] = [];
 	for (const routePath of routePaths) {
-		if (routePath.endsWith(".js")) {
+		if (routePath.match("^.+.m?[jt]s")) {
 			const route = routePath.substr(0, routePath.length - 3);
-			const endpoints = require(path.join(
+			// We need to be able to dynamically require the route files
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			let endpoints = require(path.join(
 				config.routes.directory,
 				routePath
 			));
-			for (const key in endpoints) {
+			// If the route uses export we need to pull default property from it
+			if (endpoints.default) {
+				endpoints = endpoints.default;
+			}
+			const middleware = endpoints.middleware || [];
+			const keys = Object.keys(endpoints).filter(
+				(k) => k !== "middleware"
+			);
+			for (const key of keys) {
 				const [method, subPattern] = key.split(" ");
 				if (!["GET", "POST", "PUT", "DELETE"].includes(method)) {
 					throw new Error(
 						`Endpoint "${key}" in route "${routePath}" does not start with a valid request type (GET, POST, PUT or DELETE)`
 					);
 				}
+				const modifiedRoute =
+					route === config.server.index ? "" : route;
 				const pattern =
-					subPattern === "/" ? `/${route}` : `/${route}${subPattern}`;
+					subPattern === "/"
+						? `/${modifiedRoute}`
+						: `/${modifiedRoute}${subPattern}`;
 				const keys: Key[] = [];
 				const regexp = pathToRegexp(pattern, keys);
 				const fns = Array.isArray(endpoints[key])
@@ -48,6 +89,7 @@ export const bootstrap = async (config: Config_T) => {
 					regexp,
 					keys,
 					fns,
+					middleware,
 				});
 			}
 		}
@@ -57,9 +99,9 @@ export const bootstrap = async (config: Config_T) => {
 		async handleRequest(
 			method: Method_T,
 			requestUrl: string,
-			body: GenericObject_T,
-			headers: GenericObject_T
-		) {
+			body: JSONObject_T,
+			headers: StringValueObject_T
+		): Promise<unknown> {
 			const { pathname, query } = url.parse(requestUrl);
 			const parsedQuery = querystring.parse(query);
 			let matchedRoute = null;
@@ -74,7 +116,7 @@ export const bootstrap = async (config: Config_T) => {
 				}
 			}
 			if (match && matchedRoute) {
-				const params: GenericObject_T = {};
+				const params: StringValueObject_T = {};
 				for (let i = 0; i < matchedRoute.keys.length; i++) {
 					params[matchedRoute.keys[i].name] = match[i + 1];
 				}
@@ -86,8 +128,11 @@ export const bootstrap = async (config: Config_T) => {
 				};
 				let result = null;
 
+				for (const fn of matchedRoute.middleware) {
+					result = await fn(context as T);
+				}
 				for (const fn of matchedRoute.fns) {
-					result = await fn(context);
+					result = await fn(context as T);
 				}
 				return result;
 			} else {

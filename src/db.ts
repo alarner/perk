@@ -1,24 +1,35 @@
-import knex, { Config, Raw } from "knex";
-import { DbTransactionCallback_T, GenericObject_T } from "./types";
+import knex, { Config } from "knex";
+import { DbTransactionCallback_T, QueryParams_T, QueryResult_T } from "./types";
 
 class Db {
-	private db: knex<any, unknown[]>;
+	public client: knex<unknown, unknown[]>;
 	constructor() {
-		this.db = null;
+		this.client = null;
 	}
-	public connect(config: Config) {
+	public async connect(config: Config): Promise<void> {
 		if (!this.isConnected()) {
-			this.db = knex(config);
+			this.client = knex(config);
 		}
 	}
-	public query(sql: string, params: GenericObject_T): Raw<any> {
+	public query<T>(
+		sql: string,
+		params?: QueryParams_T
+	): Promise<QueryResult_T<T>> {
 		if (!this.isConnected()) {
 			throw new Error("Cannot query database before we have connected");
 		}
-		return this.db.raw(sql, params);
+		return this.client.raw(sql, params);
 	}
-	private raw(fn: (sql: string, params: GenericObject_T) => Raw<any>) {
-		return (sql: string, params: GenericObject_T): Raw<any> => {
+	private raw(
+		fn: <T>(
+			sql: string,
+			params?: QueryParams_T
+		) => Promise<QueryResult_T<T>>
+	) {
+		return <T>(
+			sql: string,
+			params: QueryParams_T
+		): Promise<QueryResult_T<T>> => {
 			if (!this.isConnected()) {
 				throw new Error(
 					"Cannot query database before we have connected"
@@ -27,20 +38,22 @@ class Db {
 			return fn(sql, params);
 		};
 	}
-	public async disconnect() {
+	public async disconnect(): Promise<void> {
 		if (this.isConnected()) {
-			await this.db.destroy();
-			this.db = null;
+			await this.client.destroy();
+			this.client = null;
 		}
 	}
-	public isConnected() {
-		return !!this.db;
+	public isConnected(): boolean {
+		return !!this.client;
 	}
-	public transaction(callback: DbTransactionCallback_T) {
-		return this.db.transaction((trx) => {
+	public transaction<T>(callback: DbTransactionCallback_T<T>): Promise<T> {
+		return this.client.transaction((trx) => {
 			return callback({ query: this.raw(trx.raw.bind(trx)) });
 		});
 	}
 }
+
+export type Db_T = Db;
 
 export const db = new Db();

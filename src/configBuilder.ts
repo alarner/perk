@@ -1,15 +1,16 @@
 import { Config_T } from "./types";
-const path = require("path");
+import path from "path";
 
-export const configBuilder = (config: Config_T) => {
+export const configBuilder = (config: Config_T): Config_T => {
 	if (!config.routes || !config.routes.directory) {
 		throw new Error("config.routes.directory is required");
 	}
 
-	const rootDir = path.dirname(require.main.filename);
-
 	if (!path.isAbsolute(config.routes.directory)) {
-		config.routes.directory = path.join(rootDir, config.routes.directory);
+		config.routes.directory = path.join(
+			config.rootDirectory,
+			config.routes.directory
+		);
 	}
 
 	if (
@@ -17,7 +18,14 @@ export const configBuilder = (config: Config_T) => {
 		config.public.directory &&
 		!path.isAbsolute(config.routes.directory)
 	) {
-		config.public.directory = path.join(rootDir, config.public.directory);
+		config.public.directory = path.join(
+			config.rootDirectory,
+			config.public.directory
+		);
+	}
+
+	if (config.server && !config.server.index) {
+		config.server.index = "index";
 	}
 	return config;
 };

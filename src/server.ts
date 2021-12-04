@@ -5,15 +5,14 @@ import cors from "@koa/cors";
 import Koa from "koa";
 import mime from "mime-types";
 
-import * as HTTPError from "./HTTPError";
 import { HTTPRedirect } from "./HTTPRedirect";
-import { Config_T, Method_T } from "./types";
+import { Config_T, Context_T, Method_T, Server_T } from "./types";
 import { bootstrap } from "./bootstrap";
 
-export const server = async (config: Config_T) => {
-	const { handleRequest } = await bootstrap(config);
-
-	//
+export const server = async <T extends Context_T>(
+	config: Config_T
+): Promise<Server_T> => {
+	const { handleRequest } = await bootstrap<T>(config);
 
 	// Start the server
 	const app = new Koa();
@@ -41,11 +40,12 @@ export const server = async (config: Config_T) => {
 				ctx.body = result;
 			}
 		} catch (error) {
-			if (error instanceof HTTPError.BaseError) {
+			if (error.isHTTPError) {
 				ctx.response.status = error.status;
 				ctx.body = { code: error.message };
 			} else {
 				if (config.server.debug) {
+					// eslint-disable-next-line no-console
 					console.error(error);
 				}
 				ctx.response.status = 500;

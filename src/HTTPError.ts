@@ -1,6 +1,7 @@
 export class BaseError extends Error {
 	name: string;
 	status: number;
+	public readonly isHTTPError = true;
 	constructor(message: string) {
 		super(message);
 		// Ensure the name of this error is the same as the class name
