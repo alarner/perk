@@ -16,19 +16,14 @@ server({
 	},
 })
 	.then(() => {
-		// eslint-disable-next-line no-console
-		console.log(`Server started on port ${config?.server?.port}`);
+		console.log(`Server started on port 3001`);
 	})
 	.catch((error: Error) => {
-		// eslint-disable-next-line no-console
 		console.error("The server couldn't start up...");
-		// eslint-disable-next-line no-console
 		console.error(error.message);
-		db.disconnect();
 	});
 
 process.once("SIGUSR2", async function () {
-	await db.disconnect();
 	process.kill(process.pid, "SIGUSR2");
 });
 ```

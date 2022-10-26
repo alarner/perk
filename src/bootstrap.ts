@@ -10,14 +10,14 @@ import { configBuilder } from "./configBuilder";
 import {
 	Bootstrap_T,
 	Config_T,
-	Context_T,
+	Context,
 	JSONObject_T,
 	Method_T,
 	RouteMetadata_T,
 	StringValueObject_T,
 } from "./types";
 
-export const bootstrap = async <T extends Context_T>(
+export const bootstrap = async <T extends Context>(
 	config: Config_T
 ): Promise<Bootstrap_T> => {
 	// Validate config and fix paths

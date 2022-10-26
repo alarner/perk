@@ -54,7 +54,7 @@ export interface Config_T {
 
 export type Method_T = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-export interface RouteMetadata_T<T extends Context_T> {
+export interface RouteMetadata_T<T extends Context> {
 	method: Method_T;
 	pattern: string;
 	keys: Key[];
@@ -65,14 +65,14 @@ export interface RouteMetadata_T<T extends Context_T> {
 
 export type ParsedUrlQuery_T = querystring.ParsedUrlQuery;
 
-export interface Context_T {
+export interface Context<B = JSONObject_T> {
 	query: ParsedUrlQuery_T;
 	params: StringValueObject_T;
-	body: JSONObject_T;
+	body: B;
 	headers: StringValueObject_T;
 }
 
-export type RouteHandler_T<T extends Context_T> = (
+export type RouteHandler_T<T extends Context> = (
 	context: T
 ) => Promise<JSONValue_T>;
 

@@ -6,10 +6,10 @@ import Koa from "koa";
 import mime from "mime-types";
 
 import { HTTPRedirect } from "./HTTPRedirect";
-import { Config_T, Context_T, JSONValue_T, Method_T, Server_T } from "./types";
+import { Config_T, Context, JSONValue_T, Method_T, Server_T } from "./types";
 import { bootstrap } from "./bootstrap";
 
-export const server = async <T extends Context_T>(
+export const server = async <T extends Context>(
 	config: Config_T
 ): Promise<Server_T> => {
 	const { handleRequest } = await bootstrap<T>(config);
