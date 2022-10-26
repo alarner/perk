@@ -25,6 +25,7 @@
   "main": "dist/index.js",
   "dependencies": {
     "@koa/cors": "4.0.0",
+    "@larner.dev/perk-response-codes": "1.0.0",
     "@types/node": "18.11.5",
     "koa": "2.13.4",
     "koa-bodyparser": "4.3.0",

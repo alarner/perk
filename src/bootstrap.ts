@@ -2,10 +2,10 @@ import fs from "fs";
 import path from "path";
 import url from "url";
 import querystring from "querystring";
+import { HTTPError } from "@larner.dev/perk-response-codes";
 
 import { Key, pathToRegexp } from "path-to-regexp";
 
-import * as HTTPError from "./HTTPError";
 import { configBuilder } from "./configBuilder";
 import {
 	Bootstrap_T,

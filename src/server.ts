@@ -5,7 +5,7 @@ import cors from "@koa/cors";
 import Koa from "koa";
 import mime from "mime-types";
 
-import { HTTPRedirect } from "./HTTPRedirect";
+import { HTTPRedirect } from "@larner.dev/perk-response-codes";
 import { Config_T, Context, JSONValue_T, Method_T, Server_T } from "./types";
 import { bootstrap } from "./bootstrap";
 
