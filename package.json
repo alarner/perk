@@ -4,7 +4,7 @@
   "version": "2.11.1",
   "author": "Aaron Larner",
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build": "tsup-node src/index.ts --format cjs,esm --dts --clean",
     "dev": "nodemon -x \"tsc --build tsconfig.json\" -w src -e ts,js,json",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint .",
@@ -21,8 +21,8 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "types": "build/index.d.ts",
-  "main": "build/index.js",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
   "dependencies": {
     "@koa/cors": "4.0.0",
     "@types/node": "18.11.5",
