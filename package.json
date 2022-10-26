@@ -4,7 +4,7 @@
   "version": "2.10.0",
   "author": "Aaron Larner",
   "scripts": {
-    "build": "rimraf build && tsc",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "dev": "nodemon -x \"tsc --build tsconfig.json\" -w src -e ts,js,json",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint .",
@@ -13,6 +13,13 @@
     "prepublishOnly": "npm test",
     "test": "jest",
     "version": "npm run format && git add -A src"
+  },
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
   },
   "types": "build/index.d.ts",
   "main": "build/index.js",
@@ -27,8 +34,8 @@
   },
   "devDependencies": {
     "@types/jest": "29.2.0",
-    "@types/koa-bodyparser": "4.3.0",
     "@types/koa__cors": "3.3.0",
+    "@types/koa-bodyparser": "4.3.0",
     "@types/mime-types": "2.1.1",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",
@@ -39,7 +46,7 @@
     "jest": "29.2.2",
     "nodemon": "2.0.20",
     "prettier": "2.7.1",
-    "rimraf": "3.0.2",
+    "tsup": "6.3.0",
     "typescript": "4.8.4"
   },
   "homepage": "https://github.com/alarner/perk#readme",
