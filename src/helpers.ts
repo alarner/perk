@@ -23,6 +23,7 @@ export const bootstrapTests = async (
 				"GET",
 				`${path}?${querystring.stringify(query)}`,
 				{},
+				"",
 				headers
 			);
 			return JSON.parse(JSON.stringify(result));
@@ -32,7 +33,13 @@ export const bootstrapTests = async (
 			body: JSONValue_T = {},
 			headers: StringValueObject_T = {}
 		): Promise<unknown> {
-			const result = await handleRequest("POST", path, body, headers);
+			const result = await handleRequest(
+				"POST",
+				path,
+				body,
+				JSON.stringify(body),
+				headers
+			);
 			return JSON.parse(JSON.stringify(result));
 		},
 		async put(
@@ -40,7 +47,13 @@ export const bootstrapTests = async (
 			body: JSONValue_T = {},
 			headers: StringValueObject_T = {}
 		): Promise<unknown> {
-			const result = await handleRequest("PUT", path, body, headers);
+			const result = await handleRequest(
+				"PUT",
+				path,
+				body,
+				JSON.stringify(body),
+				headers
+			);
 			return JSON.parse(JSON.stringify(result));
 		},
 		async patch(
@@ -48,7 +61,13 @@ export const bootstrapTests = async (
 			body: JSONValue_T = {},
 			headers: StringValueObject_T = {}
 		): Promise<unknown> {
-			const result = await handleRequest("PATCH", path, body, headers);
+			const result = await handleRequest(
+				"PATCH",
+				path,
+				body,
+				JSON.stringify(body),
+				headers
+			);
 			return JSON.parse(JSON.stringify(result));
 		},
 		async delete(
@@ -56,7 +75,13 @@ export const bootstrapTests = async (
 			body: JSONValue_T = {},
 			headers: StringValueObject_T = {}
 		): Promise<unknown> {
-			const result = await handleRequest("DELETE", path, body, headers);
+			const result = await handleRequest(
+				"DELETE",
+				path,
+				body,
+				JSON.stringify(body),
+				headers
+			);
 			return JSON.parse(JSON.stringify(result));
 		},
 	};

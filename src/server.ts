@@ -26,6 +26,7 @@ export const server = async <T extends Context>(
 				ctx.request.method as Method_T,
 				ctx.request.url,
 				ctx.request.body as JSONValue_T,
+				ctx.request.rawBody,
 				ctx.request.header
 			);
 			if (result instanceof HTTPRedirect) {

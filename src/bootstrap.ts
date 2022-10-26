@@ -97,6 +97,7 @@ export const bootstrap = async <T extends Context>(
 			method: Method_T,
 			requestUrl: string,
 			body: JSONObject_T,
+			rawBody: string,
 			headers: StringValueObject_T
 		): Promise<unknown> {
 			const { pathname, query } = url.parse(requestUrl);
@@ -117,10 +118,11 @@ export const bootstrap = async <T extends Context>(
 				for (let i = 0; i < matchedRoute.keys.length; i++) {
 					params[matchedRoute.keys[i].name] = match[i + 1];
 				}
-				const context = {
+				const context: Context = {
 					query: parsedQuery,
 					params,
 					body,
+					rawBody,
 					headers,
 				};
 				let result = null;

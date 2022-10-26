@@ -19,6 +19,7 @@ export interface Bootstrap_T {
 		method: Method_T,
 		requestUrl: string,
 		body: JSONValue_T,
+		rawBody: string,
 		headers: IncomingHttpHeaders
 	) => Promise<unknown>;
 }
@@ -70,6 +71,7 @@ export interface Context<B = JSONObject_T> {
 	params: StringValueObject_T;
 	body: B;
 	headers: StringValueObject_T;
+	rawBody: string;
 }
 
 export type RouteHandler_T<T extends Context> = (
@@ -113,6 +115,7 @@ export interface TestHelpers_T extends TestRequest_T {
 		method: Method_T,
 		requestUrl: string,
 		body: StringValueObject_T,
+		rawBody: string,
 		headers: StringValueObject_T
 	) => Promise<unknown>;
 }
