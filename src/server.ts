@@ -6,7 +6,7 @@ import Koa from "koa";
 import mime from "mime-types";
 
 import { HTTPRedirect } from "./HTTPRedirect";
-import { Config_T, Context_T, Method_T, Server_T } from "./types";
+import { Config_T, Context_T, JSONValue_T, Method_T, Server_T } from "./types";
 import { bootstrap } from "./bootstrap";
 
 export const server = async <T extends Context_T>(
@@ -25,7 +25,7 @@ export const server = async <T extends Context_T>(
 			const result = await handleRequest(
 				ctx.request.method as Method_T,
 				ctx.request.url,
-				ctx.request.body,
+				ctx.request.body as JSONValue_T,
 				ctx.request.header
 			);
 			if (result instanceof HTTPRedirect) {

@@ -6,7 +6,6 @@ import querystring from "querystring";
 import { Key, pathToRegexp } from "path-to-regexp";
 
 import * as HTTPError from "./HTTPError";
-import { db } from "./db";
 import { configBuilder } from "./configBuilder";
 import {
 	Bootstrap_T,
@@ -23,10 +22,6 @@ export const bootstrap = async <T extends Context_T>(
 ): Promise<Bootstrap_T> => {
 	// Validate config and fix paths
 	config = configBuilder(config);
-
-	if (config.database) {
-		db.connect(config.database);
-	}
 
 	// Load all routes
 	let routePaths: string[] = [];
