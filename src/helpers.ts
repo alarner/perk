@@ -43,6 +43,14 @@ export const bootstrapTests = async (
 			const result = await handleRequest("PUT", path, body, headers);
 			return JSON.parse(JSON.stringify(result));
 		},
+		async patch(
+			path: string,
+			body: JSONValue_T = {},
+			headers: StringValueObject_T = {}
+		): Promise<unknown> {
+			const result = await handleRequest("PATCH", path, body, headers);
+			return JSON.parse(JSON.stringify(result));
+		},
 		async delete(
 			path: string,
 			body: JSONValue_T = {},

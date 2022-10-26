@@ -52,7 +52,7 @@ export interface Config_T {
 	};
 }
 
-export type Method_T = "GET" | "POST" | "PUT" | "DELETE";
+export type Method_T = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export interface RouteMetadata_T<T extends Context_T> {
 	method: Method_T;
@@ -92,6 +92,11 @@ export interface TestRequest_T {
 		headers?: StringValueObject_T
 	) => Promise<unknown>;
 	put: (
+		path: string,
+		body?: JSONValue_T,
+		headers?: StringValueObject_T
+	) => Promise<unknown>;
+	patch: (
 		path: string,
 		body?: JSONValue_T,
 		headers?: StringValueObject_T
