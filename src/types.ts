@@ -29,12 +29,6 @@ export interface Server_T {
 	instance: Server;
 }
 
-export interface ModelRecord_T {
-	id: string;
-	created_at: string;
-	updated_at: string;
-}
-
 export interface Config_T {
 	rootDirectory: string;
 	routes: {

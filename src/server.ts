@@ -3,7 +3,7 @@ import path from "path";
 import bodyParser from "koa-bodyparser";
 import cors from "@koa/cors";
 import Koa from "koa";
-import mime from "mime-types";
+import mime from "mime";
 
 import { HTTPRedirect } from "@larner.dev/perk-response-codes";
 import { Config_T, Context, JSONValue_T, Method_T, Server_T } from "./types";
@@ -34,8 +34,7 @@ export const server = async <T extends Context>(
 				ctx.redirect(result.location);
 			} else if (result instanceof fs.ReadStream) {
 				ctx.type =
-					mime.contentType(path.basename(result.path.toString())) ||
-					"";
+					mime.getType(path.basename(result.path.toString())) || "";
 				ctx.body = result;
 			} else {
 				ctx.body = result;

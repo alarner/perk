@@ -2,9 +2,9 @@ import querystring from "querystring";
 import { bootstrap } from "./index";
 import {
 	Config_T,
-	JSONValue_T,
-	StringValueObject_T,
 	TestHelpers_T,
+	StringValueObject_T,
+	JSONValue_T,
 } from "./types";
 
 export const bootstrapTests = async (
