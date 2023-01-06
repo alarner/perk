@@ -1,5 +1,5 @@
 {
-  "name": "@larner.dev/perk",
+  "name": "perk",
   "description": "A well documented set of tools for building node web applications.",
   "version": "2.14.2",
   "author": "Aaron Larner",
