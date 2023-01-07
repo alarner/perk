@@ -1,12 +1,12 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "NodeNext",
 		"esModuleInterop": true,
 		"target": "es6",
 		"noImplicitAny": true,
 		"moduleResolution": "node",
 		"sourceMap": true,
-		"outDir": "build",
+		"outDir": "build/esm",
 		"declaration": true,
 		"baseUrl": ".",
 		"paths": {

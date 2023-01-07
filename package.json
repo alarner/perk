@@ -3,8 +3,11 @@
   "description": "A well documented set of tools for building node web applications.",
   "version": "2.14.3",
   "author": "Aaron Larner",
+  "type": "module",
   "scripts": {
-    "build": "tsup-node src/index.ts --format cjs,esm --dts --clean",
+    "build": "npm run build-cjs && npm run build-esm",
+    "build-cjs": "tsup-node src/index.ts --format cjs --dts --clean --outDir build/cjs",
+    "build-esm": "tsc --build tsconfig.json --clean && tsc --build tsconfig.json",
     "dev": "nodemon -x \"tsc --build tsconfig.json\" -w src -e ts,js,json",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint .",
@@ -16,9 +19,9 @@
   },
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjsindex.js",
+      "types": "./dist/cjs/index.d.ts"
     }
   },
   "types": "dist/index.d.ts",
@@ -29,7 +32,7 @@
     "@types/node": "18.11.5",
     "koa": "2.13.4",
     "koa-bodyparser": "4.3.0",
-    "mime": "3.0.0",
+    "mime-types": "2.1.35",
     "path-to-regexp": "6.2.1",
     "ts-jest": "29.0.3"
   },
@@ -37,6 +40,7 @@
     "@types/jest": "29.2.0",
     "@types/koa__cors": "3.3.0",
     "@types/koa-bodyparser": "4.3.0",
+    "@types/mime-types": "2.1.1",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",
     "eslint": "8.26.0",
